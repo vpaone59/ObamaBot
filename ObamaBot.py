@@ -46,11 +46,6 @@ async def goodmorning(ctx):
     await ctx.send(file=discord.File(r'gifs\whatever-shrug.gif'))
 
 
-@obot.command()
-async def ping(ctx):
-    latency = round(obot.latency*1000, 1)
-    await ctx.send(f"Pong! {latency}")
-
 # @obot.command()
 # # create a timer that sends a message every 2 seconds
 # # tries to run command, if fail it dumps error to discord channel
@@ -70,8 +65,6 @@ async def ping(ctx):
 async def banword(ctx, word):
     if word.lower() in bannedWords:
         await ctx.send("Already banned")
-    elif 'obama' in word.lower():
-        await ctx.send("You can't ban me!")
     else:
         bannedWords.append(word.lower())
 
@@ -99,15 +92,16 @@ async def rmvbannedword(ctx, word):
             f.write(json.dumps(data))
             f.truncate()
 
-        # await ctx.message.delete()
         await ctx.send("Word removed from banned words list")
     else:
-        await ctx.send(f"{word} isn't a banned word")
+        await ctx.send("Word isn't banned")
 
 
 def msg_contain_word(msg, word):
     # return true if there is a banned word in the message
     # but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
+    # \b matches the empty string but only at the beginning or end of the word
+    # https://docs.python.org/3/library/re.html
     return re.search(fr'\b({word})\b', msg) is not None
 
 
@@ -118,20 +112,23 @@ async def on_message(message):
     messageAuthor = message.author
     # cleaned up username without # id
     username = str(message.author).split('#')[0]
-
     user_message = str(message.content)
     channel = str(message.channel.name)
+    # print the message to the terminal
     print(f'{username}: {user_message} ({channel})')
 
     # prevents bot from replying to itself infinitely
     if message.author == obot.user:
         return
+
     # ensures the message sent did not contain a banned word
-    if bannedWords != None:
-        for bannedWord in bannedWords:
-            if msg_contain_word(message.content.lower(), bannedWord):
-                await message.delete()
-                await message.channel.send(f"{messageAuthor.mention} Obama is telling your mother!")
+    if not user_message.lower().startswith('!rmvbannedword'):
+        if bannedWords != None:
+            for bannedWord in bannedWords:
+                if msg_contain_word(message.content.lower(), bannedWord):
+                    await message.delete()
+                    await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
+                    await message.channel.send(f"{messageAuthor.mention} Obama is telling your Mama! Please do not use banned words!")
 
     # .lower() grabs the user message, make the entire message lowercase
     # for easier reading

@@ -46,6 +46,11 @@ async def goodmorning(ctx):
     await ctx.send(file=discord.File(r'gifs\whatever-shrug.gif'))
 
 
+@obot.command()
+async def ping(ctx):
+    latency = round(obot.latency*1000, 1)
+    await ctx.send(f"Pong! {latency}")
+
 # @obot.command()
 # # create a timer that sends a message every 2 seconds
 # # tries to run command, if fail it dumps error to discord channel
@@ -65,6 +70,8 @@ async def goodmorning(ctx):
 async def banword(ctx, word):
     if word.lower() in bannedWords:
         await ctx.send("Already banned")
+    elif 'obama' in word.lower():
+        await ctx.send("You can't ban me!")
     else:
         bannedWords.append(word.lower())
 
@@ -95,7 +102,7 @@ async def rmvbannedword(ctx, word):
         # await ctx.message.delete()
         await ctx.send("Word removed from banned words list")
     else:
-        await ctx.send("Word isn't banned")
+        await ctx.send(f"{word} isn't a banned word")
 
 
 def msg_contain_word(msg, word):
@@ -116,16 +123,15 @@ async def on_message(message):
     channel = str(message.channel.name)
     print(f'{username}: {user_message} ({channel})')
 
+    # prevents bot from replying to itself infinitely
+    if message.author == obot.user:
+        return
     # ensures the message sent did not contain a banned word
     if bannedWords != None:
         for bannedWord in bannedWords:
             if msg_contain_word(message.content.lower(), bannedWord):
                 await message.delete()
                 await message.channel.send(f"{messageAuthor.mention} Obama is telling your mother!")
-
-    # prevents bot from replying to itself infinitely
-    if message.author == obot.user:
-        return
 
     # .lower() grabs the user message, make the entire message lowercase
     # for easier reading

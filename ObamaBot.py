@@ -112,13 +112,14 @@ async def on_message(message):
     messageAuthor = message.author
     # cleaned up username without # id
     username = str(message.author).split('#')[0]
+    user_id = str(message.author.id)
     user_message = str(message.content)
     channel = str(message.channel.name)
     # print the message to the terminal
-    print(f'{username}: {user_message} ({channel})')
+    print(f'{username}: {user_message} userid= {user_id} (channel= {channel})')
 
     # prevents bot from replying to itself infinitely
-    if message.author == obot.user:
+    if message.author == obot.user and message.author.id == obot.user.id:
         return
 
     # ensures the message sent did not contain a banned word
@@ -138,11 +139,22 @@ async def on_message(message):
     elif 'pooping' in user_message.lower():
         await message.channel.send(f'Obama wishes you a lovely poop!')
         return
-    elif 'mud' in user_message.lower():
+    elif 'mud' in user_message.lower() and user_id == '263560070959333376':
         await message.channel.send(f'Obama wishes he could shovel some mud with you!')
         return
     elif user_message.lower() == 'thanks obama':
         await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File(r'gifs\obamacare.jpg'))
+        return
+    elif 'obama' in user_message.lower():
+        # i was bored and wanted to see if i could get the filename too but it doesn't
+        # get the right id or username :((((
+        image = discord.File(r'gifs\obama-wave.jpg')
+        image_name = image.filename
+        await message.channel.send(file=image)
+        print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
+        return
+    elif 'ball' in user_message.lower():
+        await message.channel.send(file=discord.File(r'gifs\obama-basketball.jpg'))
         return
 
     await obot.process_commands(message)

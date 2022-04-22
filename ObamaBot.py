@@ -7,6 +7,11 @@ import re
 #import schedule
 #import time
 
+# Vincent Paone
+# 4/20/2022 --
+# ObamaBot!!!!!
+
+
 # search for the json file and load the file
 if os.path.exists(os.getcwd() + "/config.json"):
     with open("./config.json") as f:
@@ -109,12 +114,16 @@ def msg_contain_word(msg, word):
 # respond to certain instances of messages any user may send
 async def on_message(message):
 
+    # grabs username, user unique id, and the user message
     messageAuthor = message.author
-    # cleaned up username without # id
-    username = str(message.author).split('#')[0]
     user_id = str(message.author.id)
     user_message = str(message.content)
+    # cleaned up username without # id
+    username = str(message.author).split('#')[0]
+
+    # channel name the message was sent from
     channel = str(message.channel.name)
+
     # print the message to the terminal
     print(f'{username}: {user_message} userid= {user_id} (channel= {channel})')
 
@@ -133,6 +142,7 @@ async def on_message(message):
 
     # .lower() grabs the user message, make the entire message lowercase
     # for easier reading
+
     if user_message.lower().startswith('hello'):
         await message.channel.send(f'Hello {messageAuthor.mention}!')
         return
@@ -141,9 +151,11 @@ async def on_message(message):
         return
     elif 'mud' in user_message.lower() and user_id == '263560070959333376':
         await message.channel.send(f'Obama wishes he could shovel some mud with you!')
+
         return
     elif user_message.lower() == 'thanks obama':
         await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File(r'gifs\obamacare.jpg'))
+
         return
     elif 'obama' in user_message.lower():
         # i was bored and wanted to see if i could get the filename too but it doesn't
@@ -152,12 +164,15 @@ async def on_message(message):
         image_name = image.filename
         await message.channel.send(file=image)
         print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
+
         return
     elif 'ball' in user_message.lower():
         await message.channel.send(file=discord.File(r'gifs\obama-basketball.jpg'))
         return
 
     await obot.process_commands(message)
+
+    # have to save the old user info so it can check to ensure the person isn't spamming poor Obama
 
 
 obot.run(TOKEN)

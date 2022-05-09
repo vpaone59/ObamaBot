@@ -1,3 +1,3 @@
-# UPDATE BRANCH - ObamaBot
+# ObamaBot
 
-All first updates to ObamaBot go here first before being added to #main.
+ObamaBot.

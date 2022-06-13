@@ -4,15 +4,12 @@
 # 
 #
 
+from array import array
 from ast import alias
-import discord
+import time, os, re, json, discord, asyncio
+from tokenize import String
 from discord.ext import commands
 from discord.utils import get
-import json
-import os
-import re
-import time
-
 
 # search for the config.json file and load the file
 if os.path.exists(os.getcwd() + "/config.json"):
@@ -26,11 +23,27 @@ else:
     with open(os.getcwd() + "/config.json", "w+") as f:
         json.dump(configTemplate, f) # dump the configTemplate to the new config.json
 
-
 # grab some info from the config file
 TOKEN = configData["TOKEN"]
 bannedWords = configData["bannedWords"]
 prefix = configData["Prefix"]
+
+
+if os.path.exists(os.getcwd() + "/acc.json"):
+    with open("./acc.json") as f:
+        accData = json.load(f)
+
+    # if the acc file doesn't exist use the template to create the file
+else:
+    accTemplate = {"Usernames": [], "Passwords": [], "Account_name": []}
+
+    with open(os.getcwd() + "/acc.json", "w+") as f:
+        json.dump(accTemplate, f) # dump the configTemplate to the new acc.json  
+        
+accUsers = accData["Usernames"]
+accPasses = accData["Passwords"]    
+accNick = accData["Account_name"]
+
 
 # we need to assign the prefix to the bot and denote the bot as 'client'
 # 'client' can be called anything it is just a variable to refer to the bot
@@ -39,9 +52,10 @@ client = commands.Bot(command_prefix=prefix)
 # we need this to check the bot connected properly in the on_ready fxn
 full_ready = False
 
-@client.event
+
 # wait for the bot to FULLY connect to the server
 # once bot connects print message in local terminal
+@client.event
 async def on_ready():
         print('We have logged in as {0.user}'.format(client))
         print(f'[][][] {client} [][][]')
@@ -51,6 +65,87 @@ async def on_ready():
             loadCogs()
         else:
             print('Bot not ready, Cogs not loaded')
+            
+            
+            
+# every time there is a message in any channel in any guild, this runs
+# param: message - The message content that was last sent
+@client.event
+async def on_message(message):
+
+    # grabs username, user unique id, and the user message
+    messageAuthor = message.author
+    user_id = str(message.author.id)
+    user_message = str(message.content)
+
+    # cleaned up username without # id
+    username = str(message.author).split('#')[0]
+
+    # channel name the message was sent from
+    channel = str(message.channel.name)
+    # server name the message was sent from
+    guild = str(message.guild.name)
+
+    
+    # print the message to the terminal
+    # print(f'{username}: {user_message} [userid= {user_id} (channel= {channel})]')
+    print(f'{username}: {user_message} \t(channel= {channel} on server= {guild})')
+    
+    # ignore messages sent from the bot itself
+    # prevents infinite replying
+    if message.author == client.user:
+        return
+
+
+    # ensures the message sent did not contain a banned word
+    # allow the message if it starts with command tag -rmvbannedword
+    if not user_message.lower().startswith("-rmvbannedword"):
+        if bannedWords != None: # ensure the list isn't empty
+            for word in bannedWords:
+                if msg_contain_word(message.content.lower(), word): 
+                    await message.delete()
+                    await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
+                    await message.channel.send(f"{messageAuthor.mention} Obama is telling your Mama! Please do not use banned words!")
+
+    # some hardcoded messages and replies
+    if user_message.lower().startswith('hello'):
+        await message.channel.send(f'Hello {messageAuthor.mention}!')
+        return
+
+    # reply for specific message and user
+    elif 'mud' in user_message.lower() and user_id == '263560070959333376':
+        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
+        return
+
+    elif user_message.lower() == 'thanks obama':
+        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
+        return
+
+    elif user_message.lower() == 'obama':
+        # this is just another way to do the message sending with pictures/gifs
+        image = discord.File('gifs/obama-wave.jpg')
+        image_name = image.filename
+        await message.channel.send(file=image)
+        # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
+        return
+
+    elif user_message.lower().startswith('ball'):
+        await message.channel.send(f'Did someone say...ball?')
+        await message.channel.send(file=discord.File('gifs/obama-basketball.jpg'))
+        return
+
+    elif user_message.lower().startswith('idk'):
+        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
+        return
+
+    elif user_message.lower().startswith('who asked'):
+        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
+        return
+    
+    await client.process_commands(message)
+
+
+
 
 
 # Function to load all Cogs in the cogs folder
@@ -197,90 +292,109 @@ async def rmvbannedword(ctx, word):
     else:
         await ctx.send("Word isn't banned")
 
-
-# every time there is a message in any channel in any guild, this runs
-# param: message - The message content that was last sent
-@client.event
-async def on_message(message):
-
-   
-
-    # grabs username, user unique id, and the user message
-    messageAuthor = message.author
-    user_id = str(message.author.id)
-    user_message = str(message.content)
-
-    # cleaned up username without # id
-    username = str(message.author).split('#')[0]
-
-    # channel name the message was sent from
-    channel = str(message.channel.name)
-    # server name the message was sent from
-    guild = str(message.guild.name)
-
+# save information, username/password/nickname into a json
+# only admin should be able to run this
+# param: ctx The context of which the command is entered
+@client.command(aliases=['new_acc'])
+@commands.has_permissions(administrator=True)
+@commands.cooldown(1, 3, commands.BucketType.user)
+async def saveAccount(ctx):
     
-    # print the message to the terminal
-    # print(f'{username}: {user_message} [userid= {user_id} (channel= {channel})]')
-    print(f'{username}: {user_message} \t(channel= {channel} on server= {guild})')
+    # prompt #1 for username entry
+    await ctx.send(f"Enter in the Username you wish to add {ctx.author.mention}")
+    try:
+        user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
+        username = str(user_message.content)
+    except asyncio.TimeoutError:
+        await ctx.channel.send("```ERROR: Timeout Exception```")
     
-    # ignore messages sent from the bot itself
-    # prevents infinite replying
-    if message.author == client.user:
-        return
-
-
-    # ensures the message sent did not contain a banned word
-    # allow the message if it starts with command tag -rmvbannedword
-    if not user_message.lower().startswith("-rmvbannedword"):
-        if bannedWords != None: # ensure the list isn't empty
-            for word in bannedWords:
-                if msg_contain_word(message.content.lower(), word): 
-                    await message.delete()
-                    await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
-                    await message.channel.send(f"{messageAuthor.mention} Obama is telling your Mama! Please do not use banned words!")
-
-    # some hardcoded messages and replies
-    if user_message.lower().startswith('hello'):
-        await message.channel.send(f'Hello {messageAuthor.mention}!')
-        return
-
-    # reply for specific message and user
-    elif 'mud' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
-        return
-
-    elif user_message.lower() == 'thanks obama':
-        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
-        return
-
-    elif user_message.lower() == 'obama':
-        # this is just another way to do the message sending with pictures/gifs
-        image = discord.File('gifs/obama-wave.jpg')
-        image_name = image.filename
-        await message.channel.send(file=image)
-        # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
-        return
-
-    elif user_message.lower().startswith('ball'):
-        await message.channel.send(f'Did someone say...ball?')
-        await message.channel.send(file=discord.File('gifs/obama-basketball.jpg'))
-        return
-
-    elif user_message.lower().startswith('idk'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
-
-    elif user_message.lower().startswith('who asked'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
+        
+    # prompt #2 for password entry
+    await ctx.send(f"Enter in the Password you wish to add {ctx.author.mention}")
+    try:
+        user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
+        password = str(user_message.content)
+    except asyncio.TimeoutError:
+        await ctx.channel.send("```ERROR: Timeout Exception```")
+        
+            
+    # check if the account info is already in the list
+    if username.lower() in accUsers and password in accPasses:
+        userindex = accUsers.index(username)
+        passindex = accPasses.index(password)
+        
+        if userindex == passindex:
+            await ctx.send(f"```Account info already exists at position indices {userindex} and {passindex}\n It will not be appended.```")
+    else:
+        #add it to the list
+        accUsers.append(username.lower())
+        accPasses.append(password)
+        with open("./acc.json", "r+") as f:
+            data = json.load(f)
+            data["Usernames"] = accUsers
+            data["Passwords"] = accPasses
+            f.seek(0) 
+            f.write(json.dumps(data)) 
+            f.truncate() #resizes file
+               
+    # prompt #3 for nickname entry
+    await ctx.send(f"```Provide a nickname for this entry? Reply Y/N```")
+    user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
+    user_reply = str(user_message.content)
+    
+    if user_reply.lower() == "y":
+        await ctx.send("What would you like to name this entry?")
+        user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
+        nickname = str(user_message.content)
+        
+        if nickname.lower() in accNick:
+            await ctx.send("Nickname already exists in the list, default will be applied")
+            #have them try again, and enter Default for a default nickname to apply
+    else:
+        #if user does not want to apply a nickname a default will be chosen
+        await ctx.send("No nickname chosen. Default will be applied.")
+        nickname = username + '#' + str(accUsers.index(username))
+    
+    accNick.append(nickname)
+    with open("./acc.json", "r+") as f:
+        data = json.load(f)
+        data["Account_name"] = accNick
+        f.seek(0) 
+        f.write(json.dumps(data)) 
+        f.truncate() #resizes file
+    
+    
+    await ctx.send(f"```Added the following account information:\n Username: {username}\n Password: {password}\n Nickname: {nickname}```")
     
     
 
-
+# clear all data from a json file the user chooses
+# only admin should be able to run this
+# param: ctx The context of which the command is entered
+# param: data_file The json file which the user wants wiped of data
+@client.command(aliases = ['clean'])
+@commands.has_permissions(administrator=True)
+# message can only be sent 1 time, every 5 seconds, per user.
+@commands.cooldown(1, 5, commands.BucketType.user)
+async def cleardata(ctx, data_file):
     
+    data_file = "/" + data_file + ".json"
+    print(data_file)
     
-    await client.process_commands(message)
-
-
-
+    if os.path.exists(os.getcwd() + data_file):
+        print("true")
+        with open("." + data_file, "r") as f:
+            data = json.load(f)
+            for o in data:
+                data.pop(o)
+                await ctx.send(f"Removed {o}")
+                print("true")
+            
+            f.seek(0)
+            f.write(json.dumps(data))
+            f.truncate()
+            
+    else:
+        print("false")
+             
 client.run(TOKEN)

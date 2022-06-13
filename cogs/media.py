@@ -1,12 +1,6 @@
-from ast import alias
-import asyncio
-import discord
+import discord, asyncio
 from discord.ext import commands
 from discord.utils import get
-import json
-import os
-import re
-import time
 
 # media commands for ObamaBot
 # Cogs for Obama Bot
@@ -67,8 +61,8 @@ class media(commands.Cog):
     async def thumb(self, ctx):
         await ctx.send('React using 🍆 within 5 seconds')
 
-        # just grabs the author of the reaction and which reaction emoji they used
-        def check(reaction, user):
+        # checks the author of the reaction and which reaction emoji they used
+        def check(user, reaction):
             return user == ctx.message.author and str(reaction.emoji) == '🍆'
          
         # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji

@@ -11,12 +11,12 @@ from tokenize import String
 from discord.ext import commands
 from discord.utils import get
 
-# search for the config.json file and load the file
+# search for the config.json file in the current directory and load the file
 if os.path.exists(os.getcwd() + "/config.json"):
     with open("./config.json") as f:
         configData = json.load(f)
 
-# if the config file doesn't exist use the template to create the file
+# if the config file doesn't exist within the current directory, use the template to create the file automatically
 else:
     configTemplate = {"Token": "", "Prefix": "", "bannedWords": []}
 
@@ -28,7 +28,7 @@ TOKEN = configData["TOKEN"]
 bannedWords = configData["bannedWords"]
 prefix = configData["Prefix"]
 
-
+# search for the acc.json file in the current directory and load the file
 if os.path.exists(os.getcwd() + "/acc.json"):
     with open("./acc.json") as f:
         accData = json.load(f)
@@ -38,8 +38,9 @@ else:
     accTemplate = {"Usernames": [], "Passwords": [], "Account_name": []}
 
     with open(os.getcwd() + "/acc.json", "w+") as f:
-        json.dump(accTemplate, f) # dump the configTemplate to the new acc.json  
+        json.dump(accTemplate, f) # dump the accTemplate to the new acc.json  
         
+# grab some info from the acc file
 accUsers = accData["Usernames"]
 accPasses = accData["Passwords"]    
 accNick = accData["Account_name"]
@@ -52,21 +53,19 @@ client = commands.Bot(command_prefix=prefix)
 # we need this to check the bot connected properly in the on_ready fxn
 full_ready = False
 
-
 # wait for the bot to FULLY connect to the server
 # once bot connects print message in local terminal
 @client.event
 async def on_ready():
-        print('We have logged in as {0.user}'.format(client))
-        print(f'[][][] {client} [][][]')
-        full_ready = True
+    print('$$$$$ We have logged in as {0.user} $$$$$'.format(client))
+    print(f'$$$$$ {client} $$$$$')
+    full_ready = True
 
-        if full_ready == True:
-            loadCogs()
-        else:
-            print('Bot not ready, Cogs not loaded')
-            
-            
+    if full_ready == True:
+        print('$$$$$ Loading Cogs...standby $$$$$')
+        loadCogs()
+    else:
+        print('$$$$$ Bot not ready, Cogs not loaded $$$$$')
             
 # every time there is a message in any channel in any guild, this runs
 # param: message - The message content that was last sent
@@ -87,7 +86,8 @@ async def on_message(message):
     guild = str(message.guild.name)
 
     
-    # print the message to the terminal
+    # on every message print it to the terminal
+    # print the username, the message, the channel it was sent in and the server (guild)
     # print(f'{username}: {user_message} [userid= {user_id} (channel= {channel})]')
     print(f'{username}: {user_message} \t(channel= {channel} on server= {guild})')
     
@@ -104,51 +104,58 @@ async def on_message(message):
             for word in bannedWords:
                 if msg_contain_word(message.content.lower(), word): 
                     await message.delete()
-                    await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
-                    await message.channel.send(f"{messageAuthor.mention} Obama is telling your Mama! Please do not use banned words!")
+                    await message.channel.send(f"```{messageAuthor.mention} You used a banned word therefore your message was removed.```")
+                    await message.channel.send(f"```{messageAuthor.mention} Obama is telling your Mama! Please do not use banned words!```")
 
-    # some hardcoded messages and replies
+    # if message starts with 'hello'
     if user_message.lower().startswith('hello'):
         await message.channel.send(f'Hello {messageAuthor.mention}!')
         return
 
-    # reply for specific message and user
+    # if the word 'mud' is in any message the specific user sends
     elif 'mud' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
+        await message.channel.send(f'```Thank you for keeping the planet clean! {messageAuthor.mention}```')
         return
 
+    # if the message is exactly 'thanks obama'
     elif user_message.lower() == 'thanks obama':
-        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
+        await message.channel.send(f'```You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg```'))
         return
 
+    # if the message is exactly 'obama'
     elif user_message.lower() == 'obama':
         # this is just another way to do the message sending with pictures/gifs
-        image = discord.File('gifs/obama-wave.jpg')
+        image = discord.File('```gifs/obama-wave.jpg```')
         image_name = image.filename
         await message.channel.send(file=image)
         # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
         return
 
+    # if the message starts with the word 'ball'
     elif user_message.lower().startswith('ball'):
-        await message.channel.send(f'Did someone say...ball?')
-        await message.channel.send(file=discord.File('gifs/obama-basketball.jpg'))
+        await message.channel.send(f'```Did someone say...ball?```')
+        await message.channel.send(file=discord.File('```gifs/obama-basketball.jpg```'))
         return
 
+    # if the message starts with the string 'idk'
     elif user_message.lower().startswith('idk'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
+        await message.channel.send(file=discord.File('```gifs/obama-shrug.gif```'))
         return
 
+    # if the message starts with the words 'who asked'
     elif user_message.lower().startswith('who asked'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
+        await message.channel.send(file=discord.File('```gifs/obama-shrug.gif```'))
         return
     
+    # if the message starts with 'horny'
+    elif user_message.lower().startswith('horny'):
+        await message.channel.send(file=discord.File('```gifs/obama-lip_bite.jpg```'))
+        return
+    
+    # necessary to process anything the bot will do
     await client.process_commands(message)
 
-
-
-
-
-# Function to load all Cogs in the cogs folder
+# Function to load all Cogs that live in the cogs folder
 # Ran on Bot startup
 def loadCogs():
     for filename in os.listdir('./cogs'):
@@ -190,11 +197,11 @@ def msg_contain_word(msg, word):
 async def load(ctx, extension):
     try:
         client.load_extension(f'cogs.{extension}')
-        await ctx.send(f'Cog {extension}.py loaded')
+        await ctx.send(f'```Cog {extension}.py loaded```')
     except commands.ExtensionAlreadyLoaded:
-        await ctx.send(f'{extension}.py is already loaded')
+        await ctx.send(f'```{extension}.py is already loaded```')
     except commands.ExtensionNotFound:
-        await ctx.send(f'{extension}.py does not exist')
+        await ctx.send(f'```{extension}.py does not exist```')
 
 
 # Unload a Cog file
@@ -207,11 +214,11 @@ async def load(ctx, extension):
 async def unload(ctx, extension):
     try:
         client.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'Cog {extension}.py unloaded')
+        await ctx.send(f'```Cog {extension}.py unloaded```')
     except commands.ExtensionNotLoaded:
-        await ctx.send(f'{extension}.py is not loaded')
+        await ctx.send(f'```{extension}.py is not loaded```')
     except commands.ExtensionNotFound:
-        await ctx.send(f'{extension}.py does not exist')
+        await ctx.send(f'```{extension}.py does not exist```')
 
 
 # does unload then load of cog file
@@ -231,15 +238,15 @@ async def refreshload(ctx, extension):
     else:
         try:
             client.unload_extension(f'cogs.{extension}')
-            await ctx.send(f'Cog {extension}.py unloaded')
+            await ctx.send(f'```Cog {extension}.py unloaded```')
             time.sleep(2)
             client.load_extension(f'cogs.{extension}')
-            await ctx.send(f'Cog {extension}.py loaded')
+            await ctx.send(f'```Cog {extension}.py loaded```')
         except commands.ExtensionNotLoaded:
             client.load_extension(f'cogs.{extension}')
-            await ctx.send(f'Cog {extension}.py loaded')
+            await ctx.send(f'```Cog {extension}.py loaded```')
         except commands.ExtensionNotFound:
-            await ctx.send(f'Cog {extension}.py not in directory')
+            await ctx.send(f'```Cog {extension}.py not in directory```')
         
 
 # add a banned word to the bannedWords list in the json config
@@ -253,7 +260,7 @@ async def refreshload(ctx, extension):
 async def banword(ctx, word):
     #check if the word is already banned
     if word.lower() in bannedWords:
-        await ctx.send("Already banned")
+        await ctx.send("```Already banned```")
     else:
         bannedWords.append(word.lower())
         #add it to the list
@@ -264,7 +271,7 @@ async def banword(ctx, word):
             f.write(json.dumps(data)) 
             f.truncate() #resizes file
 
-        await ctx.send("Word added to banned words list")
+        await ctx.send("```Word added to banned words list```")
 
 
 # remove a banned word from the bannedWords list in the json config
@@ -286,11 +293,11 @@ async def rmvbannedword(ctx, word):
             f.write(json.dumps(data))
             f.truncate()
 
-        await ctx.send("Word removed from banned words list")
+        await ctx.send("```Word removed from banned words list```")
 
     #if the word isn't in the list    
     else:
-        await ctx.send("Word isn't banned")
+        await ctx.send("```Word isn't banned```")
 
 # save information, username/password/nickname into a json
 # only admin should be able to run this
@@ -352,7 +359,7 @@ async def saveAccount(ctx):
             #have them try again, and enter Default for a default nickname to apply
     else:
         #if user does not want to apply a nickname a default will be chosen
-        await ctx.send("No nickname chosen. Default will be applied.")
+        await ctx.send("```No nickname chosen. Default will be applied.```")
         nickname = username + '#' + str(accUsers.index(username))
     
     accNick.append(nickname)

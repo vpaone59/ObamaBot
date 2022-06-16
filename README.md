@@ -1,3 +1,2 @@
 # ObamaBot
-
 ObamaBot.

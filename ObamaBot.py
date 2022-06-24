@@ -1,8 +1,8 @@
 # Vincent Paone
-# 4/20/2022 --
+# Project began 4/20/2022 --
 # ObamaBot - main file
-# 
-#
+#  
+# There is no serious political offiliation. This is all in good fun.
 
 from array import array
 from ast import alias
@@ -114,7 +114,7 @@ async def on_message(message):
 
     # if the word 'mud' is in any message the specific user sends
     elif 'mud' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'```Thank you for keeping the planet clean! {messageAuthor.mention}```')
+        await message.channel.send(f'```Thank you for keeping the planet clean! {str(messageAuthor.mention)}```')
         return
 
     # if the message is exactly 'thanks obama'
@@ -125,7 +125,7 @@ async def on_message(message):
     # if the message is exactly 'obama'
     elif user_message.lower() == 'obama':
         # this is just another way to do the message sending with pictures/gifs
-        image = discord.File('```gifs/obama-wave.jpg```')
+        image = discord.File('gifs/obama-wave.jpg')
         image_name = image.filename
         await message.channel.send(file=image)
         # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
@@ -134,22 +134,22 @@ async def on_message(message):
     # if the message starts with the word 'ball'
     elif user_message.lower().startswith('ball'):
         await message.channel.send(f'```Did someone say...ball?```')
-        await message.channel.send(file=discord.File('```gifs/obama-basketball.jpg```'))
+        await message.channel.send(file=discord.File('gifs/obama-basketball.jpg'))
         return
 
     # if the message starts with the string 'idk'
     elif user_message.lower().startswith('idk'):
-        await message.channel.send(file=discord.File('```gifs/obama-shrug.gif```'))
+        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
         return
 
     # if the message starts with the words 'who asked'
     elif user_message.lower().startswith('who asked'):
-        await message.channel.send(file=discord.File('```gifs/obama-shrug.gif```'))
+        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
         return
     
     # if the message starts with 'horny'
     elif user_message.lower().startswith('horny'):
-        await message.channel.send(file=discord.File('```gifs/obama-lip_bite.jpg```'))
+        await message.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
         return
     
     # necessary to process anything the bot will do
@@ -214,11 +214,11 @@ async def load(ctx, extension):
 async def unload(ctx, extension):
     try:
         client.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'```Cog {extension}.py unloaded```')
+        await ctx.send(f'Cog {extension}.py unloaded')
     except commands.ExtensionNotLoaded:
-        await ctx.send(f'```{extension}.py is not loaded```')
+        await ctx.send(f'{extension}.py is not loaded')
     except commands.ExtensionNotFound:
-        await ctx.send(f'```{extension}.py does not exist```')
+        await ctx.send(f'{extension}.py does not exist')
 
 
 # does unload then load of cog file
@@ -233,8 +233,10 @@ async def refreshload(ctx, extension):
     
     if extension == 'all':
         unloadCogs()
+        await ctx.send(f'``` All Cogs unloaded successfully```')
         time.sleep(2)
         loadCogs()    
+        await ctx.send(f'``` All Cogs loaded successfully```')
     else:
         try:
             client.unload_extension(f'cogs.{extension}')

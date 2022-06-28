@@ -46,6 +46,16 @@ class general(commands.Cog):
             time.sleep(1)
             await ctx.send('Get a load of this guy!')
 
+    # list the roles of the user
+    @commands.command(aliases=['ia'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def isAmerican(self, ctx, user: discord.Member):
+        role = discord.utils.find(lambda r: r.name == 'American', ctx.message.guild.roles)
+        if role in user.roles:
+            await ctx.send(f"User {user.mention} is a PATRIOT!!")   
+        else:
+            await ctx.send(f"User {user.mention} is NOT A TRUE CHRISTIAN AMERICAN!!")
+        
 
     # @commands.command(aliases=['makerole'])
     # @commands.cooldown(1, 3, commands.BucketType.user)

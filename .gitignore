@@ -1,2 +1,5 @@
+# config files and data files
+.json
 
-config.json
+# unimportant old Cogs file
+obogs2.py

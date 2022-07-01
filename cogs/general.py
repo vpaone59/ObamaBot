@@ -46,7 +46,8 @@ class general(commands.Cog):
             time.sleep(1)
             await ctx.send('Get a load of this guy!')
 
-    # list the roles of the user
+    # check if the user has the American role
+    # param: @user. ex, -ia @user
     @commands.command(aliases=['ia'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def isAmerican(self, ctx, user: discord.Member):

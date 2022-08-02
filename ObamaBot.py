@@ -21,11 +21,15 @@ from discord.utils import get
 # *****************************************************************************
 # ************ INITIAL SETUP --- YOU SHOULD NOT TOUCH THIS SECTION ************
 # *****************************************************************************
-print(f"*********** STARTING OBAMABOT IN " + os.getcwd() + " ***********")
 
-if os.path.exists(os.getcwd() + "/ObamaBot/config.json"):
+# set the current working directory, this is ESSENTIAL to the bot's functionality
+current_dir = os.getcwd()
+print(current_dir)
+print(f"*********** STARTING OBAMABOT IN " + current_dir + " ***********")
+
+if os.path.exists(current_dir + "/config.json"):
     print("***** config path exists *****")
-    with open(os.getcwd() + "/ObamaBot/config.json") as f:
+    with open(current_dir + "/config.json") as f:
         print("***** opened config *****")
         configData = json.load(f)
 
@@ -33,7 +37,7 @@ if os.path.exists(os.getcwd() + "/ObamaBot/config.json"):
 else:
     print("***** config path DOES NOT exist *****")
     configTemplate = {"Token": "", "Prefix": "", "bannedWords": []}
-    with open(os.getcwd() + "/ObamaBot/config.json", "w+") as f:
+    with open(current_dir + "/config.json", "w+") as f:
         print("***** new config being created using template *****")
         # dump the configTemplate to the new config.json
         json.dump(configTemplate, f)
@@ -47,9 +51,9 @@ prefix = configData["Prefix"]
 
 
 # search for the acc.json file in the current directory and load the file
-if os.path.exists(os.getcwd() + "/ObamaBot/acc.json"):
+if os.path.exists(current_dir + "/acc.json"):
     print("***** acc path exists *****")
-    with open(os.getcwd() + "/ObamaBot/acc.json") as f:
+    with open(current_dir + "/acc.json") as f:
         print("***** opened acc *****")
         accData = json.load(f)
 
@@ -57,7 +61,7 @@ if os.path.exists(os.getcwd() + "/ObamaBot/acc.json"):
 else:
     print("***** acc path DOES NOT exist *****")
     accTemplate = {"Usernames": [], "Passwords": [], "Account_name": []}
-    with open(os.getcwd() + "/ObamaBot/acc.json", "w+") as f:
+    with open(current_dir + "/acc.json", "w+") as f:
         print("***** new acc being created using template *****")
         # dump the accTemplate to the new acc.json
         json.dump(accTemplate, f)
@@ -188,7 +192,7 @@ async def on_message(message):
 # Function to load all Cogs that live in the cogs folder
 # Ran on Bot startup
 def loadCogs():
-    for filename in os.listdir(os.getcwd() + '/ObamaBot/cogs'):
+    for filename in os.listdir(current_dir + '/cogs'):
         if filename.endswith('.py'):
             try:
                 # -3 cuts the .py extension from filename
@@ -201,7 +205,7 @@ def loadCogs():
 # Function to unload all Cogs in the cogs folder
 # Runs on -rl all
 def unloadCogs():
-    for filename in os.listdir(os.getcwd() + '/ObamaBot/cogs'):
+    for filename in os.listdir(current_dir + '/cogs'):
         if filename.endswith('.py'):
             try:
                 client.unload_extension(f'cogs.{filename[:-3]}')
@@ -418,7 +422,7 @@ async def cleardata(ctx, data_file):
     data_file = "/" + data_file + ".json"
     print(data_file)
 
-    if os.path.exists(os.getcwd() + data_file):
+    if os.path.exists(current_dir + data_file):
         print("true")
         with open("." + data_file, "r") as f:
             data = json.load(f)

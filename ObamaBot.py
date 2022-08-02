@@ -4,20 +4,23 @@
 #
 # There is no serious political offiliation. This is all in good fun.
 
-from array import array
-from ast import alias
 import time
 import os
 import re
 import json
 import discord
 import asyncio
+import requests
+from array import array
+from ast import alias
+from bs4 import BeautifulSoup
 from tokenize import String
 from discord.ext import commands
 from discord.utils import get
 
-
+# *****************************************************************************
 # ************ INITIAL SETUP --- YOU SHOULD NOT TOUCH THIS SECTION ************
+# *****************************************************************************
 print(f"*********** STARTING OBAMABOT IN " + os.getcwd() + " ***********")
 
 if os.path.exists(os.getcwd() + "/ObamaBot/config.json"):
@@ -72,8 +75,9 @@ client = commands.Bot(command_prefix=prefix)
 
 # we need this to check the bot connected properly in the on_ready fxn
 full_ready = False
-
+# *****************************************************************************
 # ************ INITIAL SETUP --- YOU SHOULD NOT TOUCH THIS SECTION ************
+# *****************************************************************************
 
 
 # wait for the bot to FULLY connect to the server
@@ -144,7 +148,7 @@ async def on_message(message):
 
     # if the message is exactly 'thanks obama'
     elif user_message.lower() == 'thanks obama':
-        await message.channel.send(f'```You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg```'))
+        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
         return
 
     # if the message is exactly 'obama'

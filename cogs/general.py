@@ -28,7 +28,7 @@ class general(commands.Cog):
     # use -hello0 or -hiall
     @commands.command(aliases=['hiall'])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def helloO(self, ctx):
+    async def hello2(self, ctx):
         await ctx.send(f'Hello {ctx.message.guild.default_role}')
 
     # ping command - Bot replies with the current latency
@@ -55,7 +55,7 @@ class general(commands.Cog):
     # calculate Fibonacci sequence
     # param: num - the number sequence to calculate
 
-    @commands.command()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def fib(self, ctx, num):
         # message input comes in as a string, so we cast to int
         n = int(num)

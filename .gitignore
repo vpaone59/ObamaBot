@@ -2,8 +2,5 @@
 # config files and data files
 .json
 
-# random old Cogs file
-obogs2.py
-
 # OS files
 .DS_Store

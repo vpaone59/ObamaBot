@@ -1,11 +1,9 @@
-import discord, asyncio
+import discord
+import asyncio
 from discord.ext import commands
 from discord.utils import get
 
-# media commands for ObamaBot
-# Cogs for Obama Bot
-# Cogs are a way to hide standard commands, events, functions etc 
-# in another .py file
+# Media Cogs for Obama Bot
 
 
 class media(commands.Cog):
@@ -45,9 +43,9 @@ class media(commands.Cog):
         await ctx.send(f'Goodnight and God Bless!')
         await ctx.send(file=discord.File('gifs/obama-sleep.jpeg'))
 
-
     # there is a message reply for this as well
     # do -ball or -b
+
     @commands.command(aliases=['b'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def ball(self, ctx):
@@ -64,7 +62,7 @@ class media(commands.Cog):
         # checks the author of the reaction and which reaction emoji they used
         def check(user, reaction):
             return user == ctx.message.author and str(reaction.emoji) == '🍆'
-         
+
         # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
         try:
             reaction, user = await self.client.wait_for('reaction_add', timeout=5.0, check=check)
@@ -73,12 +71,10 @@ class media(commands.Cog):
         else:
             await ctx.channel.send('Obama approves')
 
-
-    @commands.command(aliases=['monkey'])
+    @commands.command(aliases=['monkey', 'm'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def monkey_falling(self, ctx):
         await ctx.send(file=discord.File('gifs/monkey-fall.gif'))
-
 
 
 def setup(client):

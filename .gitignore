@@ -4,3 +4,7 @@
 
 # OS files
 .DS_Store
+*.txt
+genius/geniustest.py
+genius/test.json
+gifs/.DS_Store

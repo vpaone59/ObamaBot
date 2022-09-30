@@ -18,14 +18,10 @@ from tokenize import String
 from discord.ext import commands
 from discord.utils import get
 
-# *****************************************************************************
-# ************ INITIAL SETUP --- YOU SHOULD NOT TOUCH THIS SECTION ************
-# *****************************************************************************
-
 # set the current working directory, this is ESSENTIAL to the bot's functionality
 current_dir = os.getcwd()
 print(current_dir)
-print(f"*********** STARTING OBAMABOT IN " + current_dir + " ***********")
+print(f"*********** STARTING IN {current_dir} ***********")
 
 if os.path.exists(current_dir + "/config.json"):
     print("***** config path exists *****")
@@ -79,9 +75,6 @@ client = commands.Bot(command_prefix=prefix)
 
 # we need this to check the bot connected properly in the on_ready fxn
 full_ready = False
-# *****************************************************************************
-# ************ INITIAL SETUP --- YOU SHOULD NOT TOUCH THIS SECTION ************
-# *****************************************************************************
 
 
 # wait for the bot to FULLY connect to the server
@@ -119,7 +112,7 @@ async def on_message(message):
     # server name the message was sent from
     guild = str(message.guild.name)
 
-    # on every message **** IN LOGS CHANNEL **** print it to the terminal
+    # on every message **** in the logs channel **** print it to the terminal
     # print the username, the message, the channel it was sent in and the server (guild)
     # print(f'{username}: {user_message} [userid= {user_id} (channel= {channel})]')
     if channel == 'logs':
@@ -128,6 +121,12 @@ async def on_message(message):
     # ignore messages sent from the bot itself
     # prevents infinite replying
     if message.author == client.user:
+        return
+
+    # ignore messages sent from other bots
+    # prevents infinite replying
+    if message.author.bot:
+        print(f'last message from bot, returning')
         return
 
     # ensures the message sent did not contain a banned word
@@ -145,13 +144,16 @@ async def on_message(message):
         await message.channel.send(f'Hello {messageAuthor.mention}!')
         return
 
+    # vinny id 149356710455279617
+    # renji id 263560070959333376
+    # TO GET IDS RIGHT CLICK A USER'S NAME IN DISCORD AND SELECT COPY ID
     # if the word 'mud' is in any message the specific user sends
-    elif 'mud' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'```Thank you for keeping the planet clean! {str(messageAuthor.mention)}```')
+    elif 'poop' in user_message.lower() and user_id == '263560070959333376':
+        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
         return
 
-    # if the message is exactly 'thanks obama'
-    elif user_message.lower() == 'thanks obama':
+    # if 'thanks obama' is in the message
+    elif 'thanks obama' in user_message.lower():
         await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
         return
 
@@ -164,10 +166,9 @@ async def on_message(message):
         # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
         return
 
-    # if the message starts with the word 'ball'
-    elif user_message.lower().startswith('ball'):
-        await message.channel.send(f'```Did someone say...ball?```')
-        await message.channel.send(file=discord.File('gifs/obama-basketball.jpg'))
+    # if 'ball' is in the message
+    elif 'ball' in user_message.lower():
+        await message.channel.send(f'```Did someone say...ball?```', file=discord.File('gifs/obama-basketball.jpg'))
         return
 
     # if the message starts with the string 'idk'
@@ -180,13 +181,21 @@ async def on_message(message):
         await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
         return
 
-    # if the message starts with 'horny'
-    elif user_message.lower().startswith('horny'):
+    # if the word 'horny' is in the message
+    elif 'horny' in user_message.lower():
         await message.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
         return
 
-    # necessary to process anything the bot will do
+    # necessary to process the bot's message
     await client.process_commands(message)
+
+
+# return true if there is a banned word in the message
+# but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
+# \b matches the empty string but only at the beginning or end of the word
+# https://docs.python.org/3/library/re.html
+def msg_contain_word(msg, word):
+    return re.search(fr'\b({word})\b', msg) is not None
 
 
 # Function to load all Cogs that live in the cogs folder
@@ -212,14 +221,6 @@ def unloadCogs():
                 print(f'----- Cog {filename} unloaded successfully -----')
             except commands.ExtensionNotLoaded:
                 print(f'----- Cog {filename} is not loaded -----')
-
-
-# return true if there is a banned word in the message
-# but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
-# \b matches the empty string but only at the beginning or end of the word
-# https://docs.python.org/3/library/re.html
-def msg_contain_word(msg, word):
-    return re.search(fr'\b({word})\b', msg) is not None
 
 
 # Load a Cog file

@@ -2,6 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 from discord.utils import get
+import re
 
 # Media Cogs for Obama Bot
 
@@ -75,6 +76,18 @@ class media(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def monkey_falling(self, ctx):
         await ctx.send(file=discord.File('gifs/monkey-fall.gif'))
+
+    @commands.Cog.listener("on_message")
+    async def obama_pog(self, message):
+        if message.author == self.client.user or message.author.bot:
+            return
+        x = message.content
+        y = re.search(fr"[p|P][e,u,o,a,x,E,U,O,A,X]+[g|G]", x)
+        z = re.search(r"<:.*(p|P).*(g|G).*:.*>", x)
+        if y is not None:
+            await message.channel.send("<:obamapog:1040355321102749819>")
+        elif z is not None:
+            await message.channel.send(f"<:obamapog:1040355321102749819>")
 
 
 def setup(client):

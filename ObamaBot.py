@@ -46,8 +46,6 @@ else:
 TOKEN = configData["TOKEN"]
 bannedWords = configData["bannedWords"]
 prefix = configData["Prefix"]
-# search for the config.json file in the current directory and load the file
-
 
 # we need to assign the prefix to the bot and denote the bot as 'client'
 # 'client' can be called anything it is just a variable to refer to the bot
@@ -57,10 +55,10 @@ client = commands.Bot(command_prefix=prefix)
 full_ready = False
 
 
-# wait for the bot to FULLY connect to the server
-# once bot connects print message in local terminal
 @client.event
 async def on_ready():
+    # wait for the bot to FULLY connect to the server
+    # once bot connects print message in local terminal
     print(f'////////// We have logged in as {client.user}')
     full_ready = True
     if full_ready == True:
@@ -71,28 +69,23 @@ async def on_ready():
         print('////////// Bot not ready, Cogs not loaded')
 
 
-# every time there is a message in any channel in any guild, this runs
-# param: message - The message content that was last sent
 @client.event
 async def on_message(message):
-
-    # grabs username, user unique id, and the user message
-    messageAuthor = message.author
-    user_id = str(message.author.id)
-    user_message = str(message.content)
-
-    # cleaned up username without # id
-    username = str(message.author).split('#')[0]
-
-    # channel name the message was sent from
-    channel = str(message.channel.name)
-    # server name the message was sent from
-    guild = str(message.guild.name)
+    # every time there is a message in any channel in any guild, this runs
+    # param: message - The message that was last sent to the channel
 
     # ignore messages sent from the bot itself and other bots
     # prevents infinite replying
     if message.author == client.user or message.author.bot:
         return
+
+    messageAuthor = message.author
+    user_message = str(message.content)
+
+    # user_id = str(message.author.id)
+    # username = str(message.author).split('#')[0]
+    # channel = str(message.channel.name)
+    # guild = str(message.guild.name)
 
     # ensures the message sent did not contain a banned word
     if not user_message.lower().startswith(f"{prefix}unbanword"):
@@ -101,53 +94,6 @@ async def on_message(message):
                 await message.delete()
                 await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
                 await message.channel.send(f"Obama is telling your Mama! Please do not use banned words!")
-
-    # if message starts with 'hello'
-    if user_message.lower().startswith('hello'):
-        await message.channel.send(f'Hello {messageAuthor.mention}!')
-        return
-
-    # vinny id 149356710455279617
-    # renji id 263560070959333376
-    # TO GET IDS RIGHT CLICK A USER'S NAME IN DISCORD AND SELECT COPY ID
-    # if the word 'poop' is in any message the specific user sends
-    elif 'poop' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
-        return
-
-    # if 'thanks obama' is in the message
-    elif 'thanks obama' in user_message.lower():
-        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
-        return
-
-    # if the message is exactly 'obama'
-    elif user_message.lower() == 'obama':
-        # this is just another way to do the message sending with pictures/gifs
-        image = discord.File('gifs/obama-wave.jpg')
-        image_name = image.filename
-        await message.channel.send(file=image)
-        # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
-        return
-
-    # if the message starts with 'ball'
-    elif user_message.lower().startswith('ball'):
-        await message.channel.send(f'```Did someone say...ball?```', file=discord.File('gifs/obama-basketball.jpg'))
-        return
-
-    # if the message starts with 'idk'
-    elif user_message.lower().startswith('idk'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
-
-    # if the message starts with 'who asked'
-    elif user_message.lower().startswith('who asked'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
-
-    # if the word 'horny' is in the message
-    elif 'horny' in user_message.lower():
-        await message.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
-        return
 
     # necessary to process the bot's message
     await client.process_commands(message)
@@ -174,9 +120,9 @@ def loadCogs():
                 print(f'----- Cog {filename} aleady loaded -----')
 
 
-# Function to unload all Cogs in the cogs folder
-# Runs on -rl all
 def unloadCogs():
+    # Function to unload all Cogs in the cogs folder
+    # Runs on -rl all
     for filename in os.listdir(current_dir + '/cogs'):
         if filename.endswith('.py'):
             try:
@@ -186,14 +132,14 @@ def unloadCogs():
                 print(f'----- Cog {filename} is not loaded -----')
 
 
-# Load a Cog file
-# do -load "name of cog file"
-# only admin should be able to run this
-# param: ctx - The context in which the command has been executed
-# param: extension - The name of the Cog file you want to load
 @client.command()
 @commands.has_permissions(administrator=True)
 async def load(ctx, extension):
+    # Load a Cog file
+    # do -load "name of cog file"
+    # only admin should be able to run this
+    # param: ctx - The context in which the command has been executed
+    # param: extension - The name of the Cog file you want to load
     try:
         client.load_extension(f'cogs.{extension}')
         await ctx.send(f'```Cog {extension}.py loaded```')
@@ -203,14 +149,14 @@ async def load(ctx, extension):
         await ctx.send(f'```{extension}.py does not exist```')
 
 
-# Unload a Cog file
-# do -unload "name of cog file"
-# only admin should be able to run this
-# param: ctx- The context of which the command is entered
-# param: extension - The name of the Cog file to unload
 @client.command()
 @commands.has_permissions(administrator=True)
 async def unload(ctx, extension):
+    # Unload a Cog file
+    # do -unload "name of cog file"
+    # only admin should be able to run this
+    # param: ctx- The context of which the command is entered
+    # param: extension - The name of the Cog file to unload
     try:
         client.unload_extension(f'cogs.{extension}')
         await ctx.send(f'Cog {extension}.py unloaded')
@@ -220,15 +166,15 @@ async def unload(ctx, extension):
         await ctx.send(f'{extension}.py does not exist')
 
 
-# reload cog file, same as doing unload then load
-# do -rf or -refresh "name of cog file"
-# only admin should be able to run this
-# param: ctx - The context in which the command has been executed
-# param: extension - The name of the Cog file to reload
-# do -rf all to unload/load all Cogs
 @client.command(aliases=['rf'], description='Reloads all Cog files')
 @commands.has_permissions(administrator=True)
 async def refresh(ctx, extension):
+    # reload cog file, same as doing unload then load
+    # do -rf or -refresh "name of cog file"
+    # only admin should be able to run this
+    # param: ctx - The context in which the command has been executed
+    # param: extension - The name of the Cog file to reload
+    # do -rf all to unload/load all Cogs
     if extension == 'all':
         for cog in cog_files:
             await ctx.send(f'{cog} working...')
@@ -242,15 +188,14 @@ async def refresh(ctx, extension):
             await ctx.send(f'```Cog {extension}.py not in directory```')
 
 
-# add a banned word to the bannedWords list in the json config
-# only admin should be able to run this
-# param: ctx - The context of which the command is entered
-# param: word - The word you want to be on the banned words list
 @client.command(aliases=['bw'])
 @commands.has_permissions(administrator=True)
-# message can only be sent 1 time, every 3 seconds, per user.
 @commands.cooldown(1, 3, commands.BucketType.user)
 async def banword(ctx, word):
+    # add a banned word to the bannedWords list in the json config
+    # only admin should be able to run this
+    # param: ctx - The context of which the command is entered
+    # param: word - The word you want to be on the banned words list
     # check if the word is already banned
     if word.lower() in bannedWords:
         await ctx.send(f"```{word} is already banned```")
@@ -267,15 +212,14 @@ async def banword(ctx, word):
         await ctx.send(f"```{word} added to banned words list```")
 
 
-# remove a banned word from the bannedWords list in the json config
-# only admin should be able to run this
-# param: ctx The context of which the command is entered
-# param: word - The word you want to remove from the banned words list
 @client.command(aliases=['ubw'])
 @commands.has_permissions(administrator=True)
-# message can only be sent 1 time, every 3 seconds, per user.
 @commands.cooldown(1, 3, commands.BucketType.user)
 async def unbanword(ctx, word):
+    # remove a banned word from the bannedWords list in the json config
+    # only admin should be able to run this
+    # param: ctx The context of which the command is entered
+    # param: word - The word you want to remove from the banned words list
     if word.lower() in bannedWords:
         bannedWords.remove(word.lower())
 
@@ -293,13 +237,13 @@ async def unbanword(ctx, word):
         await ctx.send(f"```{word} isn't banned```")
 
 
-# print all of the banned words to the current channel
-# only admin should be able to run this
-# param: ctx The context of which the command is entered
 @client.command(name='banlist', aliases=['bl'])
 @commands.has_permissions(administrator=True)
 @commands.cooldown(1, 3, commands.BucketType.user)
 async def banlist(ctx):
+    # print all of the banned words to the current channel
+    # only admin should be able to run this
+    # param: ctx The context of which the command is entered
     msg = ""
     for w in bannedWords:
         msg = msg + "\n" + w

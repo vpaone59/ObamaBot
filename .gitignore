@@ -1,10 +1,8 @@
+#python files
+rowan_it.py
 
 # config files and data files
 .json
 
 # OS files
 .DS_Store
-*.txt
-genius/geniustest.py
-genius/test.json
-gifs/.DS_Store

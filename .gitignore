@@ -3,6 +3,7 @@ rowan_it.py
 
 # config files and data files
 .json
+config.json
 
 # OS files
 .DS_Store

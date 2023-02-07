@@ -199,7 +199,7 @@ async def banword(ctx, word):
     else:
         bannedWords.append(word.lower())
         # add it to the list
-        with open("./config.json", "r+") as f:
+        with open("./banned.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)
@@ -222,7 +222,7 @@ async def unbanword(ctx, word):
     if word.lower() in bannedWords:
         bannedWords.remove(word.lower())
 
-        with open("./config.json", "r+") as f:
+        with open("./banned.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)

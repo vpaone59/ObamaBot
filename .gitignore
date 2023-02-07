@@ -1,6 +1,7 @@
 # python files
 *.pyc
 __pycache__
+.python-version
 
 # json files
 banned.json

@@ -1,10 +1,16 @@
+# python files
+*.pyc
+__pycache__
+.python-version
 
-# config files and data files
-.json
+# json files
+banned.json
 
 # OS files
 .DS_Store
-*.txt
-genius/geniustest.py
-genius/test.json
-gifs/.DS_Store
+
+# environment files
+.env
+
+# virtual environments
+.venv

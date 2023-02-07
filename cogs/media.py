@@ -1,68 +1,37 @@
 import discord
 import asyncio
+import random
 from discord.ext import commands
 from discord.utils import get
 import re
 
-# Media Cogs for Obama Bot
+ball_phrases = ['Did someone say...ball?',
+                'Status: Balling.', ':rotating_light: Baller alert :rotating_light:']
 
 
 class media(commands.Cog):
+    """
+    Media cogs/commands for Obama Bot
+    """
 
     def __init__(self, client):
         self.client = client
 
-    # do -cry or -c
-    @commands.command(aliases=['c'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def cry(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-cry.gif'))
+    @commands.Cog.listener("on_message")
+    async def obama_msg(self, message):
+        # listens for an on_message hit and then runs the following
+        if message.author == self.client.user or message.author.bot:
+            return
 
-    # do -micdrop or md
-    @commands.command(aliases=['md'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def micdrop(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-micdrop.gif'))
-
-    # do -micbomb or mb
-    @commands.command(aliases=['mb'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def micbomb(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-micbomb.gif'))
-
-    # do -goodmorning or -gm
-    @commands.command(aliases=['gm'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def goodmorning(self, ctx):
-        await ctx.send(f'Goodmorning my fellow Americans!')
-        await ctx.send(file=discord.File('gifs/obama-smile.jpg'))
-
-    # do -goodmorning or -gm
-    @commands.command(aliases=['gn'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def goodnight(self, ctx):
-        await ctx.send(f'Goodnight and God Bless!')
-        await ctx.send(file=discord.File('gifs/obama-sleep.jpeg'))
-
-    # there is a message reply for this as well
-    # do -ball or -b
-
-    @commands.command(aliases=['b'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def ball(self, ctx):
-        await ctx.send(f'Did someone say...ball?')
-        await ctx.send(file=discord.File('gifs/obama-basketball.jpg'))
-
-    # do -thumb or -t
-    # reaction must be the same emoji and within 5 seconds
-    @commands.command(aliases=['t'])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def thumb(self, ctx):
+    @commands.command(aliases=['r'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def react(self, ctx):
+        # waits for the user to react with the same emoji the Bot used
+        
         await ctx.send('React using 🍆 within 5 seconds')
-
         # checks the author of the reaction and which reaction emoji they used
-        def check(user, reaction):
-            return user == ctx.message.author and str(reaction.emoji) == '🍆'
+        def check(reaction, user):
+            return user == ctx.message.author and reaction.emoji == '🍆'
 
         # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
         try:
@@ -72,22 +41,80 @@ class media(commands.Cog):
         else:
             await ctx.channel.send('Obama approves')
 
+    @commands.command(aliases=['c'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def cry(self, ctx):
+        await ctx.send(file=discord.File('gifs/obama-cry.gif'))
+
+    @commands.command(aliases=['md'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def micdrop(self, ctx):
+        await ctx.send(file=discord.File('gifs/obama-micdrop.gif'))
+
+    @commands.command(aliases=['mb'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def micbomb(self, ctx):
+        await ctx.send(file=discord.File('gifs/obama-micbomb.gif'))
+
+    @commands.command(aliases=['gm'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def goodmorning(self, ctx):
+        await ctx.send(f'Goodmorning my fellow Americans!', file=discord.File('gifs/obama-smile.jpg'))
+
+    @commands.command(aliases=['gn'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def goodnight(self, ctx):
+        await ctx.send(f'Goodnight and God Bless!', file=discord.File('gifs/obama-sleep.jpeg'))
+
+    @commands.command(aliases=['balls'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def ball(self, ctx):
+        await ctx.channel.send(random.choice(ball_phrases), file=discord.File('gifs/obama-basketball.jpg'))
+
     @commands.command(aliases=['monkey', 'm'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def monkey_falling(self, ctx):
         await ctx.send(file=discord.File('gifs/monkey-fall.gif'))
 
-    @commands.Cog.listener("on_message")
-    async def obama_pog(self, message):
-        if message.author == self.client.user or message.author.bot:
-            return
-        x = message.content
-        y = re.search(fr"[p|P][e,u,o,a,x,E,U,O,A,X]+[g|G]", x)
-        z = re.search(r"<:.*(p|P).*(g|G).*:.*>", x)
-        if y is not None:
-            await message.channel.send("<:obamapog:1040355321102749819>")
-        elif z is not None:
-            await message.channel.send(f"<:obamapog:1040355321102749819>")
+    @commands.command(aliases=['poggers'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def pog(self, ctx):
+        await ctx.channel.send("<:obamapog:1040355321102749819>")
+
+    @commands.command(aliases=['thanks'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def thanks_obama(self, ctx):
+        await ctx.channel.send(f'You\'re welcome! <:obamacare:844291609663111208>\n', file=discord.File('gifs/obama-smile.jpg'))
+
+    @commands.command(aliases=['obunga'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def obamna(self, ctx):
+        await ctx.channel.send("<:obamacare:844291609663111208>")
+
+    @commands.command(aliases=['coord'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def coordinate(self, ctx):
+        await ctx.channel.send(":BatChest: :point_up:")
+
+    @commands.command(aliases=['o'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def obama(self, ctx):
+        await ctx.channel.send(file=discord.File('gifs/obama-wave.jpg'))
+
+    @commands.command(aliases=['idk'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def i_dont_know(self, ctx):
+        await ctx.channel.send("<:obamathink:842635667779616798>")
+
+    @commands.command(aliases=['who', 'whoasked'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def who_asked(self, ctx):
+        await ctx.channel.send(file=discord.File('gifs/biden-looking.jpg'))
+
+    @commands.command()
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def lip_bite(self, ctx):
+        await ctx.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
 
 
 def setup(client):

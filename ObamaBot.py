@@ -1,218 +1,154 @@
-# Vincent Paone
-# Project began 4/20/2022 --
-# ObamaBot - main file
-#
-# There is no serious political offiliation. This is all in good fun.
+"""
+Vincent Paone
+Project began 4/20/2022 --
+ObamaBot - main file. Run this file to start the bot.
 
+There is no serious political offiliation. This is all in good fun.
+"""
+
+import os # os calls
+import re # regex for banned words
+import json # for banned words list
+import discord # needed
+from discord.ext import commands # needed
+from dotenv import load_dotenv # to load .env variables
 import time
-import os
-import re
-import json
-import discord
-import asyncio
-from array import array
-from ast import alias
-from tokenize import String
-from discord.ext import commands
-from discord.utils import get
-from pathlib import Path
 
-# set the current working directory, this is ESSENTIAL to the bot's functionality
-current_dir = os.getcwd()
-cog_files = []
-for f in os.listdir(current_dir + '/cogs'):
-    if f.endswith('.py'):
-        cog_files.append(f)
+print(f"> STARTING IN {os.getcwd()}")
+# load env and assign variables
+load_dotenv()
+prefix = os.getenv("PREFIX")
 
-print(f"////////// STARTING IN {current_dir}")
-
-if os.path.exists(current_dir + "/config.json"):
-    print("////////// config path exists")
-    with open(current_dir + "/config.json") as f:
-        print("////////// opened config")
-        configData = json.load(f)
-
-# if the config file doesn't exist within the current directory, use the template to create the file automatically
+# find 'banned.json'
+# if it doesn't exist, auto create a new one from template
+if os.path.exists('./banned.json'):
+    with open("./banned.json") as f:
+        bannedWordsData = json.load(f)
 else:
-    print("////////// config path DOES NOT exist")
-    configTemplate = {"Token": "", "Prefix": "", "bannedWords": []}
-    with open(current_dir + "/config.json", "w+") as f:
-        print("////////// new config being created using template")
-        # dump the configTemplate to the new config.json
-        json.dump(configTemplate, f)
-        print("////////// config created")
+    bannedTemplate = {"bannedWords": []}
+    with open("./config.json", "w+") as f:
+        json.dump(bannedTemplate, f)
+# assign current banned words list to variable
+bannedWords = bannedWordsData["bannedWords"]
 
-# grab some info from the config file
-TOKEN = configData["TOKEN"]
-bannedWords = configData["bannedWords"]
-prefix = configData["Prefix"]
-# search for the config.json file in the current directory and load the file
+# initialize the bot with its prefix and intents
+intents = discord.Intents.default()
+# intents.message_content = True
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 
-
-# we need to assign the prefix to the bot and denote the bot as 'client'
-# 'client' can be called anything it is just a variable to refer to the bot
-client = commands.Bot(command_prefix=prefix)
-
-# we need this to check the bot connected properly in the on_ready fxn
-full_ready = False
-
-
-# wait for the bot to FULLY connect to the server
-# once bot connects print message in local terminal
-@client.event
+@bot.event
 async def on_ready():
-    print(f'////////// We have logged in as {client.user}')
-    full_ready = True
-    if full_ready == True:
-        print('////////// Loading Cogs...standby')
+    """
+    runs once the bot is fully connected with Discord
+    https://discordpy.readthedocs.io/en/stable/api.html?highlight=on_ready#discord.on_ready
+    bot logs in then tries to load any cogs in ./cogs
+    """
+    print(f'> === Logged in as {bot.user} ===')
+    try:
+        print('> +++ Loading Cogs...standby +++')
         loadCogs()
-        print('////////// Cogs loaded successfully')
-    else:
-        print('////////// Bot not ready, Cogs not loaded')
+        print('> +++ Cogs loaded successfully +++')
+    except:
+        print('> +++ Bot not ready, Cogs not loaded +++')
 
 
-# every time there is a message in any channel in any guild, this runs
-# param: message - The message content that was last sent
-@client.event
+@bot.event
 async def on_message(message):
-
-    # grabs username, user unique id, and the user message
-    messageAuthor = message.author
-    user_id = str(message.author.id)
-    user_message = str(message.content)
-
-    # cleaned up username without # id
-    username = str(message.author).split('#')[0]
-
-    # channel name the message was sent from
-    channel = str(message.channel.name)
-    # server name the message was sent from
-    guild = str(message.guild.name)
+    """
+    every time there is a message in any channel in any guild, this runs
+    param message - The message that was last sent to the channel
+    """
 
     # ignore messages sent from the bot itself and other bots
     # prevents infinite replying
-    if message.author == client.user or message.author.bot:
+    if message.author == bot.user or message.author.bot:
         return
+
+    messageAuthor = message.author
+    user_message = str(message.content)
 
     # ensures the message sent did not contain a banned word
     if not user_message.lower().startswith(f"{prefix}unbanword"):
         for word in bannedWords:
             if msg_contain_word(message.content.lower(), word):
                 await message.delete()
-                await message.channel.send(f"{messageAuthor.mention} You used a banned word therefore your message was removed.")
-                await message.channel.send(f"Obama is telling your Mama! Please do not use banned words!")
-
-    # if message starts with 'hello'
-    if user_message.lower().startswith('hello'):
-        await message.channel.send(f'Hello {messageAuthor.mention}!')
-        return
-
-    # vinny id 149356710455279617
-    # renji id 263560070959333376
-    # TO GET IDS RIGHT CLICK A USER'S NAME IN DISCORD AND SELECT COPY ID
-    # if the word 'poop' is in any message the specific user sends
-    elif 'poop' in user_message.lower() and user_id == '263560070959333376':
-        await message.channel.send(f'Thank you for keeping the planet clean! {messageAuthor.mention}')
-        return
-
-    # if 'thanks obama' is in the message
-    elif 'thanks obama' in user_message.lower():
-        await message.channel.send(f'You\'re welcome random citizen! \n', file=discord.File('gifs/obama-smile.jpg'))
-        return
-
-    # if the message is exactly 'obama'
-    elif user_message.lower() == 'obama':
-        # this is just another way to do the message sending with pictures/gifs
-        image = discord.File('gifs/obama-wave.jpg')
-        image_name = image.filename
-        await message.channel.send(file=image)
-        # print(f'{username}: {image_name} userid= {user_id} (channel= {channel})')
-        return
-
-    # if the message starts with 'ball'
-    elif user_message.lower().startswith('ball'):
-        await message.channel.send(f'```Did someone say...ball?```', file=discord.File('gifs/obama-basketball.jpg'))
-        return
-
-    # if the message starts with 'idk'
-    elif user_message.lower().startswith('idk'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
-
-    # if the message starts with 'who asked'
-    elif user_message.lower().startswith('who asked'):
-        await message.channel.send(file=discord.File('gifs/obama-shrug.gif'))
-        return
-
-    # if the word 'horny' is in the message
-    elif 'horny' in user_message.lower():
-        await message.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
-        return
+                await message.channel.send(f"{messageAuthor.mention} banned word detected.")
 
     # necessary to process the bot's message
-    await client.process_commands(message)
+    await bot.process_commands(message)
 
 
-# return true if there is a banned word in the message
-# but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
-# \b matches the empty string but only at the beginning or end of the word
-# https://docs.python.org/3/library/re.html
+
 def msg_contain_word(msg, word):
+    """
+    return true if there is a banned word in the message
+    but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
+    \b matches the empty string but only at the beginning or end of the word
+    https://docs.python.org/3/library/re.html
+    """
     return re.search(fr'.*({word}).*', msg) is not None
 
 
-# Function to load all Cogs that live in the cogs folder
-# Ran on Bot startup
 def loadCogs():
-    for filename in os.listdir(current_dir + '/cogs'):
+    """
+    Function to load all Cogs that live in the cogs folder
+    Ran on Bot startup
+    """
+    for filename in os.listdir(os.getcwd() + '/cogs'):
         if filename.endswith('.py'):
             try:
                 # -3 cuts the .py extension from filename
-                client.load_extension(f'cogs.{filename[:-3]}')
-                print(f'----- Cog {filename} loaded -----')
+                bot.load_extension(f'cogs.{filename[:-3]}')
+                print(f'>\tCog {filename} loaded\t<')
             except commands.ExtensionAlreadyLoaded:
-                print(f'----- Cog {filename} aleady loaded -----')
+                print(f'>\tCog {filename} aleady loaded\t<')
+            except:
+                print(f'>\tCog {filename} NOT loaded\t<')
 
 
-# Function to unload all Cogs in the cogs folder
-# Runs on -rl all
 def unloadCogs():
-    for filename in os.listdir(current_dir + '/cogs'):
+    """
+    Function to unload all Cogs in the cogs folder
+    Runs on -rl all
+    """
+    for filename in os.listdir(os.getcwd() + '/cogs'):
         if filename.endswith('.py'):
             try:
-                client.unload_extension(f'cogs.{filename[:-3]}')
-                print(f'----- Cog {filename} unloaded successfully -----')
+                bot.unload_extension(f'cogs.{filename[:-3]}')
+                print(f'>\tCog {filename} unloaded successfully\t<')
             except commands.ExtensionNotLoaded:
-                print(f'----- Cog {filename} is not loaded -----')
+                print(f'>\tCog {filename} is not loaded\t<')
 
 
-# Load a Cog file
-# do -load "name of cog file"
-# only admin should be able to run this
-# param: ctx - The context in which the command has been executed
-# param: extension - The name of the Cog file you want to load
-@client.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def load(ctx, extension):
+    """
+    Load a Cog file, do -load "name of cog file"
+    only admin should be able to run this
+    param: ctx - The context in which the command has been executed
+    param: extension - The name of the Cog file you want to load
+    """
     try:
-        client.load_extension(f'cogs.{extension}')
-        await ctx.send(f'```Cog {extension}.py loaded```')
+        bot.load_extension(f'cogs.{extension}')
+        ctx.send(f'```Cog {extension}.py loaded```')
     except commands.ExtensionAlreadyLoaded:
         await ctx.send(f'```{extension}.py is already loaded```')
     except commands.ExtensionNotFound:
         await ctx.send(f'```{extension}.py does not exist```')
 
 
-# Unload a Cog file
-# do -unload "name of cog file"
-# only admin should be able to run this
-# param: ctx- The context of which the command is entered
-# param: extension - The name of the Cog file to unload
-@client.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def unload(ctx, extension):
+    """
+    Unload a Cog file, do -unload "name of cog file"
+    only admin should be able to run this
+    param: ctx- The context of which the command is entered
+    param: extension - The name of the Cog file to unload
+    """
     try:
-        client.unload_extension(f'cogs.{extension}')
+        bot.unload_extension(f'cogs.{extension}')
         await ctx.send(f'Cog {extension}.py unloaded')
     except commands.ExtensionNotLoaded:
         await ctx.send(f'{extension}.py is not loaded')
@@ -220,44 +156,50 @@ async def unload(ctx, extension):
         await ctx.send(f'{extension}.py does not exist')
 
 
-# reload cog file, same as doing unload then load
-# do -rf or -refresh "name of cog file"
-# only admin should be able to run this
-# param: ctx - The context in which the command has been executed
-# param: extension - The name of the Cog file to reload
-# do -rf all to unload/load all Cogs
-@client.command(aliases=['rf'], description='Reloads all Cog files')
+@bot.command(aliases=['rf', 'rl'], description='Reloads all Cog files')
 @commands.has_permissions(administrator=True)
 async def refresh(ctx, extension):
+    """
+    reload cog file, same as doing unload then load, do -refresh "name of cog file" or -rf all
+    only admin should be able to run this
+    param: ctx - The context in which the command has been executed
+    param: extension - The name of the Cog file to reload
+    """
     if extension == 'all':
-        for cog in cog_files:
-            await ctx.send(f'{cog} working...')
-            client.reload_extension(cog)
-            await ctx.send(f'Cog {cog} reloaded')
+        unloadCogs()
+        time.sleep(2)
+        loadCogs()
+        await ctx.send('```Success reloading all cogs```')
     else:
         try:
-            client.reload_extension(f'cogs.{extension}')
+            print(f'> Reloading {extension}.py --')
+            
+            bot.reload_extension(f'cogs.{extension}')
+            
+            print(f'> -- {extension}.py reloaded.')
             await ctx.send(f'```Cog {extension}.py reloaded```')
         except commands.ExtensionNotFound:
             await ctx.send(f'```Cog {extension}.py not in directory```')
+        except:
+            await ctx.send(f'```Cog {extension}.py could not be reloaded```')
 
 
-# add a banned word to the bannedWords list in the json config
-# only admin should be able to run this
-# param: ctx - The context of which the command is entered
-# param: word - The word you want to be on the banned words list
-@client.command(aliases=['bw'])
+@bot.command(aliases=['bw'])
 @commands.has_permissions(administrator=True)
-# message can only be sent 1 time, every 3 seconds, per user.
-@commands.cooldown(1, 3, commands.BucketType.user)
 async def banword(ctx, word):
-    # check if the word is already banned
+    """
+    add a banned word to the bannedWords list in the json config
+    only admin should be able to run this
+    param: ctx - The context of which the command is entered
+    param: word - The word you want to be on the banned words list
+    """
     if word.lower() in bannedWords:
+        # check if the word is already banned
         await ctx.send(f"```{word} is already banned```")
     else:
         bannedWords.append(word.lower())
         # add it to the list
-        with open("./config.json", "r+") as f:
+        with open("./banned.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)
@@ -267,19 +209,20 @@ async def banword(ctx, word):
         await ctx.send(f"```{word} added to banned words list```")
 
 
-# remove a banned word from the bannedWords list in the json config
-# only admin should be able to run this
-# param: ctx The context of which the command is entered
-# param: word - The word you want to remove from the banned words list
-@client.command(aliases=['ubw'])
+@bot.command(aliases=['ubw'])
 @commands.has_permissions(administrator=True)
-# message can only be sent 1 time, every 3 seconds, per user.
 @commands.cooldown(1, 3, commands.BucketType.user)
 async def unbanword(ctx, word):
+    """
+    remove a banned word from the bannedWords list in the json config
+    only admin should be able to run this, can only be run 1 time, every 3 seconds, per user
+    param: ctx The context of which the command is entered
+    param: word - The word you want to remove from the banned words list
+    """
     if word.lower() in bannedWords:
         bannedWords.remove(word.lower())
 
-        with open("./config.json", "r+") as f:
+        with open("./banned.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)
@@ -293,119 +236,18 @@ async def unbanword(ctx, word):
         await ctx.send(f"```{word} isn't banned```")
 
 
-# print all of the banned words to the current channel
-# only admin should be able to run this
-# param: ctx The context of which the command is entered
-@client.command(name='banlist', aliases=['bl'])
+@bot.command(aliases=['bl'])
 @commands.has_permissions(administrator=True)
-@commands.cooldown(1, 3, commands.BucketType.user)
+@commands.cooldown(1, 5, commands.BucketType.user)
 async def banlist(ctx):
+    """
+    print all of the banned words to the current channel
+    only admin should be able to run this, can be run only 1 time, every 5 seconds per user
+    param: ctx The context of which the command is entered
+    """
     msg = ""
     for w in bannedWords:
         msg = msg + "\n" + w
     await ctx.send(f"```Banned Words:{msg}```")
 
-
-# # save information, username/password/nickname into a json
-# # only admin should be able to run this
-# # param: ctx The context of which the command is entered
-# @client.command(aliases=['new_acc'])
-# @commands.has_permissions(administrator=True)
-# @commands.cooldown(1, 3, commands.BucketType.user)
-# async def saveAccount(ctx):
-
-#     # prompt #1 for username entry
-#     await ctx.send(f"Enter in the Username you wish to add {ctx.author.mention}")
-#     try:
-#         user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
-#         username = str(user_message.content)
-#     except asyncio.TimeoutError:
-#         await ctx.channel.send("```ERROR: Timeout Exception```")
-
-#     # prompt #2 for password entry
-#     await ctx.send(f"Enter in the Password you wish to add {ctx.author.mention}")
-#     try:
-#         user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
-#         password = str(user_message.content)
-#     except asyncio.TimeoutError:
-#         await ctx.channel.send("```ERROR: Timeout Exception```")
-
-#     # check if the account info is already in the list
-#     if username.lower() in accUsers and password in accPasses:
-#         userindex = accUsers.index(username)
-#         passindex = accPasses.index(password)
-
-#         if userindex == passindex:
-#             await ctx.send(f"```Account info already exists at position indices {userindex} and {passindex}\n It will not be appended.```")
-#     else:
-#         # add it to the list
-#         accUsers.append(username.lower())
-#         accPasses.append(password)
-#         with open("./acc.json", "r+") as f:
-#             data = json.load(f)
-#             data["Usernames"] = accUsers
-#             data["Passwords"] = accPasses
-#             f.seek(0)
-#             f.write(json.dumps(data))
-#             f.truncate()  # resizes file
-
-#     # prompt #3 for nickname entry
-#     await ctx.send(f"```Provide a nickname for this entry? Reply Y/N```")
-#     user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
-#     user_reply = str(user_message.content)
-
-#     if user_reply.lower() == "y":
-#         await ctx.send("What would you like to name this entry?")
-#         user_message = await client.wait_for('message', timeout=15, check=lambda message: message.author == ctx.author)
-#         nickname = str(user_message.content)
-
-#         if nickname.lower() in accNick:
-#             await ctx.send("Nickname already exists in the list, default will be applied")
-#             # have them try again, and enter Default for a default nickname to apply
-#     else:
-#         # if user does not want to apply a nickname a default will be chosen
-#         await ctx.send("```No nickname chosen. Default will be applied.```")
-#         nickname = username + '#' + str(accUsers.index(username))
-
-#     accNick.append(nickname)
-#     with open("./acc.json", "r+") as f:
-#         data = json.load(f)
-#         data["Account_name"] = accNick
-#         f.seek(0)
-#         f.write(json.dumps(data))
-#         f.truncate()  # resizes file
-
-#     await ctx.send(f"```Added the following account information:\n Username: {username}\n Password: {password}\n Nickname: {nickname}```")
-
-
-# # clear all data from a json file the user chooses
-# # only admin should be able to run this
-# # param: ctx The context of which the command is entered
-# # param: data_file The json file which the user wants wiped of data
-# @client.command(aliases=['clean'])
-# @commands.has_permissions(administrator=True)
-# # message can only be sent 1 time, every 5 seconds, per user.
-# @commands.cooldown(1, 5, commands.BucketType.user)
-# async def cleardata(ctx, data_file):
-
-#     data_file = "/" + data_file + ".json"
-#     print(data_file)
-
-#     if os.path.exists(current_dir + data_file):
-#         print("true")
-#         with open("." + data_file, "r") as f:
-#             data = json.load(f)
-#             for o in data:
-#                 data.pop(o)
-#                 await ctx.send(f"Removed {o}")
-#                 print("true")
-
-#             f.seek(0)
-#             f.write(json.dumps(data))
-#             f.truncate()
-
-#     else:
-#         print("false")
-
-
-client.run(TOKEN)
+bot.run(os.getenv("DISCORD_TOKEN"))

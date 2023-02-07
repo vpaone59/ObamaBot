@@ -1,49 +1,41 @@
 import random
-import asyncio
 from discord.ext import commands
 
 
-# game commands for ObamaBot
-# Cogs for Obama Bot
-# Cogs are a way to hide standard commands, events, functions etc
-# in another .py file
-
-
 class game(commands.Cog):
+    """ 
+    game commands for a discord bot
+    """
 
     def __init__(self, client):
         self.client = client
 
-    # numbers game
+    @commands.command()
+    @commands.cooldown(1, 2, commands.BucketType.guild)
+    async def roll(self, ctx):
+        # can be used 1 time, every 2 seconds per user
+        # randomly rolls between 1 and 10,000
+        roll = random.randint(1, 10000)
+        await ctx.send(f'{ctx.message.author.name} rolled {roll}')
+
     @commands.command(aliases=['duel'])
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def numberduel(self, ctx):
-        user1 = ctx.message.author
-        print(user1)
-        user2 = ctx.message.mentions[0].id
-        print(user2)
+        # can be used 1 time, every 5 seconds per user
+        # number roll 1v1 game
 
-        await ctx.send(f'{user1} would like to duel {user2}!\n{user2} do you accept? (Reply yes/no)')
+        user1 = ctx.message.author.name
+        user2 = ctx.message.mentions[0].name
 
-        try:
-            reply, user = await self.client.wait_for('message', timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.channel.send(f'ERROR: Timeout Exception, {user1} wins by default.')
+        user1_roll = random.randint(1, 100)
+        user2_roll = random.randint(1, 100)
+        roll_diff = abs(user1_roll - user2_roll)
+
+        await ctx.send(f'{user1} rolled {user1_roll}\n{user2} rolled {user2_roll}')
+        if user1_roll > user2_roll:
+            await ctx.send(f'{user1} wins with a difference of {roll_diff}')
         else:
-            user1_roll = random.randint(1, 100)
-            user2_roll = random.randint(1, 100)
-            roll_diff = user1_roll - user2_roll
-
-            await ctx.send(f'{user1} rolled {user1_roll}\n{user2} rolled {user2_roll}')
-            if user1_roll > user2_roll:
-                await ctx.send(f'{user1} wins with a {roll_diff} differential')
-            else:
-                await ctx.send(f'{user2} wins with a {roll_diff} differential')
-
-        # #def check(message, user):
-         #   return message == str(ctx.message.content) and user == ctx.message.author
-
-        # self.client.wait_for('user_versus', 15.0, check=check)
+            await ctx.send(f'{user2} wins with a difference of {roll_diff}')
 
 
 def setup(client):

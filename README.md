@@ -1,5 +1,8 @@
 # ObamaBot
-ObamaBot
+ObamaBot - Vincent Paone
 
+A general purpose Discord Bot. Contains Cogs specific to ObamaBot and other special Guilds/Servers.
 
-General purpose bot with the intention of being active in the server depending on certain keywords or commands used. There is no political offiliation, this is for fun and my own entertainment. This is not serious.
+Setup:
+pip install -r requirements.txt
+Must have a Discord Bot Token ready. Place Token in the SAMPLE.env file. Rename file to just ".env" (without quotes).

@@ -1,9 +1,15 @@
-#python files
-rowan_it.py
+# python files
+*.pyc
+__pycache__
 
-# config files and data files
-.json
-config.json
+# json files
+banned.json
 
 # OS files
 .DS_Store
+
+# environment files
+.env
+
+# virtual environments
+.venv

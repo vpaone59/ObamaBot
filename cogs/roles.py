@@ -6,7 +6,10 @@ from discord.utils import get
 
 
 class roles(commands.Cog, name='Roles'):
-
+    """
+    role related commands for a Bot
+    """
+    
     def __init__(self, client):
         self.client = client
 

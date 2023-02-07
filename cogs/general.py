@@ -1,58 +1,47 @@
-import discord
 from discord.ext import commands
-from discord.utils import get
-
-suggestions = []
 
 
 class general(commands.Cog):
-    # general commands for any Bot
-    # Cogs are a way to hide standard commands, events, functions etc in another .py file
+    """
+    general commands for a Bot
+    """
 
     def __init__(self, client):
         self.client = client
 
     @commands.command(aliases=['hey', 'hi'])
-    @commands.cooldown(1, 7, commands.BucketType.user)
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    # can be used 1 time, every 2 seconds per user
     async def hello(self, ctx):
         await ctx.channel.send(f'Hello {ctx.author.mention}!')
 
     @commands.command(name='hiall')
-    @commands.cooldown(1, 7, commands.BucketType.user)
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def hello_everyone(self, ctx):
+        # can be used 1 time, every 2 seconds per user
         # hello all command - Bot @mentions @all users and says hello
-        # use -hello0 or -hiall
         await ctx.send(f'Hello {ctx.message.guild.default_role}')
 
     @commands.command(name='ping', aliases=['p'])
-    @commands.cooldown(1, 7, commands.BucketType.user)
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def ping(self, ctx):
+        # can be used 1 time, every 2 seconds per user
         # ping command - Bot replies with the current latency
-        # use -ping
         client_latency = round(self.client.latency * 1000, 2)
         await ctx.send(f'pong {client_latency}ms')
 
     @commands.command(name='fibonacci', aliases=['fib'])
-    @commands.cooldown(1, 7, commands.BucketType.user)
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def fib(self, ctx, num):
+        # can be used 1 time, every 3 seconds per user
         # calculate Fibonacci sequence
         # param: num - the number sequence to calculate
-        # input comes in as a string, so we cast to int
         n = int(num)
         result = fibonacci(n)
         await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
 
-    @commands.command()
-    @commands.cooldown(1, 7, commands.BucketType.user)
-    async def suggest(self, ctx, sugs):
-        # submit a suggestion for ObamaBot to the developer
-        suggestions = []
-        suggestions.append(sugs)
-        await ctx.send(f'{suggestions}')
-
-
 def fibonacci(n):
-    # fibonacci function for the fib command
+    # calculate fibonacci sequence for a given n
     if n < 0:
         print(f"User input {n}: negative not allowed ")
     elif n == 0:
@@ -64,7 +53,6 @@ def fibonacci(n):
     else:
         fib = fibonacci(n-1) + fibonacci(n-2)
         return fib
-
 
 def setup(client):
     client.add_cog(general(client))

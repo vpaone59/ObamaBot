@@ -1,3 +1,4 @@
+import asyncio
 import random
 from discord.ext import commands
 
@@ -37,6 +38,23 @@ class game(commands.Cog):
         else:
             await ctx.send(f'{user2} wins with a difference of {roll_diff}')
 
+    @commands.command(aliases=['r'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def react(self, ctx):
+        # waits for the user to react with the same emoji the Bot used
+        
+        await ctx.send('React using 🍆 within 5 seconds')
+        # checks the author of the reaction and which reaction emoji they used
+        def check(reaction, user):
+            return user == ctx.message.author and reaction.emoji == '🍆'
 
+        # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
+        try:
+            reaction, user = await self.client.wait_for('reaction_add', timeout=5.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.channel.send('ERROR: Timeout Exception')
+        else:
+            await ctx.channel.send('Obama approves')
+        
 def setup(client):
     client.add_cog(game(client))

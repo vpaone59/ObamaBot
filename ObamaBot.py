@@ -149,11 +149,11 @@ async def unload(ctx, extension):
     """
     try:
         bot.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'Cog {extension}.py unloaded')
+        await ctx.send(f'```Cog {extension}.py unloaded```')
     except commands.ExtensionNotLoaded:
-        await ctx.send(f'{extension}.py is not loaded')
+        await ctx.send(f'```{extension}.py is not loaded```')
     except commands.ExtensionNotFound:
-        await ctx.send(f'{extension}.py does not exist')
+        await ctx.send(f'```{extension}.py does not exist```')
 
 
 @bot.command(aliases=['rf', 'rl'], description='Reloads all Cog files')
@@ -166,6 +166,7 @@ async def refresh(ctx, extension):
     param: extension - The name of the Cog file to reload
     """
     if extension == 'all':
+        # unload, rest for 2 seconds, then load
         unloadCogs()
         time.sleep(2)
         loadCogs()
@@ -199,7 +200,7 @@ async def banword(ctx, word):
     else:
         bannedWords.append(word.lower())
         # add it to the list
-        with open("./banned.json", "r+") as f:
+        with open("./config.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)
@@ -222,7 +223,7 @@ async def unbanword(ctx, word):
     if word.lower() in bannedWords:
         bannedWords.remove(word.lower())
 
-        with open("./banned.json", "r+") as f:
+        with open("./config.json", "r+") as f:
             data = json.load(f)
             data["bannedWords"] = bannedWords
             f.seek(0)

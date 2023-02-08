@@ -1,9 +1,6 @@
 import discord
-import asyncio
 import random
 from discord.ext import commands
-from discord.utils import get
-import re
 
 ball_phrases = ['Did someone say...ball?',
                 'Status: Balling.', ':rotating_light: Baller alert :rotating_light:']
@@ -12,6 +9,7 @@ ball_phrases = ['Did someone say...ball?',
 class media(commands.Cog):
     """
     Media cogs/commands for Obama Bot
+    These commands will send media to the Guild the command was run in
     """
 
     def __init__(self, client):
@@ -23,23 +21,10 @@ class media(commands.Cog):
         if message.author == self.client.user or message.author.bot:
             return
 
-    @commands.command(aliases=['r'])
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def react(self, ctx):
-        # waits for the user to react with the same emoji the Bot used
-        
-        await ctx.send('React using 🍆 within 5 seconds')
-        # checks the author of the reaction and which reaction emoji they used
-        def check(reaction, user):
-            return user == ctx.message.author and reaction.emoji == '🍆'
-
-        # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
-        try:
-            reaction, user = await self.client.wait_for('reaction_add', timeout=5.0, check=check)
-        except asyncio.TimeoutError:
-            await ctx.channel.send('ERROR: Timeout Exception')
-        else:
-            await ctx.channel.send('Obama approves')
+    @commands.command(aliases=['wed'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def wednesday(self, ctx):
+        await ctx.send(file=discord.File('gifs/wednesday.jpg'))
 
     @commands.command(aliases=['c'])
     @commands.cooldown(1, 3, commands.BucketType.user)

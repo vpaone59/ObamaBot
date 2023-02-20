@@ -7,8 +7,6 @@ There is no serious political offiliation. This is all in good fun.
 """
 
 import os # os calls
-import re # regex for banned words
-import json # for banned words list
 import discord # needed
 from discord.ext import commands # needed
 from dotenv import load_dotenv # to load .env variables
@@ -18,18 +16,6 @@ print(f"> STARTING IN {os.getcwd()}")
 # load env and assign variables
 load_dotenv()
 prefix = os.getenv("PREFIX")
-
-# find 'banned.json'
-# if it doesn't exist, auto create a new one from template
-if os.path.exists('./banned.json'):
-    with open("./banned.json") as f:
-        bannedWordsData = json.load(f)
-else:
-    bannedTemplate = {"bannedWords": []}
-    with open("./config.json", "w+") as f:
-        json.dump(bannedTemplate, f)
-# assign current banned words list to variable
-bannedWords = bannedWordsData["bannedWords"]
 
 # initialize the bot with its prefix and intents
 intents = discord.Intents.default()
@@ -67,27 +53,8 @@ async def on_message(message):
     messageAuthor = message.author
     user_message = str(message.content)
 
-    # ensures the message sent did not contain a banned word
-    if not user_message.lower().startswith(f"{prefix}unbanword"):
-        for word in bannedWords:
-            if msg_contain_word(message.content.lower(), word):
-                await message.delete()
-                await message.channel.send(f"{messageAuthor.mention} banned word detected.")
-
     # necessary to process the bot's message
     await bot.process_commands(message)
-
-
-
-def msg_contain_word(msg, word):
-    """
-    return true if there is a banned word in the message
-    but will not remove attached characters i.e. will remove 'Tom' not 'Tommas'
-    \b matches the empty string but only at the beginning or end of the word
-    https://docs.python.org/3/library/re.html
-    """
-    return re.search(fr'.*({word}).*', msg) is not None
-
 
 def loadCogs():
     """
@@ -149,11 +116,11 @@ async def unload(ctx, extension):
     """
     try:
         bot.unload_extension(f'cogs.{extension}')
-        await ctx.send(f'Cog {extension}.py unloaded')
+        await ctx.send(f'```Cog {extension}.py unloaded```')
     except commands.ExtensionNotLoaded:
-        await ctx.send(f'{extension}.py is not loaded')
+        await ctx.send(f'```{extension}.py is not loaded```')
     except commands.ExtensionNotFound:
-        await ctx.send(f'{extension}.py does not exist')
+        await ctx.send(f'```{extension}.py does not exist```')
 
 
 @bot.command(aliases=['rf', 'rl'], description='Reloads all Cog files')
@@ -166,6 +133,7 @@ async def refresh(ctx, extension):
     param: extension - The name of the Cog file to reload
     """
     if extension == 'all':
+        # unload, rest for 2 seconds, then load
         unloadCogs()
         time.sleep(2)
         loadCogs()
@@ -182,72 +150,5 @@ async def refresh(ctx, extension):
             await ctx.send(f'```Cog {extension}.py not in directory```')
         except:
             await ctx.send(f'```Cog {extension}.py could not be reloaded```')
-
-
-@bot.command(aliases=['bw'])
-@commands.has_permissions(administrator=True)
-async def banword(ctx, word):
-    """
-    add a banned word to the bannedWords list in the json config
-    only admin should be able to run this
-    param: ctx - The context of which the command is entered
-    param: word - The word you want to be on the banned words list
-    """
-    if word.lower() in bannedWords:
-        # check if the word is already banned
-        await ctx.send(f"```{word} is already banned```")
-    else:
-        bannedWords.append(word.lower())
-        # add it to the list
-        with open("./banned.json", "r+") as f:
-            data = json.load(f)
-            data["bannedWords"] = bannedWords
-            f.seek(0)
-            f.write(json.dumps(data))
-            f.truncate()  # resizes file
-
-        await ctx.send(f"```{word} added to banned words list```")
-
-
-@bot.command(aliases=['ubw'])
-@commands.has_permissions(administrator=True)
-@commands.cooldown(1, 3, commands.BucketType.user)
-async def unbanword(ctx, word):
-    """
-    remove a banned word from the bannedWords list in the json config
-    only admin should be able to run this, can only be run 1 time, every 3 seconds, per user
-    param: ctx The context of which the command is entered
-    param: word - The word you want to remove from the banned words list
-    """
-    if word.lower() in bannedWords:
-        bannedWords.remove(word.lower())
-
-        with open("./banned.json", "r+") as f:
-            data = json.load(f)
-            data["bannedWords"] = bannedWords
-            f.seek(0)
-            f.write(json.dumps(data))
-            f.truncate()
-
-        await ctx.send(f"```{word} removed from banned words list```")
-
-    # if the word isn't in the list
-    else:
-        await ctx.send(f"```{word} isn't banned```")
-
-
-@bot.command(aliases=['bl'])
-@commands.has_permissions(administrator=True)
-@commands.cooldown(1, 5, commands.BucketType.user)
-async def banlist(ctx):
-    """
-    print all of the banned words to the current channel
-    only admin should be able to run this, can be run only 1 time, every 5 seconds per user
-    param: ctx The context of which the command is entered
-    """
-    msg = ""
-    for w in bannedWords:
-        msg = msg + "\n" + w
-    await ctx.send(f"```Banned Words:{msg}```")
 
 bot.run(os.getenv("DISCORD_TOKEN"))

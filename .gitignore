@@ -1,10 +1,15 @@
 # python files
 *.pyc
-__pycache__
+/__pycache__
+/cogs/__pycache__
 .python-version
+seequal.py
+sql.py
+mariadb.py
 
 # json files
 banned.json
+*.json
 
 # OS files
 .DS_Store
@@ -13,4 +18,8 @@ banned.json
 .env
 
 # virtual environments
-.venv
+/.venv
+
+# other
+/genius
+/Other

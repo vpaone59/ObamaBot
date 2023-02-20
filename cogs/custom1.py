@@ -13,15 +13,13 @@ class custom1(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['bee', 'b'])
-    @commands.cooldown(1, 2, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def bees(self, ctx):
-        # can be used 1 time, every 2 seconds per user
         await ctx.channel.send(random.choice(bee_reacts))
 
     @commands.command(aliases=['reeve', 'reevez', 'reeves!'])
-    @commands.cooldown(1, 2, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def reeves(self, ctx):
-        # can be used 1 time, every 2 seconds per user
         await ctx.channel.send()
 
 def setup(bot):

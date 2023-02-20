@@ -31,7 +31,7 @@ class counter(commands.Cog):
             my_cursor.execute("UPDATE trackers SET tally=tally+1 WHERE tracker_name = \"meows\"")
             cxn.commit()
             
-    @commands.command(aliases=['reset'])
+    @commands.command(aliases=['reset'], description='Resets the tally for a given *tracker*')
     @commands.has_permissions(administrator=True)
     async def reset_tally(self, ctx, tracker):
         # resets tally counter to zero for a user input tracker_name

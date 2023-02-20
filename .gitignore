@@ -3,9 +3,9 @@
 /__pycache__
 /cogs/__pycache__
 .python-version
+seequal.py
 sql.py
-try.py
-roles.py
+mariadb.py
 
 # json files
 banned.json

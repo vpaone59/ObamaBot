@@ -3,13 +3,17 @@ import random
 from discord.ext import commands
 
 
-class game(commands.Cog):
+class Game(commands.Cog):
     """ 
     game commands for a discord bot
     """
 
     def __init__(self, client):
         self.client = client
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
 
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -56,5 +60,5 @@ class game(commands.Cog):
         else:
             await ctx.channel.send('Obama approves')
         
-def setup(client):
-    client.add_cog(game(client))
+async def setup(client):
+    await client.add_cog(Game(client))

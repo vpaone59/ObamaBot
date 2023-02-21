@@ -11,31 +11,29 @@ import discord # needed
 from discord.ext import commands # needed
 from dotenv import load_dotenv # to load .env variables
 import time
+import asyncio
 
-print(f"> STARTING IN {os.getcwd()}")
-# load env and assign variables
-load_dotenv()
-prefix = os.getenv("PREFIX")
-
-# initialize the bot with its prefix and intents
 intents = discord.Intents.default()
-# intents.message_content = True
-bot = commands.Bot(command_prefix=prefix, intents=intents)
+intents.message_content = True
+bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
+    
+async def main():
+    async with bot:
+        # load cogs
+        await load_all()  
+        await bot.start(os.getenv("DISCORD_TOKEN"))
+        # on_ready will run next
 
 @bot.event
 async def on_ready():
     """
-    runs once the bot is fully connected with Discord
-    https://discordpy.readthedocs.io/en/stable/api.html?highlight=on_ready#discord.on_ready
-    bot logs in then tries to load any cogs in ./cogs
+    runs once the bot establishes a connection with Discord
     """
-    print(f'> === Logged in as {bot.user} ===')
+    print(f'Logged in as {bot.user}')
     try:
-        print('> +++ Loading Cogs...standby +++')
-        loadCogs()
-        print('> +++ Cogs loaded successfully +++')
+        print("Bot ready")
     except:
-        print('> +++ Bot not ready, Cogs not loaded +++')
+        print('Bot not ready')
 
 
 @bot.event
@@ -66,11 +64,11 @@ def loadCogs():
             try:
                 # -3 cuts the .py extension from filename
                 bot.load_extension(f'cogs.{filename[:-3]}')
-                print(f'>\tCog {filename} loaded\t<')
+                print(f'Cog {filename} loaded')
             except commands.ExtensionAlreadyLoaded:
-                print(f'>\tCog {filename} aleady loaded\t<')
+                print(f'Cog {filename} aleady loaded')
             except:
-                print(f'>\tCog {filename} NOT loaded\t<')
+                print(f'Cog {filename} NOT loaded')
 
 
 def unloadCogs():
@@ -82,10 +80,18 @@ def unloadCogs():
         if filename.endswith('.py'):
             try:
                 bot.unload_extension(f'cogs.{filename[:-3]}')
-                print(f'>\tCog {filename} unloaded successfully\t<')
+                print(f'Cog {filename} unloaded successfully')
             except commands.ExtensionNotLoaded:
-                print(f'>\tCog {filename} is not loaded\t<')
+                print(f'Cog {filename} is not loaded')
 
+async def load_all():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            try:
+                await bot.load_extension(f'cogs.{filename[:-3]}')
+                print(f'{filename} loaded')
+            except:
+                print(f'Could not load {filename}')
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -97,8 +103,8 @@ async def load(ctx, extension):
     param: extension - The name of the Cog file you want to load
     """
     try:
-        bot.load_extension(f'cogs.{extension}')
-        ctx.send(f'```Cog {extension}.py loaded```')
+        await bot.load_extension(f'cogs.{extension}')
+        await ctx.send(f'```Cog {extension}.py loaded```')
     except commands.ExtensionAlreadyLoaded:
         await ctx.send(f'```{extension}.py is already loaded```')
     except commands.ExtensionNotFound:
@@ -115,7 +121,7 @@ async def unload(ctx, extension):
     param: extension - The name of the Cog file to unload
     """
     try:
-        bot.unload_extension(f'cogs.{extension}')
+        await bot.unload_extension(f'cogs.{extension}')
         await ctx.send(f'```Cog {extension}.py unloaded```')
     except commands.ExtensionNotLoaded:
         await ctx.send(f'```{extension}.py is not loaded```')
@@ -142,7 +148,7 @@ async def refresh(ctx, extension):
         try:
             print(f'> Reloading {extension}.py --')
             
-            bot.reload_extension(f'cogs.{extension}')
+            await bot.reload_extension(f'cogs.{extension}')
             
             print(f'> -- {extension}.py reloaded.')
             await ctx.send(f'```Cog {extension}.py reloaded```')
@@ -151,4 +157,4 @@ async def refresh(ctx, extension):
         except:
             await ctx.send(f'```Cog {extension}.py could not be reloaded```')
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+asyncio.run(main())

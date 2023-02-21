@@ -6,7 +6,7 @@ ball_phrases = ['Did someone say...ball?',
                 'Status: Balling.', ':rotating_light: Baller alert :rotating_light:']
 
 
-class media(commands.Cog):
+class Media(commands.Cog):
     """
     Media cogs/commands for Obama Bot
     These commands will send media to the Guild the command was run in
@@ -14,6 +14,10 @@ class media(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
 
     @commands.Cog.listener("on_message")
     async def obama_msg(self, message):
@@ -102,5 +106,5 @@ class media(commands.Cog):
         await ctx.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
 
 
-def setup(client):
-    client.add_cog(media(client))
+async def setup(client):
+    await client.add_cog(Media(client))

@@ -4,13 +4,17 @@ from discord.ext import commands
 bee_reacts = ["<:obamagiga:844300314936213565> :point_right: :bee:",
               ":bee: :broom: <:feelsobama:842634906999193620>", "<:obamajoy:842822700912476190> :fire: :bee: :fire:"]
 
-class custom1(commands.Cog):
+class Custom1(commands.Cog):
     """
     custom commands made for a specific discord guild
     """
 
     def __init__(self, bot):
         self.bot = bot
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
 
     @commands.command(aliases=['bee', 'b'])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -22,5 +26,5 @@ class custom1(commands.Cog):
     async def reeves(self, ctx):
         await ctx.channel.send()
 
-def setup(bot):
-    bot.add_cog(custom1(bot))
+async def setup(bot):
+    await bot.add_cog(Custom1(bot))

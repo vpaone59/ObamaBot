@@ -10,13 +10,17 @@ giphy_key=os.getenv("GIPHY_KEY")
 url = "http://api.giphy.com/v1/gifs/search"
 
 
-class gif_gen(commands.Cog):
+class Gif_gen(commands.Cog):
     """
     giphy api - gif generator via query
     """
 
     def __init__(self, bot):
         self.bot = bot
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
 
     @commands.command(aliases=['gq', 'gif', 'giphy'])
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -37,5 +41,5 @@ class gif_gen(commands.Cog):
         await ctx.send(f'{link}')
 
 
-def setup(bot):
-    bot.add_cog(gif_gen(bot))
+async def setup(bot):
+    await bot.add_cog(Gif_gen(bot))

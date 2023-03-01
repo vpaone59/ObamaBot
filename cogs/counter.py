@@ -16,7 +16,7 @@ try:
 except mysql.connector.Error:
     print(f"Connection to the target failed")
     
-class counter(commands.Cog):
+class Counter(commands.Cog):
     """
     counter Cog for ObamaBot
     keeps a running tally of certain things.
@@ -24,6 +24,10 @@ class counter(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -58,5 +62,5 @@ def connect_db():
     return mydb
 
 
-def setup(client):
-    client.add_cog(counter(client))
+async def setup(client):
+    await client.add_cog(Counter(client))

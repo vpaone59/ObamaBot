@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-class roles(commands.Cog, name='Roles'):
+class Roles(commands.Cog, name='Roles'):
     """
     role related commands for a Bot
     """
@@ -10,7 +10,10 @@ class roles(commands.Cog, name='Roles'):
     def __init__(self, client):
         self.client = client
 
-    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
+        
     @commands.command(name='hasrole', aliases=['hr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hasRole(self, ctx, user: discord.Member = None, check=None):
@@ -73,5 +76,5 @@ class roles(commands.Cog, name='Roles'):
         await ctx.send(f"```Roles in {ctx.guild.name}:{rls}```")
 
 
-def setup(client):
-    client.add_cog(roles(client))
+async def setup(client):
+    await client.add_cog(Roles(client))

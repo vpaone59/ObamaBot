@@ -15,13 +15,16 @@ else:
 # assign current banned words list to variable for use later
 bannedWords = bannedWordsData["bannedWords"]
 
-class ban(commands.Cog):
+class Ban(commands.Cog):
     """
     banned words list management Cog
     """
-
     def __init__(self, bot):
         self.bot = bot
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'{self} ready')
     
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -29,17 +32,15 @@ class ban(commands.Cog):
         listens for an on_message call and compares the message to the banned words list using the msg_contain_word fxn
         if a banned word is detected it is removed and the bot replies with a warning
         """
+        # convert the incoming message object into a lowercase string so its usable
         msg = str(message.content.lower())
-        
-        if message.channel == "logs":
-                print(f'{msg}')
-        
-        if not msg.startswith(f'{os.getenv("PREFIX")}unbanword'):
-            # for word in bannedWords:
-            print(f'OKOKOK')
-            #     if msg_contain_word(msg, word):    
-            #         # await message.delete()
-            #         await message.channel.send(f'```Banned word detected: please do not use banned words. \n\nUse {os.getenv("PREFIX")}banlist to see the full banned words list.```')
+        if msg.startswith(f'{os.getenv("PREFIX")}'):
+            print('Command detected, returning-')
+            return
+        else:
+            for word in bannedWords:
+                if msg_contain_word(msg, word):
+                    await message.channel.send("```Banned word detected. Please do not use banned words.```")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -110,5 +111,5 @@ def msg_contain_word(msg, word):
         """
         return re.search(fr'.*({word}).*', msg) is not None         
         
-def setup(bot):
-    bot.add_cog(ban(bot))
+async def setup(bot):
+    await bot.add_cog(Ban(bot))

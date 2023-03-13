@@ -7,11 +7,14 @@ There is no serious political offiliation. This is all in good fun.
 """
 
 import os # os calls
+from dotenv import load_dotenv
 import discord # needed
 from discord.ext import commands # needed
 from dotenv import load_dotenv # to load .env variables
 import time
 import asyncio
+
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True

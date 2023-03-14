@@ -105,6 +105,12 @@ class Media(commands.Cog):
     async def lip_bite(self, ctx):
         await ctx.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
 
+    @commands.command(aliases=['smoile'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def wink(self, ctx):
+        print("wink")
+        await ctx.channel.send(file=discord.File('gifs/obama-wink.gif'))
+    
 
 async def setup(client):
     await client.add_cog(Media(client))

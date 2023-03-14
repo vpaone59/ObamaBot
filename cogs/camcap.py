@@ -22,26 +22,25 @@ class Camcap(commands.Cog):
 
     @commands.command(aliases=['catcap','catpic','catsnap', 'cat'])
     async def cat_cap(self, ctx):
-
-        cam = cv2.VideoCapture(0)
-
-        cv2.namedWindow("Cat Cap")
-
         frame_counter = 0
+        cam = cv2.VideoCapture(0)
+        
+        cv2.namedWindow("Cat Cap")
         ret, frame = cam.read()
+        
         if not ret:
             print("failed to grab frame")
         cv2.imshow("Cat Cap", frame)
-
-        img_name = "gifs/cat_cap_{}.png".format(frame_counter)
+        
+        img_name = "gifs/cat_cap_{}.jpg".format(frame_counter)
         cv2.imwrite(img_name, frame)
-        print("{} written!".format(img_name))
+        
+        # print("{} written!".format(img_name))
 
         cam.release()
-
         cv2.destroyAllWindows()
 
-        await ctx.send(file=discord.File('gifs/cat_cap_0.png'))
+        await ctx.send(file=discord.File('gifs/cat_cap_0.jpg'))
 
 async def setup(client):
     await client.add_cog(Camcap(client))

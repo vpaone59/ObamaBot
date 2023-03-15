@@ -25,7 +25,7 @@ class Camcap(commands.Cog):
         then sends it to the discord channel
         """
         frame_counter = 0
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(-1)
 
         cv2.namedWindow("Cat Cap")
         ret, frame = cam.read()

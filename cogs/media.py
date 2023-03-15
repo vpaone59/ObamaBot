@@ -14,7 +14,7 @@ class Media(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')
@@ -28,42 +28,42 @@ class Media(commands.Cog):
     @commands.command(aliases=['wed'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def wednesday(self, ctx):
-        await ctx.send(file=discord.File('gifs/wednesday.jpg'))
+        await ctx.send(file=discord.File('gifs/obama/wednesday.jpg'))
 
     @commands.command(aliases=['c'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def cry(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-cry.gif'))
+        await ctx.send(file=discord.File('gifs/obama/obama-cry.gif'))
 
     @commands.command(aliases=['md'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def micdrop(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-micdrop.gif'))
+        await ctx.send(file=discord.File('gifs/obama/obama-micdrop.gif'))
 
     @commands.command(aliases=['mb'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def micbomb(self, ctx):
-        await ctx.send(file=discord.File('gifs/obama-micbomb.gif'))
+        await ctx.send(file=discord.File('gifs/obama/obama-micbomb.gif'))
 
     @commands.command(aliases=['gm'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def goodmorning(self, ctx):
-        await ctx.send(f'Goodmorning my fellow Americans!', file=discord.File('gifs/obama-smile.jpg'))
+        await ctx.send(f'Goodmorning my fellow Americans!', file=discord.File('gifs/obama/obama-smile.jpg'))
 
     @commands.command(aliases=['gn'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def goodnight(self, ctx):
-        await ctx.send(f'Goodnight and God Bless!', file=discord.File('gifs/obama-sleep.jpeg'))
+        await ctx.send(f'Goodnight and God Bless!', file=discord.File('gifs/obama/obama-sleep.jpeg'))
 
     @commands.command(aliases=['balls'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def ball(self, ctx):
-        await ctx.channel.send(random.choice(ball_phrases), file=discord.File('gifs/obama-basketball.jpg'))
+        await ctx.channel.send(random.choice(ball_phrases), file=discord.File('gifs/obama/obama-basketball.jpg'))
 
     @commands.command(aliases=['monkey', 'm'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def monkey_falling(self, ctx):
-        await ctx.send(file=discord.File('gifs/monkey-fall.gif'))
+        await ctx.send(file=discord.File('gifs/obama/monkey-fall.gif'))
 
     @commands.command(aliases=['poggers'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -73,7 +73,7 @@ class Media(commands.Cog):
     @commands.command(aliases=['thanks'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def thanks_obama(self, ctx):
-        await ctx.channel.send(f'You\'re welcome! <:obamacare:844291609663111208>\n', file=discord.File('gifs/obama-smile.jpg'))
+        await ctx.channel.send(f'You\'re welcome! <:obamacare:844291609663111208>\n', file=discord.File('gifs/obama/obama-smile.jpg'))
 
     @commands.command(aliases=['obunga'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -88,7 +88,7 @@ class Media(commands.Cog):
     @commands.command(aliases=['o'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def obama(self, ctx):
-        await ctx.channel.send(file=discord.File('gifs/obama-wave.jpg'))
+        await ctx.channel.send(file=discord.File('gifs/obama/obama-wave.jpg'))
 
     @commands.command(aliases=['idk'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -98,19 +98,19 @@ class Media(commands.Cog):
     @commands.command(aliases=['who', 'whoasked'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def who_asked(self, ctx):
-        await ctx.channel.send(file=discord.File('gifs/biden-looking.jpg'))
+        await ctx.channel.send(file=discord.File('gifs/obama/biden-looking.jpg'))
 
     @commands.command()
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def lip_bite(self, ctx):
-        await ctx.channel.send(file=discord.File('gifs/obama-lip_bite.jpg'))
+        await ctx.channel.send(file=discord.File('gifs/obama/obama-lip_bite.jpg'))
 
     @commands.command(aliases=['smoile'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def wink(self, ctx):
         print("wink")
-        await ctx.channel.send(file=discord.File('gifs/obama-wink.gif'))
-    
+        await ctx.channel.send(file=discord.File('gifs/obama/obama-wink.gif'))
+
 
 async def setup(client):
     await client.add_cog(Media(client))

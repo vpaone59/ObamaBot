@@ -1,19 +1,23 @@
+"""
+Roles Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+"""
 import discord
 from discord.ext import commands
 from discord.utils import get
+
 
 class Roles(commands.Cog, name='Roles'):
     """
     role related commands for a Bot
     """
-    
+
     def __init__(self, client):
         self.client = client
 
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')
-        
+
     @commands.command(name='hasrole', aliases=['hr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hasRole(self, ctx, user: discord.Member = None, check=None):
@@ -34,7 +38,6 @@ class Roles(commands.Cog, name='Roles'):
             else:
                 await ctx.send(f"User{user.mention} does not have the **{check}** role")
 
-    
     @commands.command(aliases=['cr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def createrole(self, ctx, role):
@@ -49,7 +52,6 @@ class Roles(commands.Cog, name='Roles'):
             await ctx.guild.create_role(name=role, color=discord.Color(0x0062ff))
             await ctx.send(f"{role} has been created")
 
-    
     @commands.command(aliases=['dr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def deleterole(self, ctx, role):
@@ -65,7 +67,6 @@ class Roles(commands.Cog, name='Roles'):
             await r.delete()
             await ctx.send(f"{role} has been deleted")
 
-    
     @commands.command(aliases=['lr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def listroles(self, ctx):

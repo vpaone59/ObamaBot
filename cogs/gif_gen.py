@@ -1,3 +1,6 @@
+"""
+Gif Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+"""
 import random
 import os
 import json
@@ -6,7 +9,7 @@ from urllib import parse, request
 from discord.ext import commands
 
 # grab giphy key & assign url to variable
-giphy_key=os.getenv("GIPHY_KEY")
+giphy_key = os.getenv("GIPHY_KEY")
 url = "http://api.giphy.com/v1/gifs/search"
 
 
@@ -17,7 +20,7 @@ class Gif_gen(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')

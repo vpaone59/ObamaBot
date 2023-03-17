@@ -1,13 +1,19 @@
+"""
+Camcap Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+This Cog is custom made for a specific server and will not work in normal servers.
+"""
+
+import time
 import discord
 from discord.ext import commands
-import time
 import cv2
 
 
 class Camcap(commands.Cog):
     """
-    counter Cog for ObamaBot
-    keeps a running tally of certain things.
+    camera capture commands that uses webcams to take pictures,
+    record videos, etc
     """
 
     def __init__(self, client):
@@ -15,6 +21,9 @@ class Camcap(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        runs when Cog is loaded and ready to use
+        """
         print(f'{self} ready')
 
     @commands.command(aliases=['catcap', 'catpic', 'catsnap', 'cat'])
@@ -50,7 +59,7 @@ class Camcap(commands.Cog):
         records a 5 second video through webcam and saves the file
         then sends the file to the discord channel
         """
-        rec = cv2.VideoCapture(0)
+        rec = cv2.VideoCapture(1)
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         video_output = cv2.VideoWriter(

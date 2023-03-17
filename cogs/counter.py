@@ -1,3 +1,9 @@
+"""
+Counter Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+This Cog is custom made for a specific server and will not work in normal servers.
+"""
+
 from discord.ext import commands
 import mysql.connector
 from dotenv import load_dotenv
@@ -19,8 +25,7 @@ except mysql.connector.Error:
 
 class Counter(commands.Cog):
     """
-    counter Cog for ObamaBot
-    keeps a running tally of certain things.
+    keeps a running tally of certain things...
     """
 
     def __init__(self, client):

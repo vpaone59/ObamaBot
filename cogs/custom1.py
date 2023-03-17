@@ -1,8 +1,15 @@
+"""
+Custom1 Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+This Cog is custom made for a specific server and will not work in normal servers.
+"""
+
 import random
 from discord.ext import commands
 
 bee_reacts = ["<:obamagiga:844300314936213565> :point_right: :bee:",
               ":bee: :broom: <:feelsobama:842634906999193620>", "<:obamajoy:842822700912476190> :fire: :bee: :fire:"]
+
 
 class Custom1(commands.Cog):
     """
@@ -11,7 +18,7 @@ class Custom1(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')
@@ -25,6 +32,7 @@ class Custom1(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def reeves(self, ctx):
         await ctx.channel.send()
+
 
 async def setup(bot):
     await bot.add_cog(Custom1(bot))

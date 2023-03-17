@@ -1,3 +1,9 @@
+"""
+General Commands Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+These are general use commands that any bot should have by default.
+"""
+
 from discord.ext import commands
 
 
@@ -8,7 +14,7 @@ class General(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')
@@ -45,6 +51,7 @@ class General(commands.Cog):
         result = fibonacci(n)
         await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
 
+
 def fibonacci(n):
     # calculate fibonacci sequence for a given n
     if n < 0:
@@ -58,6 +65,7 @@ def fibonacci(n):
     else:
         fib = fibonacci(n-1) + fibonacci(n-2)
         return fib
+
 
 async def setup(client):
     await client.add_cog(General(client))

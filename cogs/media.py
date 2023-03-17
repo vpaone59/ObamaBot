@@ -1,3 +1,6 @@
+"""
+Media Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+"""
 import discord
 import random
 from discord.ext import commands

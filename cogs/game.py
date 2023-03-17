@@ -1,3 +1,7 @@
+"""
+Game Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+"""
+
 import asyncio
 import random
 from discord.ext import commands
@@ -10,7 +14,7 @@ class Game(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'{self} ready')
@@ -46,9 +50,10 @@ class Game(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def react(self, ctx):
         # waits for the user to react with the same emoji the Bot used
-        
+
         await ctx.send('React using 🍆 within 5 seconds')
         # checks the author of the reaction and which reaction emoji they used
+
         def check(reaction, user):
             return user == ctx.message.author and reaction.emoji == '🍆'
 
@@ -59,6 +64,7 @@ class Game(commands.Cog):
             await ctx.channel.send('ERROR: Timeout Exception')
         else:
             await ctx.channel.send('Obama approves')
-        
+
+
 async def setup(client):
     await client.add_cog(Game(client))

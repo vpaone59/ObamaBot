@@ -5,6 +5,7 @@ This Cog is custom made for a specific server and will not work in normal server
 """
 
 import time
+import random
 import discord
 from discord.ext import commands
 import cv2
@@ -33,8 +34,10 @@ class Camcap(commands.Cog):
         takes a quick picture from the webcam and saves the file
         then sends it to the discord channel
         """
+        rand_Cam = random.randint(0, 2)  # index 1 is the logitech webcam
+        print(rand_Cam)
         frame_counter = 0
-        cam = cv2.VideoCapture(-1)
+        cam = cv2.VideoCapture(rand_Cam)
 
         cv2.namedWindow("Cat Cap")
         ret, frame = cam.read()
@@ -45,7 +48,7 @@ class Camcap(commands.Cog):
 
         img_name = "gifs/catcam/cat_cap_{}.jpg".format(frame_counter)
         cv2.imwrite(img_name, frame)
-        # print("{} written!".format(img_name))
+        print("{} written!".format(img_name))
 
         cam.release()
         cv2.destroyAllWindows()
@@ -61,12 +64,12 @@ class Camcap(commands.Cog):
         """
         rec = cv2.VideoCapture(1)
 
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
         video_output = cv2.VideoWriter(
-            'gifs/catcam/cat_rec.mp4', fourcc, 20.0, (640, 480))
+            'gifs/catcam/cat_rec.avi', fourcc, 25.0, (640, 480))
 
         start_time = time.time()
-        while (time.time() - start_time) < 5.0:
+        while (time.time() - start_time) < 3.0:
             ret, frame = rec.read()
             if ret:
                 video_output.write(frame)
@@ -76,7 +79,7 @@ class Camcap(commands.Cog):
         rec.release()
         video_output.release()
 
-        await ctx.send(file=discord.File('gifs/catcam/cat_rec.mp4'))
+        await ctx.send(file=discord.File('gifs/catcam/cat_rec.avi'))
 
 
 async def setup(client):

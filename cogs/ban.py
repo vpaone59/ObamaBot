@@ -44,8 +44,7 @@ class Ban(commands.Cog):
         # convert the incoming message object into a lowercase string so its usable
         msg = str(message.content.lower())
         if msg.startswith(f'{os.getenv("PREFIX")}'):
-            print('Command detected, returning-')
-            return
+            return  # command was probably used so we return
         else:
             for word in bannedWords:
                 if msg_contain_word(msg, word):

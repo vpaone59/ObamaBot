@@ -17,6 +17,9 @@ class Game(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        runs when Cog is loaded and ready to use
+        """
         print(f'{self} ready')
 
     @commands.command()

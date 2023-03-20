@@ -25,17 +25,19 @@ class Game(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.guild)
     async def roll(self, ctx):
-        # can be used 1 time, every 2 seconds per user
-        # randomly rolls between 1 and 10,000
+        """
+        Roll a random int from 1 to 10000
+        """
         roll = random.randint(1, 10000)
         await ctx.send(f'{ctx.message.author.name} rolled {roll}')
 
     @commands.command(aliases=['duel'])
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def numberduel(self, ctx):
-        # can be used 1 time, every 5 seconds per user
-        # number roll 1v1 game
-
+        """
+        Rolls 2 random ints and compares them
+        parameter is @another_user
+        """
         user1 = ctx.message.author.name
         user2 = ctx.message.mentions[0].name
 
@@ -52,7 +54,9 @@ class Game(commands.Cog):
     @commands.command(aliases=['r'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def react(self, ctx):
-        # waits for the user to react with the same emoji the Bot used
+        """
+        Waits for the user to react with the same emoji the Bot used
+        """
 
         await ctx.send('React using 🍆 within 5 seconds')
         # checks the author of the reaction and which reaction emoji they used

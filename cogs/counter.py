@@ -48,7 +48,9 @@ class Counter(commands.Cog):
     @commands.command(aliases=['reset'], description='Resets the tally for a given *tracker*')
     @commands.has_permissions(administrator=True)
     async def reset_tally(self, ctx, tracker):
-        # resets tally counter to zero for a user input tracker_name
+        """
+        Resets tally counter to zero for a user input tracker_name
+        """
         db_conn = connect_db()
 
         sql = "UPDATE trackers SET tally=0 WHERE tracker_name = %s"
@@ -63,7 +65,9 @@ class Counter(commands.Cog):
 
 
 def connect_db():
-    # fxn that connects to the database
+    """
+    Function that connects to the database
+    """
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",

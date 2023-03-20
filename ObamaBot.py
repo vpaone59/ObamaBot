@@ -49,7 +49,6 @@ async def on_message(message):
     every time there is a message in any channel in any guild, this runs
     param message - The message that was last sent to the channel
     """
-
     # ignore messages sent from the bot itself and other bots
     # prevents infinite replying
     if message.author == bot.user or message.author.bot:

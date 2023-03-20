@@ -73,7 +73,9 @@ class Roles(commands.Cog, name='Roles'):
     @commands.command(aliases=['lr'])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def listroles(self, ctx):
-        # list all of the roles in the current guild
+        """
+        list all of the roles in the current guild
+        """
         rls = ""
         for r in ctx.guild.roles:
             rls = rls + "\n" + r.name

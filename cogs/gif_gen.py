@@ -31,8 +31,10 @@ class Gif_gen(commands.Cog):
     @commands.command(aliases=['gq', 'gif', 'giphy'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def giphyquery(self, ctx, *query):
-        # uses giphy api to search for gifs using user input query strings
-        # picks 10 gifs and then randomly chooses 1 to send
+        """
+        Uses giphy api to search for gifs using user input query strings
+        Picks 10 gifs and then randomly chooses 1 to send
+        """
         params = parse.urlencode({
             "q": query,
             "api_key": giphy_key,

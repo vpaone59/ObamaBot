@@ -1,7 +1,11 @@
-from discord.ext import commands
+"""
+Ban Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+"""
+
 import json
 import os
 import re
+from discord.ext import commands
 
 # find 'banned.json'
 # if it doesn't exist, auto create a new one from template
@@ -15,17 +19,22 @@ else:
 # assign current banned words list to variable for use later
 bannedWords = bannedWordsData["bannedWords"]
 
+
 class Ban(commands.Cog):
     """
-    banned words list management Cog
+    banned words list management commands
     """
+
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        runs when Cog is loaded and ready to use
+        """
         print(f'{self} ready')
-    
+
     @commands.Cog.listener()
     async def on_message(self, message):
         """
@@ -35,8 +44,7 @@ class Ban(commands.Cog):
         # convert the incoming message object into a lowercase string so its usable
         msg = str(message.content.lower())
         if msg.startswith(f'{os.getenv("PREFIX")}'):
-            print('Command detected, returning-')
-            return
+            return  # command was probably used so we return
         else:
             for word in bannedWords:
                 if msg_contain_word(msg, word):
@@ -91,7 +99,6 @@ class Ban(commands.Cog):
         else:
             await ctx.send(f"```{word} isn't banned```")
 
-
     @commands.command(aliases=['bl'])
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -104,12 +111,14 @@ class Ban(commands.Cog):
         for w in bannedWords:
             msg = msg + "\n" + w
         await ctx.send(f"```Banned Words:{msg}```")
-        
+
+
 def msg_contain_word(msg, word):
-        """
-        return true if there is a banned word in the message
-        """
-        return re.search(fr'.*({word}).*', msg) is not None         
-        
+    """
+    return true if there is a banned word in the message
+    """
+    return re.search(fr'.*({word}).*', msg) is not None
+
+
 async def setup(bot):
     await bot.add_cog(Ban(bot))

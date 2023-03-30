@@ -16,6 +16,7 @@ banned.json
 
 # environment files
 .env
+.env*
 
 # virtual environments
 /.venv
@@ -23,5 +24,5 @@ banned.json
 # other
 /genius
 /Other
-/gifs/catcam
-/gifs/obama
+gifs/catcam
+gifs/weird

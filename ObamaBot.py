@@ -6,26 +6,30 @@ ObamaBot - main file. Run this file to start the bot.
 There is no serious political offiliation. This is all in good fun.
 """
 
-import os # os calls
-from dotenv import load_dotenv
-import discord # needed
-from discord.ext import commands # needed
-from dotenv import load_dotenv # to load .env variables
+import os  # os calls
 import time
 import asyncio
+import discord  # needed
+from discord.ext import commands  # needed
+from dotenv import load_dotenv  # to load .env variables
 
 load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-    
+
+
 async def main():
+    """
+    main function that starts the Bot
+    """
     async with bot:
         # load cogs
-        await load_all()  
+        await load_all()
         await bot.start(os.getenv("DISCORD_TOKEN"))
         # on_ready will run next
+
 
 @bot.event
 async def on_ready():
@@ -35,8 +39,8 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     try:
         print("Bot ready")
-    except:
-        print('Bot not ready')
+    except Exception as e:
+        print(f'Bot not ready {e}')
 
 
 @bot.event
@@ -45,19 +49,19 @@ async def on_message(message):
     every time there is a message in any channel in any guild, this runs
     param message - The message that was last sent to the channel
     """
-
     # ignore messages sent from the bot itself and other bots
     # prevents infinite replying
     if message.author == bot.user or message.author.bot:
         return
 
-    messageAuthor = message.author
-    user_message = str(message.content)
+    # messageAuthor = message.author
+    # user_message = str(message.content)
 
     # necessary to process the bot's message
     await bot.process_commands(message)
 
-def loadCogs():
+
+def load_Cogs():
     """
     Function to load all Cogs that live in the cogs folder
     Ran on Bot startup
@@ -70,11 +74,11 @@ def loadCogs():
                 print(f'Cog {filename} loaded')
             except commands.ExtensionAlreadyLoaded:
                 print(f'Cog {filename} aleady loaded')
-            except:
-                print(f'Cog {filename} NOT loaded')
+            except Exception as e:
+                print(f'Cog {filename} NOT loaded\n{e}')
 
 
-def unloadCogs():
+def unload_Cogs():
     """
     Function to unload all Cogs in the cogs folder
     Runs on -rl all
@@ -87,14 +91,20 @@ def unloadCogs():
             except commands.ExtensionNotLoaded:
                 print(f'Cog {filename} is not loaded')
 
+
 async def load_all():
+    """
+    goes through the /cogs dir and tries to load \
+    every file with .py extension
+    """
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
             try:
                 await bot.load_extension(f'cogs.{filename[:-3]}')
                 print(f'{filename} loaded')
-            except:
-                print(f'Could not load {filename}')
+            except Exception as e:
+                print(f'Could not load {filename}\n{e}')
+
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -143,21 +153,21 @@ async def refresh(ctx, extension):
     """
     if extension == 'all':
         # unload, rest for 2 seconds, then load
-        unloadCogs()
+        unload_Cogs()
         time.sleep(2)
-        loadCogs()
+        load_Cogs()
         await ctx.send('```Success reloading all cogs```')
     else:
         try:
             print(f'> Reloading {extension}.py --')
-            
+
             await bot.reload_extension(f'cogs.{extension}')
-            
+
             print(f'> -- {extension}.py reloaded.')
             await ctx.send(f'```Cog {extension}.py reloaded```')
         except commands.ExtensionNotFound:
             await ctx.send(f'```Cog {extension}.py not in directory```')
-        except:
-            await ctx.send(f'```Cog {extension}.py could not be reloaded```')
+        except Exception as e:
+            await ctx.send(f'```Cog {extension}.py could not be reloaded\n{e}```')
 
 asyncio.run(main())

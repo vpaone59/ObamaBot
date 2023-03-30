@@ -1,3 +1,9 @@
+"""
+Counter Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+This Cog is custom made for a specific server and will not work in normal servers.
+"""
+
 from discord.ext import commands
 import mysql.connector
 from dotenv import load_dotenv
@@ -19,8 +25,7 @@ except mysql.connector.Error:
 
 class Counter(commands.Cog):
     """
-    counter Cog for ObamaBot
-    keeps a running tally of certain things.
+    keeps a running tally of certain things...
     """
 
     def __init__(self, client):
@@ -28,6 +33,9 @@ class Counter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        runs when Cog is loaded and ready to use
+        """
         print(f'{self} ready')
 
     @commands.Cog.listener()
@@ -40,7 +48,9 @@ class Counter(commands.Cog):
     @commands.command(aliases=['reset'], description='Resets the tally for a given *tracker*')
     @commands.has_permissions(administrator=True)
     async def reset_tally(self, ctx, tracker):
-        # resets tally counter to zero for a user input tracker_name
+        """
+        Resets tally counter to zero for a user input tracker_name
+        """
         db_conn = connect_db()
 
         sql = "UPDATE trackers SET tally=0 WHERE tracker_name = %s"
@@ -55,7 +65,9 @@ class Counter(commands.Cog):
 
 
 def connect_db():
-    # fxn that connects to the database
+    """
+    Function that connects to the database
+    """
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",

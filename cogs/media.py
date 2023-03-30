@@ -1,12 +1,19 @@
 """
 Media Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 """
+
+import os
 import discord
 import random
+from PIL import Image, ImageDraw
 from discord.ext import commands
+import colorgram
 
 ball_phrases = ['Did someone say...ball?',
                 'Status: Balling.', ':rotating_light: Baller alert :rotating_light:']
+
+obama_pics = os.listdir(os.getcwd() + '/gifs/obama')
+obama_dir = 'gifs/obama/'
 
 
 class Media(commands.Cog):
@@ -165,8 +172,60 @@ class Media(commands.Cog):
         """
         Reply with media
         """
-        print("wink")
         await ctx.channel.send(file=discord.File('gifs/obama/obama-wink.gif'))
+
+    @commands.command(aliases=['pixel'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def pixel_image(self, ctx, pixel_count=16):
+        """
+        Pick a random file, select 24 RGB pixels, redraw the file using only those pixels
+        """
+        rgb_colors = []
+        non_gif_files = [f for f in obama_pics if not f.endswith('.gif')]
+        file = random.choice(non_gif_files)
+
+        try:
+            # extract 24 RGB colors from the image
+            # this might fail if there is something wrong with the file (wrong file type, etc)
+            colors = colorgram.extract(
+                os.path.join(obama_dir, file), pixel_count)
+        except Exception as e:
+            print(e)
+
+        for color in colors:
+            r = color.rgb.r
+            g = color.rgb.g
+            b = color.rgb.b
+            new_color = (r, g, b)
+            rgb_colors.append(new_color)
+
+        # Determine the number of squares to be displayed per row and column
+        num_squares = len(rgb_colors)
+        num_per_row = int(num_squares ** 0.5)
+        # Calculate the number of rows the image will have, based on whether or not its a square
+        num_rows = num_per_row if num_per_row ** 2 == num_squares else num_per_row + 1
+
+        # Determine the size of each square
+        square_size = 50
+        total_width = num_per_row * square_size
+        total_height = num_rows * square_size
+
+        # Create the image and draw each square
+        image = Image.new('RGB', (total_width, total_height))
+        draw = ImageDraw.Draw(image)
+
+        # Draw the image, 1 color block at a time
+        for i, color in enumerate(rgb_colors):
+            row = i // num_per_row
+            col = i % num_per_row
+            x = col * square_size
+            y = row * square_size
+            draw.rectangle(
+                [(x, y), (x+square_size, y+square_size)], fill=color)
+
+        # Save the image to a file
+        image.save('gifs/obama/pixel_obama.png')
+        await ctx.send(f'```{file}, in {pixel_count} pixels!```', file=discord.File('gifs/obama/pixel_obama.png'))
 
 
 async def setup(client):

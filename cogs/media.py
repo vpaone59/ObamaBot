@@ -178,10 +178,11 @@ class Media(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def pixel_image(self, ctx, pixel_count=16):
         """
-        Pick a random file, select 24 RGB pixels, redraw the file using only those pixels
+        Pick a random file, select RGB pixels, redraw the file using only those pixels
         """
         rgb_colors = []
-        non_gif_files = [f for f in obama_pics if not f.endswith('.gif')]
+        non_gif_files = [f for f in obama_pics if not f.endswith(
+            '.gif') or f == 'pixel_obama.png']
         file = random.choice(non_gif_files)
 
         try:
@@ -189,6 +190,7 @@ class Media(commands.Cog):
             # this might fail if there is something wrong with the file (wrong file type, etc)
             colors = colorgram.extract(
                 os.path.join(obama_dir, file), pixel_count)
+            print(colors)
         except Exception as e:
             print(e)
 
@@ -198,6 +200,7 @@ class Media(commands.Cog):
             b = color.rgb.b
             new_color = (r, g, b)
             rgb_colors.append(new_color)
+            print(color.proportion)  # get % of each pixel in the image
 
         # Determine the number of squares to be displayed per row and column
         num_squares = len(rgb_colors)
@@ -225,6 +228,10 @@ class Media(commands.Cog):
 
         # Save the image to a file
         image.save('gifs/obama/pixel_obama.png')
+
+        # adjust the number of pixels printed out
+        # if user input 50 and image could only do 36, it will say 36 pixels
+        pixel_count = num_squares
         await ctx.send(f'```{file}, in {pixel_count} pixels!```', file=discord.File('gifs/obama/pixel_obama.png'))
 
 

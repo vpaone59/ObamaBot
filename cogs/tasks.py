@@ -41,7 +41,7 @@ class Tasks(commands.Cog):
         """
         Start the Wednesday Meme Task. !start_memes (seconds) (minutes) (hours)
         """
-
+        self.memes_channel = ctx.channel
         if seconds <= 1 or minutes < 0 or hours < 0:
             if seconds < 1:
                 await ctx.send("```Seconds cannot be less than or equal to 1```")
@@ -53,37 +53,41 @@ class Tasks(commands.Cog):
                 self.send_meme.change_interval(
                     seconds=seconds, minutes=minutes, hours=hours)
                 self.send_meme.start(ctx.channel)
-                self.tasks.append(self.send_meme)
+                self.tasks.append("Memes.task")
                 await ctx.send(
                     f"```Memes task was started in this channel and will run every {self.send_meme.seconds} seconds, {self.send_meme.minutes} minutes, and {self.send_meme.hours} hours.```")
             except Exception as e:
-                print(f"ERROR {e}")
-                await ctx.send(f"```ERROR {e}")
+                await ctx.send(f"```ERROR {e}```")
 
     @commands.command()
     async def stop_memes(self, ctx):
         """
         Stop the Wednesday Meme Task
         """
-        try:
-            self.send_meme.cancel()
-            await ctx.send("```Memes task was stopped in this channel.```")
-        except Exception as e:
-            print(f"ERROR {e}")
-            await ctx.send(f"```ERROR {e}```")
+        if ctx.channel == self.memes_channel:
+            try:
+                self.send_meme.cancel()
+                self.tasks.remove("Memes.task")
+                await ctx.send("```Memes task was stopped in this channel.```")
+            except Exception as e:
+                print(f"ERROR {e}")
+                await ctx.send(f"```ERROR {e}```")
+        else:
+            await ctx.send("```Task was not stopped.\nMust send the stop_memes command from the same channel the task is running in. You can check the status of tasks using the tasks_status command.```")
 
-    @commands.command()
+    @commands.command(aliases=['tasks', 'status'])
     async def tasks_status(self, ctx):
         """
         Show the status of all currently running tasks.
         """
-        print(self.tasks)
-        running_tasks = []
+        running_tasks = 'Running Tasks:\n'
         for task in self.tasks:
-            running_tasks.append(f"{task.__name__} is running.")
+            if task == "Memes.task":
+                task += " in Channel: " + str(self.memes_channel)
+            running_tasks += task
 
-        if running_tasks:
-            message = "Currently running tasks:\n\n" + "\n".join(running_tasks)
+        if self.tasks:
+            message = running_tasks
         else:
             message = "There are no running tasks."
 

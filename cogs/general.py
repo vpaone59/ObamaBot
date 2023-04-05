@@ -12,8 +12,8 @@ class General(commands.Cog):
     general commands for a Bot
     """
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -44,8 +44,8 @@ class General(commands.Cog):
         """
         Send ping to server
         """
-        client_latency = round(self.client.latency * 1000, 2)
-        await ctx.send(f'pong {client_latency}ms')
+        bot_latency = round(self.bot.latency * 1000, 2)
+        await ctx.send(f'pong {bot_latency}ms')
 
     @commands.command(name='fibonacci', aliases=['fib'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -76,5 +76,5 @@ def fibonacci(n):
         return fib
 
 
-async def setup(client):
-    await client.add_cog(General(client))
+async def setup(bot):
+    await bot.add_cog(General(bot))

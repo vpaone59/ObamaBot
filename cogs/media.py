@@ -22,8 +22,8 @@ class Media(commands.Cog):
     These commands will send media to the Guild the command was run in
     """
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -35,7 +35,7 @@ class Media(commands.Cog):
     @commands.Cog.listener("on_message")
     async def obama_msg(self, message):
         # listens for an on_message hit and then runs the following
-        if message.author == self.client.user or message.author.bot:
+        if message.author == self.bot.user or message.author.bot:
             return
 
     @commands.command(aliases=['wed'])
@@ -44,7 +44,7 @@ class Media(commands.Cog):
         """
         Reply with media
         """
-        await ctx.send(file=discord.File('gifs/obama/wednesday.jpg'))
+        await ctx.send(file=discord.File('gifs/memes/wednesday.jpg'))
 
     @commands.command(aliases=['c'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -100,7 +100,7 @@ class Media(commands.Cog):
         """
         Reply with media
         """
-        await ctx.send(file=discord.File('gifs/obama/monkey-fall.gif'))
+        await ctx.send(file=discord.File('gifs/memes/monkey-fall.gif'))
 
     @commands.command(aliases=['poggers'])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -235,5 +235,5 @@ class Media(commands.Cog):
         await ctx.send(f'```{file}, in {pixel_count} pixels!```', file=discord.File('gifs/obama/pixel_obama.png'))
 
 
-async def setup(client):
-    await client.add_cog(Media(client))
+async def setup(bot):
+    await bot.add_cog(Media(bot))

@@ -12,8 +12,8 @@ class Game(commands.Cog):
     game commands for a discord bot
     """
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -66,12 +66,12 @@ class Game(commands.Cog):
 
         # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
         try:
-            reaction, user = await self.client.wait_for('reaction_add', timeout=5.0, check=check)
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=5.0, check=check)
         except asyncio.TimeoutError:
             await ctx.channel.send('ERROR: Timeout Exception')
         else:
             await ctx.channel.send('Obama approves')
 
 
-async def setup(client):
-    await client.add_cog(Game(client))
+async def setup(bot):
+    await bot.add_cog(Game(bot))

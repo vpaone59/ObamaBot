@@ -18,8 +18,8 @@ class Camcap(commands.Cog):
     record videos, etc
     """
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -85,5 +85,5 @@ class Camcap(commands.Cog):
         await ctx.send(file=discord.File('gifs/catcam/cat_rec.avi'))
 
 
-async def setup(client):
-    await client.add_cog(Camcap(client))
+async def setup(bot):
+    await bot.add_cog(Camcap(bot))

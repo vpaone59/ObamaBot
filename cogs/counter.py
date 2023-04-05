@@ -28,8 +28,8 @@ class Counter(commands.Cog):
     keeps a running tally of certain things...
     """
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -77,5 +77,5 @@ def connect_db():
     return mydb
 
 
-async def setup(client):
-    await client.add_cog(Counter(client))
+async def setup(bot):
+    await bot.add_cog(Counter(bot))

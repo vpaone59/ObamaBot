@@ -19,7 +19,6 @@ class Tasks(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.send_wed_meme.start()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -28,26 +27,27 @@ class Tasks(commands.Cog):
         """
         print(f'{self} ready')
 
-    @tasks.loop(count=1)
-    async def send_wed_meme(self):
-        print(f"{self.command.name} started on channel")
-        now = datetime.datetime.now()
-        if now.weekday() == wednesday and now.time() == nine_am:
-            send_to_channel = self.bot.get_channel()
+    @tasks.loop(seconds=5, minutes=0, hours=0)
+    async def send_wed_meme(self, channel):
+        print(f"sending meme")
+        await channel.send("meme")
+        # await self.send(file=discord.File('gifs/obama/wednesday.jpg'))
 
-            await send_to_channel.send(file=discord.File('gifs/obama/wednesday.jpg'))
+    @commands.command()
+    async def start_memes(self, ctx):
+        print('starting')
+        try:
+            self.send_wed_meme.start(ctx.channel)
+        except Exception as e:
+            print(f'ERROR {e}')
 
-    @send_wed_meme.before_loop
-    async def before_send_hi(self):
-        # Calculate the time until the next Wednesday at 9:00am
-        now = datetime.datetime.now()
-        next_wednesday = now + \
-            datetime.timedelta((wednesday - now.weekday()) % 7)
-        time_until_next_wednesday = datetime.datetime.combine(
-            next_wednesday, nine_am) - now
-
-        # Wait until it's time to send the first "Hi" message
-        await discord.utils.sleep_until(now + time_until_next_wednesday)
+    @commands.command()
+    async def stop_memes(self, ctx):
+        print('stopping')
+        try:
+            self.send_wed_meme.cancel()
+        except Exception as e:
+            print(f'ERROR {e}')
 
 
 async def setup(bot):

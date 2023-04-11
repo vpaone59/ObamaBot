@@ -38,6 +38,7 @@ class Custom1(commands.Cog):
         # return whenever a prefix / command message is detected
         if message.startswith(f'{os.getenv("PREFIX")}'):
             return
+
         # if Walter sends a message the bot will always send the picture below
         if messageAuthor.id == 247936308733935616:
             await message.channel.send(file=discord.File('gifs/weird/boner_alert.jpg'))

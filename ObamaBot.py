@@ -7,7 +7,6 @@ There is no serious political offiliation. This is all in good fun.
 """
 
 import os  # os calls
-import time
 import asyncio
 import discord  # needed
 from discord.ext import commands  # needed
@@ -61,7 +60,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-def load_Cogs():
+async def load_Cogs():
     """
     Function to load all Cogs that live in the cogs folder
     Ran on Bot startup
@@ -70,7 +69,7 @@ def load_Cogs():
         if filename.endswith('.py'):
             try:
                 # -3 cuts the .py extension from filename
-                bot.load_extension(f'cogs.{filename[:-3]}')
+                await bot.load_extension(f'cogs.{filename[:-3]}')
                 print(f'Cog {filename} loaded')
             except commands.ExtensionAlreadyLoaded:
                 print(f'Cog {filename} aleady loaded')
@@ -78,7 +77,7 @@ def load_Cogs():
                 print(f'Cog {filename} NOT loaded\n{e}')
 
 
-def unload_Cogs():
+async def unload_Cogs():
     """
     Function to unload all Cogs in the cogs folder
     Runs on -rl all
@@ -86,7 +85,7 @@ def unload_Cogs():
     for filename in os.listdir(os.getcwd() + '/cogs'):
         if filename.endswith('.py'):
             try:
-                bot.unload_extension(f'cogs.{filename[:-3]}')
+                await bot.unload_extension(f'cogs.{filename[:-3]}')
                 print(f'Cog {filename} unloaded successfully')
             except commands.ExtensionNotLoaded:
                 print(f'Cog {filename} is not loaded')
@@ -152,22 +151,22 @@ async def refresh(ctx, extension):
     param: extension - The name of the Cog file to reload
     """
     if extension == 'all':
-        # unload, rest for 2 seconds, then load
-        unload_Cogs()
-        time.sleep(2)
-        load_Cogs()
+        # unload, then load
+        await unload_Cogs()
+        await load_Cogs()
         await ctx.send('```Success reloading all cogs```')
     else:
         try:
             print(f'> Reloading {extension}.py --')
-
             await bot.reload_extension(f'cogs.{extension}')
-
             print(f'> -- {extension}.py reloaded.')
             await ctx.send(f'```Cog {extension}.py reloaded```')
+
         except commands.ExtensionNotFound:
             await ctx.send(f'```Cog {extension}.py not in directory```')
+
         except Exception as e:
-            await ctx.send(f'```Cog {extension}.py could not be reloaded\n{e}```')
+            print(f'> -- {extension}.py could not be reloaded \n{e}')
+            await ctx.send(f'```Cog {extension}.py could not be reloaded \n{e}```')
 
 asyncio.run(main())

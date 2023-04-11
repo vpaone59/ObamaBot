@@ -5,8 +5,6 @@ Setup tasks to run periodically in your server.
 """
 
 import datetime
-import asyncio
-import discord
 from discord.ext import commands, tasks
 
 wednesday = 1  # Wednesday is 2 in Python's Datetime module

@@ -25,7 +25,6 @@ class Counter(commands.Cog):
         # When this Cog first loads we grab a list of every entry in the DB name_of_counters column
         # and add it to global variable list counters_from_db
         get_counters()
-        print(counters_from_db)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -68,7 +67,7 @@ class Counter(commands.Cog):
             db_cursor.close()
             db_conn.close()
 
-    @commands.command(aliases=[])
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def create_counter(self, ctx, counter_name):
         """
@@ -76,12 +75,34 @@ class Counter(commands.Cog):
         """
         sql = "INSERT INTO counters (id, name_of_counter, tally_counter) VALUES (id, %s, %s)"
         val = (counter_name, 0)
-        print(sql, val)
         try:
             db_conn, db_cursor = connect_db()
             db_cursor.execute(sql, val)
             db_conn.commit()
             await ctx.send(f"```success. {counter_name} is now being counted!```")
+            get_counters()
+
+        except Exception as err:
+            await ctx.send("Something went wrong: {}".format(err))
+        finally:
+            db_cursor.close()
+            db_conn.close()
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def delete_counter(self, ctx, counter_name):
+        """
+        Delete an entry in the Database
+        """
+        sql = "DELETE FROM counters WHERE name_of_counter = %s"
+        # must be a list, tuple or dict because of how create_counter is entered
+        # we opt for tuple here with the second value left empty
+        val = (counter_name,)
+        try:
+            db_conn, db_cursor = connect_db()
+            db_cursor.execute(sql, val)
+            db_conn.commit()
+            await ctx.send(f"```success. {counter_name} has now been deleted!```")
             get_counters()
 
         except Exception as err:
@@ -99,9 +120,7 @@ class Counter(commands.Cog):
         counter_string = "String - Tally\n"
 
         try:
-            # update the current list, in case there is something missing from the database
             get_counters()
-
             for c in counters_from_db:
                 c_name = c[0]
                 c_tally = c[1]
@@ -148,7 +167,7 @@ def connect_db():
             password=os.getenv("PASSWORD"),
             database=os.getenv("TARGET"))
         my_cursor = mydb.cursor()
-        print(f"Connection to {mydb.database} established")
+        # print(f"Connection to {mydb.database} established")
     except Exception as err:
         print("Something went wrong: {}".format(err))
 

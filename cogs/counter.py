@@ -35,6 +35,10 @@ class Counter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        """
+        On every message we are going to check if it matches an entry in the database
+        and then we update the entry's tally by +1
+        """
         cap_message = str(message.content)
         if cap_message in counter_names:
             try:
@@ -47,6 +51,8 @@ class Counter(commands.Cog):
             finally:
                 db_cursor.close()
                 db_conn.close()
+        else:
+            return
 
     @commands.command(aliases=['reset'], description='Resets the tally for a given *tracker*')
     @commands.has_permissions(administrator=True)

@@ -4,11 +4,8 @@ Tasks Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 Setup tasks to run periodically in your server.
 """
 
-import datetime
+import asyncio
 from discord.ext import commands, tasks
-
-wednesday = 1  # Wednesday is 2 in Python's Datetime module
-nine_am = datetime.time(hour=20, minute=40)
 
 
 class Tasks(commands.Cog):
@@ -27,51 +24,115 @@ class Tasks(commands.Cog):
         """
         print(f'{self} ready')
 
-    @tasks.loop(seconds=20, minutes=0, hours=0)
-    async def send_meme(self, channel):
-        """
-        Send the Wednesday meme on, you guessed it, Wednesday.
-        """
-        await channel.send(f"This is a meme")
+    async def start_task(self, task):
+        channel = task['channel']
+        content = task['content']
+        seconds = task['interval']['seconds']
+        minutes = task['interval']['minutes']
+        hours = task['interval']['hours']
 
-    @commands.command()
-    async def start_memes(self, ctx, seconds: int = 20, minutes: int = 0, hours: int = 0):
+        async def send_content():
+            await channel.send(content)
+
+        self.bot.loop.create_task(send_content())
+        self.tasks.append(asyncio.gather(asyncio.sleep(
+            seconds + minutes * 60 + hours * 3600), send_content()))
+
+    @commands.command(aliases=['start'])
+    async def start_custom_task(self, ctx):
         """
-        Start the Wednesday Meme Task. !start_memes (seconds) (minutes) (hours)
+        Start a new custom task !start_custom_task
         """
-        self.memes_channel = ctx.channel
-        if seconds <= 1 or minutes < 0 or hours < 0:
-            if seconds < 1:
-                await ctx.send("```Seconds cannot be less than or equal to 1```")
-            else:
-                await ctx.send("```Minutes and hours cannot be less than 0```")
+        def check(message):
+            return message.author == ctx.author and message.channel == ctx.channel
+
+        await ctx.send("What would you like to name this task?")
+        try:
+            task_name = await self.bot.wait_for('message', timeout=10.0, check=lambda message: message.author == ctx.author)
+            task_name = task_name.content.strip()
+        except asyncio.TimeoutError:
+            await ctx.send("```Task creation timed out.```")
             return
-        else:
-            try:
-                self.send_meme.change_interval(
-                    seconds=seconds, minutes=minutes, hours=hours)
-                self.send_meme.start(ctx.channel)
-                self.tasks.append("Memes.task")
-                await ctx.send(
-                    f"```Memes task was started in this channel and will run every {self.send_meme.seconds} seconds, {self.send_meme.minutes} minutes, and {self.send_meme.hours} hours.```")
-            except Exception as e:
-                await ctx.send(f"```ERROR {e}```")
 
-    @commands.command()
-    async def stop_memes(self, ctx):
+        # Check if the task name already exists
+        for task in self.tasks:
+            if task['name'] == task_name:
+                await ctx.send("```A task with this name already exists. Please choose a different name.```")
+                return
+
+        await ctx.send("What should be sent to the channel when the task runs?")
+        try:
+            task_content = await self.bot.wait_for('message', timeout=20.0, check=check)
+            task_content = task_content.content
+        except asyncio.TimeoutError:
+            await ctx.send("```Task creation timed out.```")
+            return
+
+        await ctx.send("Enter the task interval in seconds, minutes, and hours (separated by spaces):")
+        try:
+            response = await self.bot.wait_for('message', timeout=60.0, check=check)
+            interval_time = response.content.strip().split()
+            if len(interval_time) == 1:
+                seconds = int(interval_time[0])
+                minutes = 0
+                hours = 0
+            elif len(interval_time) == 2:
+                seconds = int(interval_time[0])
+                minutes = int(interval_time[1])
+                hours = 0
+            elif len(interval_time) >= 3:
+                seconds = int(interval_time[0])
+                minutes = int(interval_time[1])
+                hours = int(interval_time[2])
+            if seconds <= 1 or minutes < 0 or hours < 0:
+                raise ValueError("Invalid time interval.")
+            else:
+                # Create a new task object
+                new_task = {
+                    'name': task_name,
+                    'interval': {
+                        'seconds': seconds,
+                        'minutes': minutes,
+                        'hours': hours
+                    },
+                    'content': task_content,
+                    'channel': ctx.channel
+                }
+                # Start the task
+                self.start_task(new_task)
+                # Add the task to the list of running tasks
+                print(new_task, "new_task")
+                self.tasks.append(new_task)
+                print("TASK LIST", self.tasks)
+
+                await ctx.send(
+                    f"```A new task '{task_name}' was started in this channel and will run every {new_task['interval']['seconds']} seconds, {new_task['interval']['minutes']} minutes, and {new_task['interval']['hours']} hours.```")
+        except asyncio.TimeoutError:
+            await ctx.send("```Task creation timed out.```")
+        except ValueError:
+            await ctx.send("```Invalid time interval.```")
+        except Exception as e:
+            await ctx.send(f"```ERROR {e}```")
+
+    @commands.command(aliases=['stop'])
+    async def stop_task(self, ctx, task_name):
         """
-        Stop the Wednesday Meme Task
+        Stops a task by its task_name
         """
-        if ctx.channel == self.memes_channel:
-            try:
-                self.send_meme.cancel()
-                self.tasks.remove("Memes.task")
-                await ctx.send("```Memes task was stopped in this channel.```")
-            except Exception as e:
-                print(f"ERROR {e}")
-                await ctx.send(f"```ERROR {e}```")
+        try:
+            for task in self.tasks:
+                if task == task_name:
+                    # Stop the task and remove it from the task list
+                    self.send_task.cancel()
+                    self.tasks.remove(task_name)
+                    await ctx.send(f"```Task '{task_name}' was stopped in this channel.```")
+                    return
+            await ctx.send(f"```Task '{task_name}' is not currently running in this channel.```")
+        except Exception as e:
+            print(f"ERROR {e}")
+            await ctx.send(f"```ERROR {e}```")
         else:
-            await ctx.send("```Task was not stopped.\nMust send the stop_memes command from the same channel the task is running in. You can check the status of tasks using the tasks_status command.```")
+            await ctx.send("```Task was not stopped.\nMust send the stop_task command from the same channel the task is running in. You can check the status of tasks using the tasks_status command.```")
 
     @commands.command(aliases=['tasks', 'status'])
     async def tasks_status(self, ctx):
@@ -80,8 +141,6 @@ class Tasks(commands.Cog):
         """
         running_tasks = 'Running Tasks:\n'
         for task in self.tasks:
-            if task == "Memes.task":
-                task += " in Channel: " + str(self.memes_channel)
             running_tasks += task
 
         if self.tasks:
@@ -90,27 +149,6 @@ class Tasks(commands.Cog):
             message = "There are no running tasks."
 
         await ctx.send(f"```{message}```")
-
-    # async def wednesday_meme(self, ctx):
-    #     now = datetime.datetime.now()
-    #     today = datetime.date.today()
-    #     days_until_wednesday = (wednesday - today.weekday()) % 7
-    #     next_wednesday = today + datetime.timedelta(days=days_until_wednesday)
-    #     next_wednesday_nine_am = datetime.datetime.combine(
-    #         next_wednesday, nine_am)
-    #     if now >= next_wednesday_nine_am:
-    #         next_wednesday += datetime.timedelta(days=7)
-    #         next_wednesday_nine_am = datetime.datetime.combine(
-    #             next_wednesday, nine_am)
-    #     seconds_until_nine_am = (next_wednesday_nine_am - now).seconds
-
-    #     print("now", now)
-    #     print("today", today)
-    #     print("days_until_wednesday", days_until_wednesday)
-    #     print("next_wednesday", next_wednesday)
-    #     print("next_wednesday_nine_am", next_wednesday_nine_am)
-
-    #     await asyncio.sleep(seconds_until_nine_am)
 
 
 async def setup(bot):

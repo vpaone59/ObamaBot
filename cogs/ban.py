@@ -1,5 +1,8 @@
 """
 Ban Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+THIS FILE MIGHT FAIL THE FIRST TIME THE BOT IS RAN DEPENDING ON 
+IF banned.json EXISTS IN THE SAME DIRECTORY AS THE main.py
 """
 
 import json

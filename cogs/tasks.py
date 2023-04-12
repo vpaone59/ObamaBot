@@ -27,19 +27,22 @@ class Tasks(commands.Cog):
         """
         print(f'{self} ready')
 
-    async def start_task(self, task):
-        channel = task['channel']
-        content = task['content']
-        seconds = task['interval']['seconds']
-        minutes = task['interval']['minutes']
-        hours = task['interval']['hours']
-
-        async def send_content():
-            await channel.send(content)
-
-        self.bot.loop.create_task(send_content())
-        self.tasks.append(asyncio.gather(asyncio.sleep(
-            seconds + minutes * 60 + hours * 3600), send_content()))
+    @commands.command(aliases=['tct'])
+    async def toggle_custom_task(self, ctx):
+        """
+        Toggle the Wednesday meme task
+        """
+        if self.wednesday_meme.is_running():
+            self.wednesday_meme.cancel()
+            self.tasks.remove(self.wednesday_meme)
+            print(self.tasks)
+            await ctx.send("```Wednesday meme task stopped.```")
+        else:
+            print('start')
+            self.wednesday_meme.start()
+            self.tasks.append(self.wednesday_meme)
+            print(self.tasks)
+            await ctx.send("```Wednesday meme task started.```")
 
     @commands.command(aliases=['start'])
     async def start_custom_task(self, ctx):
@@ -48,6 +51,10 @@ class Tasks(commands.Cog):
         """
         def check(message):
             return message.author == ctx.author and message.channel == ctx.channel
+
+        if self.toggle_custom_task.is_running():
+            self.toggle_custom_task.cancel()
+            self.tasks.remove(self.toggle_custom_task)
 
         await ctx.send("What would you like to name this task?")
         try:
@@ -90,17 +97,6 @@ class Tasks(commands.Cog):
             if seconds <= 1 or minutes < 0 or hours < 0:
                 raise ValueError("Invalid time interval.")
             else:
-                # Create a new task object
-                new_task = {
-                    'name': task_name,
-                    'interval': {
-                        'seconds': seconds,
-                        'minutes': minutes,
-                        'hours': hours
-                    },
-                    'content': task_content,
-                    'channel': ctx.channel
-                }
                 # Start the task
                 self.start_task(new_task)
                 # Add the task to the list of running tasks
@@ -163,24 +159,23 @@ class Tasks(commands.Cog):
             self.wednesday_meme.cancel()
             self.tasks.remove(self.wednesday_meme)
             print(self.tasks)
-            await ctx.send("```Wednesday meme loop stopped.```")
+            await ctx.send(f"```Wednesday meme task stopped in {ctx.channel}.```")
         else:
             print('start')
-            self.wednesday_meme.start()
+            self.wednesday_meme.start(ctx.channel)
             self.tasks.append(self.wednesday_meme)
             print(self.tasks)
-            await ctx.send("```Wednesday meme loop started.```")
+            await ctx.send(f"```Wednesday meme task started in {ctx.channel}.```")
 
     @tasks.loop(hours=1)
-    async def wednesday_meme(self):
+    async def wednesday_meme(self, channel):
         # Check if today is Wednesday and the current time is 9:00am EST
         now = datetime.now(pytz.timezone('US/Eastern'))
         print(now)
         not_sent = True
-        if now.weekday() == 2 and now.hour == 13:
+        if now.weekday() == 2 and now.hour == 9:
             while (not_sent):
                 # Replace with your channel ID
-                channel = self.bot.get_channel(1087204250481856646)
                 await channel.send(file=discord.File('gifs/memes/wednesday.jpg'))
                 not_sent = False
             not_sent = True

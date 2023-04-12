@@ -4,7 +4,10 @@ Tasks Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 Setup tasks to run periodically in your server.
 """
 
+from datetime import datetime, timedelta
 import asyncio
+import pytz
+import discord
 from discord.ext import commands, tasks
 
 
@@ -139,6 +142,7 @@ class Tasks(commands.Cog):
         """
         Show the status of all currently running tasks.
         """
+        print("TASKS")
         running_tasks = 'Running Tasks:\n'
         for task in self.tasks:
             running_tasks += task
@@ -149,6 +153,39 @@ class Tasks(commands.Cog):
             message = "There are no running tasks."
 
         await ctx.send(f"```{message}```")
+
+    @commands.command(aliases=['twm'])
+    async def toggle_wednesday_meme(self, ctx):
+        """
+        Toggle the Wednesday meme task
+        """
+        if self.wednesday_meme.is_running():
+            self.wednesday_meme.cancel()
+            self.tasks.remove(self.wednesday_meme)
+            print(self.tasks)
+            await ctx.send("```Wednesday meme loop stopped.```")
+        else:
+            print('start')
+            self.wednesday_meme.start()
+            self.tasks.append(self.wednesday_meme)
+            print(self.tasks)
+            await ctx.send("```Wednesday meme loop started.```")
+
+    @tasks.loop(hours=1)
+    async def wednesday_meme(self):
+        # Check if today is Wednesday and the current time is 9:00am EST
+        now = datetime.now(pytz.timezone('US/Eastern'))
+        print(now)
+        not_sent = True
+        if now.weekday() == 2 and now.hour == 13:
+            while (not_sent):
+                # Replace with your channel ID
+                channel = self.bot.get_channel(1087204250481856646)
+                await channel.send(file=discord.File('gifs/memes/wednesday.jpg'))
+                not_sent = False
+            not_sent = True
+        else:
+            print("not wednesday")
 
 
 async def setup(bot):

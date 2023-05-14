@@ -36,10 +36,10 @@ class Camcap(commands.Cog):
         """
         bot_warn = await ctx.send("```loading image...pls do not spam command :D```")
         # camera 2 is being reserved for an outside camera
-        camera_number = [1, 3]
+        camera_number = [1, 2, 3]
         frame_counter = 0
-        if cam_num > 3 or cam_num == 0 or cam_num < -1 or cam_num == 2:
-            await ctx.send(f'INDEX ERROR: Cameras available #s 1 or 3. Use -1 or leave empty for random.')
+        if cam_num > 3 or cam_num == 0 or cam_num < -1:
+            await ctx.send(f'INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random.')
             return
         elif cam_num == -1:
             cam_num = random.choice(camera_number)

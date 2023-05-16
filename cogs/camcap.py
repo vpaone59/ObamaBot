@@ -9,6 +9,7 @@ import random
 import discord
 from discord.ext import commands
 import cv2
+import os
 
 
 class Camcap(commands.Cog):
@@ -53,10 +54,21 @@ class Camcap(commands.Cog):
             print("failed to grab frame")
         img_name = f"gifs/catcam/cat_cap_{frame_counter}.jpg"
         cv2.imwrite(img_name, frame)
-
         cam.release()
+
+        # Check to see if the cat is in the image taken and assign the return status to a variable
+        cat_status = check_for_cat(img_name)
+        # delete the warning message
         await bot_warn.delete()
-        await ctx.send(f'```Image from Camera #{cam_num}```', file=discord.File('gifs/catcam/cat_cap_0.jpg'))
+
+        if cat_status == "CAT DETECTED":
+            await ctx.send(f'```{cat_status} Image from Camera #{cam_num}```', file=discord.File('gifs/catcam/cat_cap_0.jpg'))
+        elif cat_status == "NO CAT DETECTED":
+            cat_dir = 'gifs/catcam/FRITA/'
+            cat_files = os.listdir(cat_dir)
+            random_cat_pic = random.choice(cat_files)
+            random_cat_path = os.path.join(cat_dir, random_cat_pic)
+            await ctx.send(f'```{cat_status} :( enjoy a complimentary random cat pic```', file=discord.File(random_cat_path))
 
     @commands.command(aliases=['catrec', 'catvid'])
     @commands.cooldown(1, 6, commands.BucketType.user)
@@ -83,6 +95,27 @@ class Camcap(commands.Cog):
         video_output.release()
 
         await ctx.send(file=discord.File('gifs/catcam/cat_rec.avi'))
+
+
+def check_for_cat(image):
+    """
+    Check for black pixels in the center of the image
+    """
+
+    try:
+        img = cv2.imread(image)
+        height, width, _ = img.shape
+        center_x = width // 2
+        center_y = height // 2
+        b, g, r = img[center_y, center_x]
+
+        if r == 0 and g == 0 and b == 0:
+            return "CAT DETECTED"
+        else:
+            return "NO CAT DETECTED"
+
+    except Exception as e:
+        return f"ERROR {e}"
 
 
 async def setup(bot):

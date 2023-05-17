@@ -11,6 +11,9 @@ from discord.ext import commands
 import cv2
 import os
 
+# number of cameras active and an index to identify each
+active_cam_nums = [1, 2, 3]
+
 
 class Camcap(commands.Cog):
     """
@@ -36,14 +39,13 @@ class Camcap(commands.Cog):
         then sends it to the discord channel
         """
         bot_warn = await ctx.send("```loading image...pls do not spam command :D```")
-        # camera 2 is being reserved for an outside camera
-        camera_number = [1, 2, 3]
+
         frame_counter = 0
         if cam_num > 3 or cam_num == 0 or cam_num < -1:
             await ctx.send(f'INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random.')
             return
         elif cam_num == -1:
-            cam_num = random.choice(camera_number)
+            cam_num = random.choice(active_cam_nums)
             cam = cv2.VideoCapture(cam_num-1)
         else:
             cam = cv2.VideoCapture(cam_num-1)
@@ -52,7 +54,10 @@ class Camcap(commands.Cog):
         ret, frame = cam.read()
         if not ret:
             print("failed to grab frame")
-        img_name = f"gifs/catcam/cat_cap_{frame_counter}.jpg"
+        img_name = f"gifs/catcam/catcap/cat_cap_{frame_counter}.jpg"
+        while os.path.exists(img_name):
+            frame_counter += 1
+            img_name = f"gifs/catcam/catcap/cat_cap_{frame_counter}.jpg"
         cv2.imwrite(img_name, frame)
         cam.release()
 
@@ -62,13 +67,18 @@ class Camcap(commands.Cog):
         await bot_warn.delete()
 
         if cat_status == "CAT DETECTED":
-            await ctx.send(f'```{cat_status} Image from Camera #{cam_num}```', file=discord.File('gifs/catcam/cat_cap_0.jpg'))
+            await ctx.send(f'```{cat_status} Image from Camera #{cam_num}```', file=discord.File(f'gifs/catcam/catcap/cat_cap_{frame_counter}.jpg'))
         elif cat_status == "NO CAT DETECTED":
+            os.remove(img_name)
             cat_dir = 'gifs/catcam/FRITA/'
             cat_files = os.listdir(cat_dir)
             random_cat_pic = random.choice(cat_files)
             random_cat_path = os.path.join(cat_dir, random_cat_pic)
-            await ctx.send(f'```{cat_status} :( enjoy a complimentary random cat pic```', file=discord.File(random_cat_path))
+            try:
+                await ctx.send(f'```{cat_status} :( enjoy a complimentary random cat pic```', file=discord.File(random_cat_path))
+            except Exception as e:
+                print(e)
+                await ctx.send(f'```ERROR {e}```')
 
     @commands.command(aliases=['catrec', 'catvid'])
     @commands.cooldown(1, 6, commands.BucketType.user)
@@ -81,7 +91,7 @@ class Camcap(commands.Cog):
 
         fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
         video_output = cv2.VideoWriter(
-            'gifs/catcam/cat_rec.avi', fourcc, 1.0, (640, 480))
+            'gifs/catcam/catcap/cat_rec.avi', fourcc, 1.0, (640, 480))
 
         start_time = time.time()
         while (time.time() - start_time) < 3.0:
@@ -94,7 +104,7 @@ class Camcap(commands.Cog):
         rec.release()
         video_output.release()
 
-        await ctx.send(file=discord.File('gifs/catcam/cat_rec.avi'))
+        await ctx.send(file=discord.File('gifs/catcam/catcap/cat_rec.avi'))
 
 
 def check_for_cat(image):

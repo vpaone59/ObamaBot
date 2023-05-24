@@ -34,7 +34,7 @@ class Custom1(commands.Cog):
         whenever a message is sent this Cog will listen and execute code below
         """
         messageAuthor = message.author
-
+        message = str(message)
         # return whenever a prefix / command message is detected
         if message.startswith(f'{os.getenv("PREFIX")}'):
             return

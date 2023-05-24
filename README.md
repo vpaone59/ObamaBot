@@ -14,8 +14,9 @@ python (or python3) ObamaBot.py
 
 ## Running with Docker:
 ### When running with Docker you cannot have any code that accesses USB elements. I've found that the container will not start at all if camcap.py is included in the Cogs.
+### You also cannot access any services that are running on the host machine with this simple configuration. The counter.py Cog will not work correctly with MySQL Server running on the host system and not within the same Docker container or another container on the same network.
 Build the container
-docker build . -t ObamaBot --no-cache
+docker build . -t obama-bot --no-cache
 
 Run the container (-d for detached mode to not take over the current shell session)
-docker run -d ObamaBot
+docker run -d obama-bot

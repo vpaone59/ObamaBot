@@ -106,8 +106,10 @@ async def load_cog(ctx, cog_name):
         await bot.load_extension(f'cogs.{cog_name}')
         await ctx.send(f'```{cog_name}.py loaded```')
     except commands.ExtensionAlreadyLoaded as e:
+        logger.error({e})
         await ctx.send(f'```{cog_name}.py is already loaded\n{e}```')
     except commands.ExtensionNotFound as e:
+        logger.error({e})
         await ctx.send(f'```{cog_name}.py does not exist\n{e}```')
 
 

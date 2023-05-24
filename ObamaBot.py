@@ -7,11 +7,11 @@ There is no serious political offiliation. This is all in good fun.
 """
 
 import logging
-import os  # os calls
+import os
 import asyncio
-import discord  # needed
-from discord.ext import commands  # needed
-from dotenv import load_dotenv  # to load .env variables
+import discord
+from discord.ext import commands
+from dotenv import load_dotenv
 
 load_dotenv()
 

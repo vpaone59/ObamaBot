@@ -2,8 +2,6 @@
 https://github.com/vpaone59
 """
 
-import asyncio
-import random
 from discord.ext import commands
 
 

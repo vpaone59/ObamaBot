@@ -76,6 +76,11 @@
             "type": "Guardian"
         },
         {
+            "name": "Atlas",
+            "pantheon": "Greek",
+            "type": "Guardian"
+        },
+        {
             "name": "Awilix",
             "pantheon": "Mayan",
             "type": "Assassin"
@@ -161,14 +166,14 @@
             "type": "Mage"
         },
         {
+            "name": "Cliodhna",
+            "pantheon": "Celtic",
+            "type": "Assassin"
+        },
+        {
             "name": "Cthulhu",
             "pantheon": "Great Old Ones",
             "type": "Guardian"
-        },
-        {
-            "name": "Cuchulainn",
-            "pantheon": "Celtic",
-            "type": "Warrior"
         },
         {
             "name": "Cu Chulainn",
@@ -291,6 +296,16 @@
             "type": "Assassin"
         },
         {
+            "name": "Ishtar",
+            "pantheon": "Babylonian",
+            "type": "Hunter"
+        },
+        {
+            "name": "Ix Chel",
+            "pantheon": "Babylonian",
+            "type": "Mage"
+        },
+        {
             "name": "Izanami",
             "pantheon": "Japanese",
             "type": "Hunter"
@@ -341,9 +356,24 @@
             "type": "Guardian"
         },
         {
+            "name": "Lancelot",
+            "pantheon": "Arthurian",
+            "type": "Assassin"
+        },
+        {
             "name": "Loki",
             "pantheon": "Norse",
             "type": "Assassin"
+        },
+        {
+            "name": "Martichoras",
+            "pantheon": "Greek",
+            "type": "Hunter"
+        },
+        {
+            "name": "Maui",
+            "pantheon": "Polynesian",
+            "type": "Guardian"
         },
         {
             "name": "Medusa",
@@ -357,6 +387,11 @@
         },
         {
             "name": "Merlin",
+            "pantheon": "Arthurian",
+            "type": "Mage"
+        },
+        {
+            "name": "Morgan Le Fay",
             "pantheon": "Arthurian",
             "type": "Mage"
         },
@@ -466,6 +501,11 @@
             "type": "Assassin"
         },
         {
+            "name": "Shiva",
+            "pantheon": "Hindu",
+            "type": "Warrior"
+        },
+        {
             "name": "Skadi",
             "pantheon": "Norse",
             "type": "Hunter"
@@ -483,6 +523,11 @@
         {
             "name": "Sun Wukong",
             "pantheon": "Chinese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Surtr",
+            "pantheon": "Norse",
             "type": "Warrior"
         },
         {
@@ -569,6 +614,11 @@
             "name": "Ymir",
             "pantheon": "Norse",
             "type": "Guardian"
+        },
+        {
+            "name": "Yu Huang",
+            "pantheon": "Chinese",
+            "type": "Mage"
         },
         {
             "name": "Zeus",

@@ -85,7 +85,7 @@ class Tasks(commands.Cog):
         while True:
             try:
                 await ctx.send("Enter the content of the task:")
-                task_content = await self.bot.wait_for('message', timeout=10.0, check=check)
+                task_content = await self.bot.wait_for('message', timeout=30.0, check=check)
                 task_content = task_content.content
                 if len(task_content) > 100:
                     await ctx.send(f"Task content length too long, must be less than 100 characters. Current length {len(task_content)}")

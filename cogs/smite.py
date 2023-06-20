@@ -7,8 +7,7 @@ import json
 with open("./dynamic/smite_gods.json", "r") as file:
     god_list = json.load(file)
 
-god_list_length = len(god_list["gods"])
-available_types = ['mage', 'warrior', 'asassin', 'guardian', 'hunter']
+available_types = ['mage', 'warrior', 'assassin', 'guardian', 'hunter']
 
 
 class Smite_Shuffler(commands.Cog):
@@ -32,6 +31,24 @@ class Smite_Shuffler(commands.Cog):
         await ctx.send(f'Synced {len(number_of_synced_commands)} commands.')
 
     @commands.command()
+    async def gods(self, ctx):
+        """
+        List all current Gods
+        """
+        count = 0
+        god_list_length = len(god_list["gods"])
+        list_text = ""
+
+        for god in god_list["gods"]:
+            god_name = god["name"]
+            if count == god_list_length-1:
+                list_text += f"{god_name}."
+            else:
+                list_text += f"{god_name}, "
+            count += 1
+        await ctx.send(list_text)
+
+    @commands.command()
     async def shuffle(self, ctx, god_type: str = None):
         """
         Chooses a random God. Optionally takes a god_type filter results
@@ -39,7 +56,7 @@ class Smite_Shuffler(commands.Cog):
         if god_type is None:
             shuffle_gods = god_list["gods"]
         else:
-            if god_type not in available_types:
+            if god_type.lower() not in available_types:
                 await ctx.send(f'{god_type} is not one of {available_types}')
                 return
             else:
@@ -52,30 +69,52 @@ class Smite_Shuffler(commands.Cog):
 
     @app_commands.command(name="add_god", description="add a god")
     @commands.has_permissions(administrator=True)
-    async def add_god(self, interaction: discord.Interaction, god_name: str, god_type: str):
+    async def add_god(self, interaction: discord.Interaction, god_name: str, god_pantheon: str, god_type: str):
         """
         Add a God to the God list
         """
-        if god_type not in available_types:
+        print(god_name, god_pantheon, god_type)
+        if god_type.lower() not in available_types:
             await interaction.response.send_message(f"{god_type} is not one of {available_types}")
-        await interaction.response.send_message(f'Thanks {god_name} {god_type}')
+        else:
+            response = add_god_to_list(god_name, god_type, god_pantheon)
+            await interaction.response.send_message(f'{response}')
 
-    @commands.command()
-    async def gods(self, ctx):
-        """
-        List all current Gods
-        """
-        count = 0
-        god_list_text = ""
 
-        for god in god_list["gods"]:
-            god_name = god["name"]
-            if count == god_list_length-1:
-                god_list_text += f"{god_name}."
-            else:
-                god_list_text += f"{god_name}, "
-            count += 1
-        await ctx.send(god_list_text)
+def remove_god_from_list(name):
+    pass
+
+
+def add_god_to_list(name, type, pantheon):
+    """
+    Function that adds a new God to the God list with a name, type and pantheon parameter
+    """
+    # Capitalize the first letter of each String in each parameter
+    # "god name" will become "God Name"
+    name = ' '.join(word.capitalize() for word in name.split())
+    pantheon = ' '.join(word.capitalize() for word in pantheon.split())
+    type = ' '.join(word.capitalize() for word in type.split())
+
+    for god in god_list["gods"]:
+        if god["name"] == name:
+            return f"The God {name} already exists."
+
+    new_god = {
+        "name": name,
+        "pantheon": pantheon,
+        "type": type
+    }
+    try:
+        # Append the new God to the list of Gods
+        god_list["gods"].append(new_god)
+        god_list["gods"].sort(key=lambda x: x["name"])
+        # Write the data to the file
+        with open("./dynamic/smite_gods.json", "w") as file:
+            json.dump(god_list, file, indent=4)
+            print("done")
+        return f"```God Added\n---\nName: {name}\nPantheon: {pantheon}\nType: {type}```"
+    except Exception as e:
+        return f"ERROR : {e}"
 
 
 async def setup(bot):

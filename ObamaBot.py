@@ -6,6 +6,8 @@ ObamaBot - main file. Run this file to start the bot.
 There is no serious political offiliation. This is all in good fun.
 """
 
+from discord.ext.commands import Greedy, Context  # or a subclass of yours
+from typing import Literal, Optional
 import logging
 import os
 import asyncio
@@ -47,6 +49,7 @@ async def main():
     """
     async with bot:
         await bot.start(os.getenv("DISCORD_TOKEN"))
+        logger.info(f'Starting bot with {os.getenv("DISCORD_TOKEN")}')
         # on_ready will run next
 
 
@@ -164,5 +167,55 @@ async def reload_cog(ctx, cog_name=""):
         except Exception as e:
             logger.error({e})
             await ctx.send(f'```{cog_name}.py could not be reloaded \n{e}```')
+
+
+@bot.command()
+# @commands.guild_only()
+# @commands.is_owner()
+async def sync(
+        ctx: Context, guilds: Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    """
+    Sync Slash Commands Globally to the bot
+    When to sync
+    When you add a new command.
+    When you remove a command.
+    When a command's name or description changes.
+    When the callback's parameters change.
+    This includes parameter names, types or descriptions.
+    Also when you add or remove a parameter.
+    If you change a global to a guild command, or vice versa.
+    NOTE: If you do this, you will need to sync both global and to that guild to reflect the change.
+    These are currently the only times you should re-sync.
+    """
+    print('running')
+
+    if not guilds:
+        if spec == "~":
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "*":
+            ctx.bot.tree.copy_global_to(guild=ctx.guild)
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "^":
+            ctx.bot.tree.clear_commands(guild=ctx.guild)
+            await ctx.bot.tree.sync(guild=ctx.guild)
+            synced = []
+        else:
+            synced = await ctx.bot.tree.sync()
+
+        await ctx.send(
+            f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+        )
+        return
+
+    ret = 0
+    for guild in guilds:
+        try:
+            await ctx.bot.tree.sync(guild=guild)
+        except discord.HTTPException:
+            pass
+        else:
+            ret += 1
+
+    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 asyncio.run(main())

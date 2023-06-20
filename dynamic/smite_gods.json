@@ -1,0 +1,584 @@
+{
+    "gods": [
+        {
+            "name": "Achilles",
+            "pantheon": "Greek",
+            "type": "Warrior"
+        },
+        {
+            "name": "Agni",
+            "pantheon": "Hindu",
+            "type": "Mage"
+        },
+        {
+            "name": "Ah Muzen Cab",
+            "pantheon": "Mayan",
+            "type": "Hunter"
+        },
+        {
+            "name": "Ah Puch",
+            "pantheon": "Mayan",
+            "type": "Mage"
+        },
+        {
+            "name": "Amaterasu",
+            "pantheon": "Japanese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Anhur",
+            "pantheon": "Egyptian",
+            "type": "Hunter"
+        },
+        {
+            "name": "Anubis",
+            "pantheon": "Egyptian",
+            "type": "Mage"
+        },
+        {
+            "name": "Ao Kuang",
+            "pantheon": "Chinese",
+            "type": "Mage"
+        },
+        {
+            "name": "Aphrodite",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Apollo",
+            "pantheon": "Greek",
+            "type": "Hunter"
+        },
+        {
+            "name": "Arachne",
+            "pantheon": "Greek",
+            "type": "Assassin"
+        },
+        {
+            "name": "Ares",
+            "pantheon": "Greek",
+            "type": "Guardian"
+        },
+        {
+            "name": "Artemis",
+            "pantheon": "Greek",
+            "type": "Hunter"
+        },
+        {
+            "name": "Artio",
+            "pantheon": "Celtic",
+            "type": "Guardian"
+        },
+        {
+            "name": "Athena",
+            "pantheon": "Greek",
+            "type": "Guardian"
+        },
+        {
+            "name": "Awilix",
+            "pantheon": "Mayan",
+            "type": "Assassin"
+        },
+        {
+            "name": "Baba Yaga",
+            "pantheon": "Slavic",
+            "type": "Mage"
+        },
+        {
+            "name": "Bacchus",
+            "pantheon": "Roman",
+            "type": "Guardian"
+        },
+        {
+            "name": "Bakasura",
+            "pantheon": "Hindu",
+            "type": "Assassin"
+        },
+        {
+            "name": "Baron Samedi",
+            "pantheon": "Voodoo",
+            "type": "Mage"
+        },
+        {
+            "name": "Bastet",
+            "pantheon": "Egyptian",
+            "type": "Assassin"
+        },
+        {
+            "name": "Bellona",
+            "pantheon": "Roman",
+            "type": "Warrior"
+        },
+        {
+            "name": "Cabrakan",
+            "pantheon": "Mayan",
+            "type": "Guardian"
+        },
+        {
+            "name": "Camazotz",
+            "pantheon": "Mayan",
+            "type": "Assassin"
+        },
+        {
+            "name": "Cerberus",
+            "pantheon": "Greek",
+            "type": "Guardian"
+        },
+        {
+            "name": "Cernunnos",
+            "pantheon": "Celtic",
+            "type": "Hunter"
+        },
+        {
+            "name": "Chaac",
+            "pantheon": "Mayan",
+            "type": "Warrior"
+        },
+        {
+            "name": "Chang'e",
+            "pantheon": "Chinese",
+            "type": "Mage"
+        },
+        {
+            "name": "Charybdis",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Chernobog",
+            "pantheon": "Slavic",
+            "type": "Hunter"
+        },
+        {
+            "name": "Chiron",
+            "pantheon": "Greek",
+            "type": "Hunter"
+        },
+        {
+            "name": "Chronos",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Cthulhu",
+            "pantheon": "Great Old Ones",
+            "type": "Guardian"
+        },
+        {
+            "name": "Cuchulainn",
+            "pantheon": "Celtic",
+            "type": "Warrior"
+        },
+        {
+            "name": "Cu Chulainn",
+            "pantheon": "Celtic",
+            "type": "Warrior"
+        },
+        {
+            "name": "Cupid",
+            "pantheon": "Roman",
+            "type": "Hunter"
+        },
+        {
+            "name": "Da Ji",
+            "pantheon": "Chinese",
+            "type": "Assassin"
+        },
+        {
+            "name": "Danzaburou",
+            "pantheon": "Japanese",
+            "type": "Hunter"
+        },
+        {
+            "name": "Discordia",
+            "pantheon": "Roman",
+            "type": "Mage"
+        },
+        {
+            "name": "Erlang Shen",
+            "pantheon": "Chinese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Eset",
+            "pantheon": "Egyptian",
+            "type": "Mage"
+        },
+        {
+            "name": "Fafnir",
+            "pantheon": "Norse",
+            "type": "Guardian"
+        },
+        {
+            "name": "Fenrir",
+            "pantheon": "Norse",
+            "type": "Assassin"
+        },
+        {
+            "name": "Freya",
+            "pantheon": "Norse",
+            "type": "Mage"
+        },
+        {
+            "name": "Ganesha",
+            "pantheon": "Hindu",
+            "type": "Guardian"
+        },
+        {
+            "name": "Geb",
+            "pantheon": "Egyptian",
+            "type": "Guardian"
+        },
+        {
+            "name": "Gilgamesh",
+            "pantheon": "Sumerian",
+            "type": "Warrior"
+        },
+        {
+            "name": "Guan Yu",
+            "pantheon": "Chinese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Hachiman",
+            "pantheon": "Japanese",
+            "type": "Hunter"
+        },
+        {
+            "name": "Hades",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "He Bo",
+            "pantheon": "Chinese",
+            "type": "Mage"
+        },
+        {
+            "name": "Heimdallr",
+            "pantheon": "Norse",
+            "type": "Hunter"
+        },
+        {
+            "name": "Hel",
+            "pantheon": "Norse",
+            "type": "Mage"
+        },
+        {
+            "name": "Hera",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Hercules",
+            "pantheon": "Roman",
+            "type": "Warrior"
+        },
+        {
+            "name": "Horus",
+            "pantheon": "Egyptian",
+            "type": "Warrior"
+        },
+        {
+            "name": "Hou Yi",
+            "pantheon": "Chinese",
+            "type": "Hunter"
+        },
+        {
+            "name": "Hun Batz",
+            "pantheon": "Mayan",
+            "type": "Assassin"
+        },
+        {
+            "name": "Izanami",
+            "pantheon": "Japanese",
+            "type": "Hunter"
+        },
+        {
+            "name": "Janus",
+            "pantheon": "Roman",
+            "type": "Mage"
+        },
+        {
+            "name": "Jing Wei",
+            "pantheon": "Chinese",
+            "type": "Hunter"
+        },
+        {
+            "name": "Jormungandr",
+            "pantheon": "Norse",
+            "type": "Guardian"
+        },
+        {
+            "name": "Kali",
+            "pantheon": "Hindu",
+            "type": "Assassin"
+        },
+        {
+            "name": "Khepri",
+            "pantheon": "Egyptian",
+            "type": "Guardian"
+        },
+        {
+            "name": "King Arthur",
+            "pantheon": "Arthurian",
+            "type": "Warrior"
+        },
+        {
+            "name": "Kukulkan",
+            "pantheon": "Mayan",
+            "type": "Mage"
+        },
+        {
+            "name": "Kumbhakarna",
+            "pantheon": "Hindu",
+            "type": "Guardian"
+        },
+        {
+            "name": "Kuzenbo",
+            "pantheon": "Japanese",
+            "type": "Guardian"
+        },
+        {
+            "name": "Loki",
+            "pantheon": "Norse",
+            "type": "Assassin"
+        },
+        {
+            "name": "Medusa",
+            "pantheon": "Greek",
+            "type": "Hunter"
+        },
+        {
+            "name": "Mercury",
+            "pantheon": "Roman",
+            "type": "Assassin"
+        },
+        {
+            "name": "Merlin",
+            "pantheon": "Arthurian",
+            "type": "Mage"
+        },
+        {
+            "name": "Mulan",
+            "pantheon": "Chinese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Ne Zha",
+            "pantheon": "Chinese",
+            "type": "Assassin"
+        },
+        {
+            "name": "Neith",
+            "pantheon": "Egyptian",
+            "type": "Hunter"
+        },
+        {
+            "name": "Nemesis",
+            "pantheon": "Greek",
+            "type": "Assassin"
+        },
+        {
+            "name": "Nike",
+            "pantheon": "Greek",
+            "type": "Warrior"
+        },
+        {
+            "name": "Nox",
+            "pantheon": "Roman",
+            "type": "Mage"
+        },
+        {
+            "name": "Nu Wa",
+            "pantheon": "Chinese",
+            "type": "Mage"
+        },
+        {
+            "name": "Odin",
+            "pantheon": "Norse",
+            "type": "Warrior"
+        },
+        {
+            "name": "Olorun",
+            "pantheon": "Yoruba",
+            "type": "Mage"
+        },
+        {
+            "name": "Osiris",
+            "pantheon": "Egyptian",
+            "type": "Warrior"
+        },
+        {
+            "name": "Pele",
+            "pantheon": "Polynesian",
+            "type": "Assassin"
+        },
+        {
+            "name": "Persephone",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Poseidon",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Ra",
+            "pantheon": "Egyptian",
+            "type": "Mage"
+        },
+        {
+            "name": "Raijin",
+            "pantheon": "Japanese",
+            "type": "Mage"
+        },
+        {
+            "name": "Rama",
+            "pantheon": "Hindu",
+            "type": "Hunter"
+        },
+        {
+            "name": "Ratatoskr",
+            "pantheon": "Norse",
+            "type": "Assassin"
+        },
+        {
+            "name": "Ravana",
+            "pantheon": "Hindu",
+            "type": "Assassin"
+        },
+        {
+            "name": "Scylla",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Serqet",
+            "pantheon": "Egyptian",
+            "type": "Assassin"
+        },
+        {
+            "name": "Set",
+            "pantheon": "Egyptian",
+            "type": "Assassin"
+        },
+        {
+            "name": "Skadi",
+            "pantheon": "Norse",
+            "type": "Hunter"
+        },
+        {
+            "name": "Sobek",
+            "pantheon": "Egyptian",
+            "type": "Guardian"
+        },
+        {
+            "name": "Sol",
+            "pantheon": "Norse",
+            "type": "Mage"
+        },
+        {
+            "name": "Sun Wukong",
+            "pantheon": "Chinese",
+            "type": "Warrior"
+        },
+        {
+            "name": "Susano",
+            "pantheon": "Japanese",
+            "type": "Assassin"
+        },
+        {
+            "name": "Sylvanus",
+            "pantheon": "Roman",
+            "type": "Guardian"
+        },
+        {
+            "name": "Terra",
+            "pantheon": "Roman",
+            "type": "Guardian"
+        },
+        {
+            "name": "Thanatos",
+            "pantheon": "Greek",
+            "type": "Assassin"
+        },
+        {
+            "name": "The Morrigan",
+            "pantheon": "Celtic",
+            "type": "Mage"
+        },
+        {
+            "name": "Thor",
+            "pantheon": "Norse",
+            "type": "Assassin"
+        },
+        {
+            "name": "Thoth",
+            "pantheon": "Egyptian",
+            "type": "Mage"
+        },
+        {
+            "name": "Tiamat",
+            "pantheon": "Babylonian",
+            "type": "Mage"
+        },
+        {
+            "name": "Tsukuyomi",
+            "pantheon": "Japanese",
+            "type": "Assassin"
+        },
+        {
+            "name": "Tyr",
+            "pantheon": "Norse",
+            "type": "Warrior"
+        },
+        {
+            "name": "Ullr",
+            "pantheon": "Norse",
+            "type": "Hunter"
+        },
+        {
+            "name": "Vamana",
+            "pantheon": "Hindu",
+            "type": "Warrior"
+        },
+        {
+            "name": "Vulcan",
+            "pantheon": "Roman",
+            "type": "Mage"
+        },
+        {
+            "name": "Xbalanque",
+            "pantheon": "Mayan",
+            "type": "Hunter"
+        },
+        {
+            "name": "Xing Tian",
+            "pantheon": "Chinese",
+            "type": "Guardian"
+        },
+        {
+            "name": "Yemoja",
+            "pantheon": "Yoruba",
+            "type": "Guardian"
+        },
+        {
+            "name": "Ymir",
+            "pantheon": "Norse",
+            "type": "Guardian"
+        },
+        {
+            "name": "Zeus",
+            "pantheon": "Greek",
+            "type": "Mage"
+        },
+        {
+            "name": "Zhong Kui",
+            "pantheon": "Chinese",
+            "type": "Mage"
+        }
+    ]
+}

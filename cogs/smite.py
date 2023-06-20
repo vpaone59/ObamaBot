@@ -48,7 +48,7 @@ class Smite_Shuffler(commands.Cog):
             count += 1
         await ctx.send(list_text)
 
-    @commands.command()
+    @commands.command(aliases=["ss"])
     async def shuffle(self, ctx, god_type: str = None):
         """
         Chooses a random God. Optionally takes a god_type filter results
@@ -73,16 +73,23 @@ class Smite_Shuffler(commands.Cog):
         """
         Add a God to the God list
         """
-        print(god_name, god_pantheon, god_type)
         if god_type.lower() not in available_types:
             await interaction.response.send_message(f"{god_type} is not one of {available_types}")
         else:
             response = add_god_to_list(god_name, god_type, god_pantheon)
             await interaction.response.send_message(f'{response}')
 
-
-def remove_god_from_list(name):
-    pass
+    @app_commands.command(name="remove_god", description="remove a god")
+    @commands.has_permissions(administrator=True)
+    async def remove_god(self, interaction: discord.Interaction, god_name: str):
+        """
+        Add a God to the God list
+        """
+        if god_check(god_name) == False:
+            await interaction.response.send_message(f"{god_name} is not in the list.")
+        else:
+            response = remove_god_from_list(god_name)
+            await interaction.response.send_message(f'{response}')
 
 
 def add_god_to_list(name, type, pantheon):
@@ -111,10 +118,44 @@ def add_god_to_list(name, type, pantheon):
         # Write the data to the file
         with open("./dynamic/smite_gods.json", "w") as file:
             json.dump(god_list, file, indent=4)
-            print("done")
         return f"```God Added\n---\nName: {name}\nPantheon: {pantheon}\nType: {type}```"
     except Exception as e:
         return f"ERROR : {e}"
+
+
+def remove_god_from_list(name):
+    """
+    Function that removes a god from the God list by name and updates the JSON file
+    """
+    index = -1
+
+    # Get the index of the name
+    for i, god in enumerate(god_list["gods"]):
+        if god["name"].lower() == name.lower():
+            index = i
+            break
+
+    if index != -1:
+        removed_god = god_list["gods"].pop(index)
+
+        with open("./dynamic/smite_gods.json", "w") as file:
+            json.dump(god_list, file, indent=4)
+
+        return f"```God Removed\n---\nName: {removed_god['name']}\nPantheon: {removed_god['pantheon']}\nType: {removed_god['type']}```"
+    else:
+        return f"The god '{name}' does not exist in the list."
+
+
+def god_check(name):
+    """
+    Checks to see if the input name exists within the God list
+    """
+    # Capitalize the name so it can properly check against the formatted names already in the list
+    capitalized_name = ' '.join(word.capitalize() for word in name.split())
+    for god in god_list["gods"]:
+        if god["name"] == capitalized_name:
+            return True
+    return False
 
 
 async def setup(bot):

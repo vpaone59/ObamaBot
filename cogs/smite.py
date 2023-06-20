@@ -85,11 +85,8 @@ class Smite_Shuffler(commands.Cog):
         """
         Add a God to the God list
         """
-        if god_check(god_name) == False:
-            await interaction.response.send_message(f"{god_name} is not in the list.")
-        else:
-            response = remove_god_from_list(god_name)
-            await interaction.response.send_message(f'{response}')
+        response = remove_god_from_list(god_name)
+        await interaction.response.send_message(f'{response}')
 
 
 def add_god_to_list(name, type, pantheon):
@@ -127,23 +124,27 @@ def remove_god_from_list(name):
     """
     Function that removes a god from the God list by name and updates the JSON file
     """
+    capitalized_name = ' '.join(word.capitalize() for word in name.split())
     index = -1
 
     # Get the index of the name
-    for i, god in enumerate(god_list["gods"]):
-        if god["name"].lower() == name.lower():
-            index = i
+    for curr_index, god in enumerate(god_list["gods"]):
+        if god["name"] == capitalized_name:
+            index = curr_index
             break
 
     if index != -1:
-        removed_god = god_list["gods"].pop(index)
+        try:
+            removed_god = god_list["gods"].pop(index)
 
-        with open("./dynamic/smite_gods.json", "w") as file:
-            json.dump(god_list, file, indent=4)
+            with open("./dynamic/smite_gods.json", "w") as file:
+                json.dump(god_list, file, indent=4)
 
-        return f"```God Removed\n---\nName: {removed_god['name']}\nPantheon: {removed_god['pantheon']}\nType: {removed_god['type']}```"
+            return f"```God Removed\n---\nName: {removed_god['name']}\nPantheon: {removed_god['pantheon']}\nType: {removed_god['type']}```"
+        except Exception as e:
+            return f"ERROR : {e}"
     else:
-        return f"The god '{name}' does not exist in the list."
+        return f"'{name}' does not exist in the list."
 
 
 def god_check(name):

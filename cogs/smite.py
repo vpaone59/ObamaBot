@@ -22,7 +22,9 @@ class Smite_Shuffler(commands.Cog):
     async def on_ready(self):
         print(f'{self} ready')
 
-    @commands.command()
+    @commands.command(description="Syncs the Smite.py Cog to Discord")
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.has_permissions(administrator=True)
     async def sync_smite(self, ctx) -> None:
         """
         Specifically sync the slash commands from this Cog
@@ -67,7 +69,7 @@ class Smite_Shuffler(commands.Cog):
         random_god_name = random_god["name"]
         await ctx.send(f"{random_god_name}")
 
-    @app_commands.command(name="add_god", description="add a god")
+    @app_commands.command(name="add_god", description="Add a God to the God list")
     @commands.has_permissions(administrator=True)
     async def add_god(self, interaction: discord.Interaction, god_name: str, god_pantheon: str, god_type: str):
         """
@@ -79,11 +81,11 @@ class Smite_Shuffler(commands.Cog):
             response = add_god_to_list(god_name, god_type, god_pantheon)
             await interaction.response.send_message(f'{response}')
 
-    @app_commands.command(name="remove_god", description="remove a god")
+    @app_commands.command(name="remove_god", description="Remove a God from the God list")
     @commands.has_permissions(administrator=True)
     async def remove_god(self, interaction: discord.Interaction, god_name: str):
         """
-        Add a God to the God list
+        Remove a God from the God list
         """
         response = remove_god_from_list(god_name)
         await interaction.response.send_message(f'{response}')

@@ -34,7 +34,7 @@ class Custom1(commands.Cog):
         whenever a message is sent this Cog will listen and execute code below
         """
         messageAuthor = message.author
-        string_message = str(message)
+        string_message = str(message.content)
         # return whenever a prefix / command message is detected
         if string_message.startswith(f'{os.getenv("PREFIX")}'):
             return
@@ -42,6 +42,11 @@ class Custom1(commands.Cog):
         # if Walter sends a message the bot will always send the picture below
         if messageAuthor.id == 247936308733935616:
             await message.channel.send(file=discord.File('gifs/weird/boner_alert.jpg'))
+
+        if message.guild.id == 842545435050508328:
+            if string_message.startswith("INC"):
+                format_link = format_incident_link(string_message)
+                await message.channel.send(f'{format_link}')
 
     @commands.command(aliases=['bee', 'b'])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -58,6 +63,10 @@ class Custom1(commands.Cog):
         Send a picture of Reeves!
         """
         await ctx.channel.send(file=discord.File('gifs/weird/Reeves/Reeves_gun_permit.jpg'))
+
+
+def format_incident_link(incident_number):
+    return f"https://s.rowan.edu/{incident_number}"
 
 
 async def setup(bot):

@@ -41,8 +41,7 @@ class Custom1(commands.Cog):
 
         # if DJ is @ mentioned
         for user in message.mentions:
-            # if user.id == 123107464240562180:
-            if user.id == 149356710455279617:
+            if user.id == 123107464240562180:
                 await message.channel.send(file=discord.File('gifs/memes/batman_deej.png'))
                 break  # Once the user is found, we can break out of the loop
 

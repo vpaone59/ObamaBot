@@ -76,10 +76,16 @@ class Custom1(commands.Cog):
 
 
 def format_incident_link(incident_number):
+    """
+    Format incident number to a clickable link
+    """
     return f"https://s.rowan.edu/{incident_number}"
 
 
 def get_random_batman_deej_file():
+    """
+    Get all files in the memes directory that are of .png and contain 'batman_deej' in the filename
+    """
     folder_path = 'gifs/memes'
     files = [file for file in os.listdir(folder_path) if file.endswith(
         '.png') and 'batman_deej' in file]

@@ -42,7 +42,11 @@ class Custom1(commands.Cog):
         # if DJ is @ mentioned
         for user in message.mentions:
             if user.id == 123107464240562180:
-                await message.channel.send(file=discord.File('gifs/memes/batman_deej.png'))
+                # if user.id == 965414583860883456: # dog dev user ID
+                file_name = get_random_batman_deej_file()
+                if file_name:
+                    file_path = os.path.join('gifs/memes', file_name)
+                    await message.channel.send(file=discord.File(file_path))
                 break  # Once the user is found, we can break out of the loop
 
         # if Walter sends a message the bot will always send the picture below
@@ -73,6 +77,16 @@ class Custom1(commands.Cog):
 
 def format_incident_link(incident_number):
     return f"https://s.rowan.edu/{incident_number}"
+
+
+def get_random_batman_deej_file():
+    folder_path = 'gifs/memes'
+    files = [file for file in os.listdir(folder_path) if file.endswith(
+        '.png') and 'batman_deej' in file]
+    if files:
+        return random.choice(files)
+    else:
+        return None
 
 
 async def setup(bot):

@@ -74,8 +74,6 @@ class Not_Reddit(commands.Cog):
         
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
-            
-    import random
 
 
     @commands.command(aliases=['rr'])

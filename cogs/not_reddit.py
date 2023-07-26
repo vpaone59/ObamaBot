@@ -2,26 +2,21 @@
 https://github.com/vpaone59
 """
 
-import discord
 from discord.ext import commands
-from discord import app_commands
-from polygon import RESTClient
 import os
 import datetime
-import requests
-import requests.auth
 import asyncpraw
 
 CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
 USERNAME = os.getenv("REDDIT_USERNAME")
 PASSWORD = os.getenv("REDDIT_PASSWORD")
+USER_AGENT = os.getenv("REDDIT_USER_AGENT")
 
 class Not_Reddit(commands.Cog):
     """ 
     Reddit API thingy
     """
-    
     def __init__(self, bot):
         self.bot = bot
         self.reddit = asyncpraw.Reddit(
@@ -29,7 +24,7 @@ class Not_Reddit(commands.Cog):
             client_secret=CLIENT_SECRET,
             password=PASSWORD,
             username=USERNAME,
-            user_agent="obamabot by u/fuggetz",
+            user_agent=USER_AGENT,
         )
         
     @commands.Cog.listener()

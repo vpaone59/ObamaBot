@@ -22,16 +22,15 @@ class Counter(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        # When this Cog first loads we grab a list of every entry in the DB name_of_counters column
-        # and add it to global variable list counters_from_db
-        get_counters()
-
     @commands.Cog.listener()
     async def on_ready(self):
         """
         runs when Cog is loaded and ready to use
         """
         print(f'{self} ready')
+        # When this Cog first loads we grab a list of every entry in the DB name_of_counters column
+        # and add it to global variable list counters_from_db
+        get_counters()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -139,7 +138,7 @@ class Counter(commands.Cog):
 
 def get_counters():
     """
-    Function to get and set the list of counters and their tally's
+    Function to get and set the list of counters and their tally's into global variables
     """
     global counter_names
     global counters_from_db
@@ -173,12 +172,12 @@ def connect_db():
             password=os.getenv("PASSWORD"),
             database=os.getenv("TARGET"))
         my_cursor = mydb.cursor()
-        # print(f"Connection to {mydb.database} established")
+        
+        return mydb, my_cursor
+    
     except Exception as err:
         print("Something went wrong: {}".format(err))
-
-    return mydb, my_cursor
-
+        return 200
 
 async def setup(bot):
     await bot.add_cog(Counter(bot))

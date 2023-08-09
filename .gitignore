@@ -7,9 +7,8 @@ seequal.py
 sql.py
 mariadb.py
 
-# json files
+# specific json files
 banned.json
-*.json
 
 # OS files
 .DS_Store
@@ -28,3 +27,6 @@ gifs/catcam
 gifs/weird
 pixel_obama.png
 /CatBot
+bot_startup.bat
+bot.log
+try.py

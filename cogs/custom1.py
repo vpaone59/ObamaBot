@@ -34,14 +34,29 @@ class Custom1(commands.Cog):
         whenever a message is sent this Cog will listen and execute code below
         """
         messageAuthor = message.author
-
+        string_message = str(message.content)
         # return whenever a prefix / command message is detected
-        if message.startswith(f'{os.getenv("PREFIX")}'):
+        if string_message.startswith(f'{os.getenv("PREFIX")}'):
             return
+
+        # if DJ is @ mentioned
+        for user in message.mentions:
+            if user.id == 123107464240562180:
+                # if user.id == 965414583860883456: # dog dev user ID
+                file_name = get_random_batman_deej_file()
+                if file_name:
+                    file_path = os.path.join('gifs/memes', file_name)
+                    await message.channel.send(file=discord.File(file_path))
+                break  # Once the user is found, we can break out of the loop
 
         # if Walter sends a message the bot will always send the picture below
         if messageAuthor.id == 247936308733935616:
             await message.channel.send(file=discord.File('gifs/weird/boner_alert.jpg'))
+
+        if message.guild.id == 842545435050508328:
+            if string_message.startswith("INC"):
+                format_link = format_incident_link(string_message)
+                await message.channel.send(f'{format_link}')
 
     @commands.command(aliases=['bee', 'b'])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -58,6 +73,26 @@ class Custom1(commands.Cog):
         Send a picture of Reeves!
         """
         await ctx.channel.send(file=discord.File('gifs/weird/Reeves/Reeves_gun_permit.jpg'))
+
+
+def format_incident_link(incident_number):
+    """
+    Format incident number to a clickable link
+    """
+    return f"https://s.rowan.edu/{incident_number}"
+
+
+def get_random_batman_deej_file():
+    """
+    Get all files in the memes directory that are of .png and contain 'batman_deej' in the filename
+    """
+    folder_path = 'gifs/memes'
+    files = [file for file in os.listdir(folder_path) if file.endswith(
+        '.png') and 'batman_deej' in file]
+    if files:
+        return random.choice(files)
+    else:
+        return None
 
 
 async def setup(bot):

@@ -8,7 +8,7 @@ from discord.ext import commands
 
 
 class Game(commands.Cog):
-    """ 
+    """
     game commands for a discord bot
     """
 
@@ -20,7 +20,7 @@ class Game(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.guild)
@@ -29,9 +29,9 @@ class Game(commands.Cog):
         Roll a random int from 1 to 10000
         """
         roll = random.randint(1, 10000)
-        await ctx.send(f'{ctx.message.author.name} rolled {roll}')
+        await ctx.send(f"{ctx.message.author.name} rolled {roll}")
 
-    @commands.command(aliases=['duel'])
+    @commands.command(aliases=["duel"])
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def numberduel(self, ctx):
         """
@@ -45,32 +45,34 @@ class Game(commands.Cog):
         user2_roll = random.randint(1, 100)
         roll_diff = abs(user1_roll - user2_roll)
 
-        await ctx.send(f'{user1} rolled {user1_roll}\n{user2} rolled {user2_roll}')
+        await ctx.send(f"{user1} rolled {user1_roll}\n{user2} rolled {user2_roll}")
         if user1_roll > user2_roll:
-            await ctx.send(f'{user1} wins with a difference of {roll_diff}')
+            await ctx.send(f"{user1} wins with a difference of {roll_diff}")
         else:
-            await ctx.send(f'{user2} wins with a difference of {roll_diff}')
+            await ctx.send(f"{user2} wins with a difference of {roll_diff}")
 
-    @commands.command(aliases=['r'])
+    @commands.command(aliases=["r"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def react(self, ctx):
         """
         Waits for the user to react with the same emoji the Bot used
         """
 
-        await ctx.send('React using 🍆 within 5 seconds')
+        await ctx.send("React using 🍆 within 5 seconds")
         # checks the author of the reaction and which reaction emoji they used
 
         def check(reaction, user):
-            return user == ctx.message.author and reaction.emoji == '🍆'
+            return user == ctx.message.author and reaction.emoji == "🍆"
 
         # wait 5 seconds to see if the user that ran the command has reacted with the correct emoji
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=5.0, check=check)
+            reaction, user = await self.bot.wait_for(
+                "reaction_add", timeout=5.0, check=check
+            )
         except asyncio.TimeoutError:
-            await ctx.channel.send('ERROR: Timeout Exception')
+            await ctx.channel.send("ERROR: Timeout Exception")
         else:
-            await ctx.channel.send('Obama approves')
+            await ctx.channel.send("Obama approves")
 
 
 async def setup(bot):

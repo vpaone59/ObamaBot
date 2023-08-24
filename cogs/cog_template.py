@@ -6,7 +6,7 @@ from discord.ext import commands
 
 
 class COG_NAME(commands.Cog):
-    """ 
+    """
     Class
     """
 
@@ -15,8 +15,7 @@ class COG_NAME(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-
-        print(f'{self} ready')
+        print(f"{self} ready")
 
 
 async def setup(bot):

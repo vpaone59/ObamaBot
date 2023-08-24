@@ -12,7 +12,7 @@ from discord.ext import commands
 
 # find 'banned.json'
 # if it doesn't exist, auto create a new one from template
-if os.path.exists('./banned.json'):
+if os.path.exists("./banned.json"):
     with open("./banned.json") as f:
         bannedWordsData = json.load(f)
 else:
@@ -36,7 +36,7 @@ class Ban(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -51,7 +51,9 @@ class Ban(commands.Cog):
         else:
             for word in bannedWords:
                 if msg_contain_word(msg, word):
-                    await message.channel.send("```Banned word detected. Please do not use banned words.```")
+                    await message.channel.send(
+                        "```Banned word detected. Please do not use banned words.```"
+                    )
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -61,7 +63,7 @@ class Ban(commands.Cog):
         only admin should be able to run this
         param: word - The word you want to be on the banned words list
         """
-        print(f'{word}')
+        print(f"{word}")
         if word.lower() in bannedWords:
             # check if the word is already banned
             await ctx.send(f"```{word} is already banned```")
@@ -102,7 +104,7 @@ class Ban(commands.Cog):
         else:
             await ctx.send(f"```{word} isn't banned```")
 
-    @commands.command(aliases=['bl'])
+    @commands.command(aliases=["bl"])
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def banlist(self, ctx):
@@ -120,7 +122,7 @@ def msg_contain_word(msg, word):
     """
     return true if there is a banned word in the message
     """
-    return re.search(fr'.*({word}).*', msg) is not None
+    return re.search(rf".*({word}).*", msg) is not None
 
 
 async def setup(bot):

@@ -29,9 +29,9 @@ class Camcap(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
-    @commands.command(aliases=['catcap', 'catpic', 'catsnap', 'cat'])
+    @commands.command(aliases=["catcap", "catpic", "catsnap", "cat"])
     @commands.cooldown(1, 6, commands.BucketType.user)
     async def cat_cap(self, ctx, cam_num=-1):
         """
@@ -42,13 +42,15 @@ class Camcap(commands.Cog):
 
         frame_counter = 0
         if cam_num > 3 or cam_num == 0 or cam_num < -1:
-            await ctx.send(f'INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random.')
+            await ctx.send(
+                f"INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random."
+            )
             return
         elif cam_num == -1:
             cam_num = random.choice(active_cam_nums)
-            cam = cv2.VideoCapture(cam_num-1)
+            cam = cv2.VideoCapture(cam_num - 1)
         else:
-            cam = cv2.VideoCapture(cam_num-1)
+            cam = cv2.VideoCapture(cam_num - 1)
 
         cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         ret, frame = cam.read()
@@ -67,31 +69,38 @@ class Camcap(commands.Cog):
         await bot_warn.delete()
 
         if cat_status == "CAT DETECTED":
-            await ctx.send(f'```{cat_status} Image from Camera #{cam_num}```', file=discord.File(f'gifs/catcam/catcap/cat_cap_{frame_counter}.jpg'))
+            await ctx.send(
+                f"```{cat_status} Image from Camera #{cam_num}```",
+                file=discord.File(f"gifs/catcam/catcap/cat_cap_{frame_counter}.jpg"),
+            )
         elif cat_status == "NO CAT DETECTED":
             os.remove(img_name)
-            cat_dir = 'gifs/catcam/FRITA/'
+            cat_dir = "gifs/catcam/FRITA/"
             cat_files = os.listdir(cat_dir)
             random_cat_pic = random.choice(cat_files)
             random_cat_path = os.path.join(cat_dir, random_cat_pic)
             try:
-                await ctx.send(f'```{cat_status} :( enjoy a complimentary random cat pic```', file=discord.File(random_cat_path))
+                await ctx.send(
+                    f"```{cat_status} :( enjoy a complimentary random cat pic```",
+                    file=discord.File(random_cat_path),
+                )
             except Exception as e:
                 print(e)
-                await ctx.send(f'```ERROR {e}```')
+                await ctx.send(f"```ERROR {e}```")
 
-    @commands.command(aliases=['catrec', 'catvid'])
+    @commands.command(aliases=["catrec", "catvid"])
     @commands.cooldown(1, 6, commands.BucketType.user)
     async def cat_rec(self, ctx):
         """
         records a 5 second video through webcam and saves the file
-        then sends the file to the discord channel 
+        then sends the file to the discord channel
         """
         rec = cv2.VideoCapture(1)
 
-        fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
+        fourcc = cv2.VideoWriter_fourcc("X", "V", "I", "D")
         video_output = cv2.VideoWriter(
-            'gifs/catcam/catcap/cat_rec.avi', fourcc, 1.0, (640, 480))
+            "gifs/catcam/catcap/cat_rec.avi", fourcc, 1.0, (640, 480)
+        )
 
         start_time = time.time()
         while (time.time() - start_time) < 3.0:
@@ -104,7 +113,7 @@ class Camcap(commands.Cog):
         rec.release()
         video_output.release()
 
-        await ctx.send(file=discord.File('gifs/catcam/catcap/cat_rec.avi'))
+        await ctx.send(file=discord.File("gifs/catcam/catcap/cat_rec.avi"))
 
 
 def check_for_cat(image):

@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord.utils import get
 
 
-class Roles(commands.Cog, name='Roles'):
+class Roles(commands.Cog, name="Roles"):
     """
     role related commands for a Bot
     """
@@ -19,9 +19,9 @@ class Roles(commands.Cog, name='Roles'):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
-    @commands.command(name='hasrole', aliases=['hr'])
+    @commands.command(name="hasrole", aliases=["hr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hasRole(self, ctx, user: discord.Member = None, check=None):
         """
@@ -30,18 +30,23 @@ class Roles(commands.Cog, name='Roles'):
         param: @check The role you want to check if the user has
         """
         if check == None or user == None:
-            await ctx.send("Missing argument.\nTo use; $hasRole __@user_mention__ \"__role_name__\"")
+            await ctx.send(
+                'Missing argument.\nTo use; $hasRole __@user_mention__ "__role_name__"'
+            )
         elif not get(ctx.guild.roles, name=check):
-            await ctx.send(f"Role **{check}** does not exist in this guild. Use **$listroles** to get a list of this guild's roles.")
+            await ctx.send(
+                f"Role **{check}** does not exist in this guild. Use **$listroles** to get a list of this guild's roles."
+            )
         else:
             role = discord.utils.find(
-                lambda r: r.name == check, ctx.message.guild.roles)
+                lambda r: r.name == check, ctx.message.guild.roles
+            )
             if role in user.roles:
                 await ctx.send(f"User {user.mention} has the **{check}** role")
             else:
                 await ctx.send(f"User{user.mention} does not have the **{check}** role")
 
-    @commands.command(aliases=['cr'])
+    @commands.command(aliases=["cr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def createrole(self, ctx, role):
         """
@@ -52,10 +57,10 @@ class Roles(commands.Cog, name='Roles'):
         if get(ctx.guild.roles, name=role):
             await ctx.send("Role already exists!")
         else:
-            await ctx.guild.create_role(name=role, color=discord.Color(0x0062ff))
+            await ctx.guild.create_role(name=role, color=discord.Color(0x0062FF))
             await ctx.send(f"{role} has been created")
 
-    @commands.command(aliases=['dr'])
+    @commands.command(aliases=["dr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def deleterole(self, ctx, role):
         """
@@ -70,7 +75,7 @@ class Roles(commands.Cog, name='Roles'):
             await r.delete()
             await ctx.send(f"{role} has been deleted")
 
-    @commands.command(aliases=['lr'])
+    @commands.command(aliases=["lr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def listroles(self, ctx):
         """

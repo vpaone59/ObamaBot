@@ -28,7 +28,7 @@ creates a stream handler for printing logs to the shell,
 creates a file handler for saving logs with date/time
 """
 # Delete existing log file if it exists
-log_file = 'bot.log'
+log_file = "bot.log"
 if os.path.exists(log_file):
     os.remove(log_file)
 logging.basicConfig(level=logging.INFO)  # Set the logging level to INFO
@@ -37,9 +37,10 @@ logger = logging.getLogger(__name__)
 # stream_handler = logging.StreamHandler()
 # logger.addHandler(stream_handler)
 # Configure the logger to save logs to a file
-file_handler = logging.FileHandler('bot.log')
-file_handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+file_handler = logging.FileHandler("bot.log")
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+)
 logger.addHandler(file_handler)
 
 
@@ -58,11 +59,11 @@ async def on_ready():
     """
     Runs once the bot establishes a connection with Discord
     """
-    logger.info(f'Logged in as {bot.user}')
+    logger.info(f"Logged in as {bot.user}")
     try:
         await load_all_cogs()
     except Exception as e:
-        logger.error(f'Bot not ready: {e}')
+        logger.error(f"Bot not ready: {e}")
 
 
 @bot.event
@@ -87,16 +88,16 @@ async def load_all_cogs():
     """
     Function for loading all Cog .py files in /cogs directory
     """
-    for filename in os.listdir('./cogs'):
-        if filename.endswith('.py'):
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
             try:
-                await bot.load_extension(f'cogs.{filename[:-3]}')
-                logger.info(f'{filename} loaded')
+                await bot.load_extension(f"cogs.{filename[:-3]}")
+                logger.info(f"{filename} loaded")
             except Exception as e:
                 logger.error({e})
 
 
-@bot.command(aliases=['load'], help='Load a Cog file')
+@bot.command(aliases=["load"], help="Load a Cog file")
 @commands.has_permissions(administrator=True)
 async def load_cog(ctx, cog_name):
     """
@@ -106,17 +107,17 @@ async def load_cog(ctx, cog_name):
     param: extension - The name of the Cog file you want to load
     """
     try:
-        await bot.load_extension(f'cogs.{cog_name}')
-        await ctx.send(f'```{cog_name}.py loaded```')
+        await bot.load_extension(f"cogs.{cog_name}")
+        await ctx.send(f"```{cog_name}.py loaded```")
     except commands.ExtensionAlreadyLoaded as e:
         logger.error({e})
-        await ctx.send(f'```{cog_name}.py is already loaded\n{e}```')
+        await ctx.send(f"```{cog_name}.py is already loaded\n{e}```")
     except commands.ExtensionNotFound as e:
         logger.error({e})
-        await ctx.send(f'```{cog_name}.py does not exist\n{e}```')
+        await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
 
 
-@bot.command(aliases=['unload'], help='Unload a Cog file')
+@bot.command(aliases=["unload"], help="Unload a Cog file")
 @commands.has_permissions(administrator=True)
 async def unload_cog(ctx, cog_name):
     """
@@ -126,17 +127,17 @@ async def unload_cog(ctx, cog_name):
     param: extension - The name of the Cog file to unload
     """
     try:
-        await bot.unload_extension(f'cogs.{cog_name}')
-        await ctx.send(f'```{cog_name}.py unloaded```')
+        await bot.unload_extension(f"cogs.{cog_name}")
+        await ctx.send(f"```{cog_name}.py unloaded```")
     except commands.ExtensionNotLoaded as e:
         logger.error({e})
-        await ctx.send(f'```{cog_name}.py is not loaded\n{e}```')
+        await ctx.send(f"```{cog_name}.py is not loaded\n{e}```")
     except commands.ExtensionNotFound as e:
         logger.error({e})
-        await ctx.send(f'```{cog_name}.py does not exist\n{e}```')
+        await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
 
 
-@bot.command(aliases=['rl'], help='Reloads all Cog files')
+@bot.command(aliases=["rl"], help="Reloads all Cog files")
 @commands.has_permissions(administrator=True)
 async def reload_cog(ctx, cog_name=""):
     """
@@ -148,32 +149,37 @@ async def reload_cog(ctx, cog_name=""):
     if cog_name == "":
         reloaded_cogs = ""
         failed = ""
-        for filename in os.listdir('./cogs'):
-            if filename.endswith('.py'):
+        for filename in os.listdir("./cogs"):
+            if filename.endswith(".py"):
                 try:
-                    await bot.reload_extension(f'cogs.{filename[:-3]}')
+                    await bot.reload_extension(f"cogs.{filename[:-3]}")
                     reloaded_cogs += " - " + filename
                 except Exception as e:
                     logger.error({e})
                     failed += " - " + filename
-        await ctx.send(f'```These Cogs were reloaded: {reloaded_cogs}\n\nThese Cogs failed to reload: {failed}```')
+        await ctx.send(
+            f"```These Cogs were reloaded: {reloaded_cogs}\n\nThese Cogs failed to reload: {failed}```"
+        )
     else:
         try:
-            await bot.reload_extension(f'cogs.{cog_name}')
-            await ctx.send(f'```{cog_name}.py reloaded```')
+            await bot.reload_extension(f"cogs.{cog_name}")
+            await ctx.send(f"```{cog_name}.py reloaded```")
         except commands.ExtensionNotFound as e:
             logger.error({e})
-            await ctx.send(f'```{cog_name}.py not in directory\n{e}```')
+            await ctx.send(f"```{cog_name}.py not in directory\n{e}```")
         except Exception as e:
             logger.error({e})
-            await ctx.send(f'```{cog_name}.py could not be reloaded \n{e}```')
+            await ctx.send(f"```{cog_name}.py could not be reloaded \n{e}```")
 
 
 @bot.command()
 # @commands.guild_only()
 # @commands.is_owner()
 async def sync(
-        ctx: Context, guilds: Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    ctx: Context,
+    guilds: Greedy[discord.Object],
+    spec: Optional[Literal["~", "*", "^"]] = None,
+) -> None:
     """
     Sync Slash Commands Globally to the bot
     When to sync
@@ -187,7 +193,7 @@ async def sync(
     NOTE: If you do this, you will need to sync both global and to that guild to reflect the change.
     These are currently the only times you should re-sync.
     """
-    print('running')
+    print("running")
 
     if not guilds:
         if spec == "~":
@@ -217,5 +223,6 @@ async def sync(
             ret += 1
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
 
 asyncio.run(main())

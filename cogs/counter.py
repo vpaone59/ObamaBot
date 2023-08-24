@@ -1,15 +1,7 @@
-"""
-Counter Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
-
-This Cog is custom made for a specific server and will not work in normal servers.
-"""
-
 from discord.ext import commands
-import mysql.connector
-from dotenv import load_dotenv
+import sqlite3
 import os
 
-load_dotenv()
 counter_names = []
 counters_from_db = []
 
@@ -27,7 +19,7 @@ class Counter(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
         # When this Cog first loads we grab a list of every entry in the DB name_of_counters column
         # and add it to global variable list counters_from_db
         get_counters()
@@ -41,36 +33,39 @@ class Counter(commands.Cog):
         cap_message = str(message.content)
         if cap_message in counter_names:
             try:
-                db_conn, db_cursor = connect_db()
-                db_cursor.execute(
-                    f"UPDATE counters SET tally_counter=tally_counter + 1 WHERE name_of_counter = '{cap_message}'")
-                db_conn.commit()
+                conn, cursor = connect_db()
+                cursor.execute(
+                    f"UPDATE counters SET tally_counter=tally_counter + 1 WHERE name_of_counter = '{cap_message}'"
+                )
+                conn.commit()
             except Exception as err:
                 await message.channel.send("Something went wrong: {}".format(err))
             finally:
-                db_cursor.close()
-                db_conn.close()
+                cursor.close()
+                conn.close()
         else:
             return
 
-    @commands.command(aliases=['reset'], description='Resets the tally for a given *tracker*')
+    @commands.command(
+        aliases=["reset"], description="Resets the tally for a given *tracker*"
+    )
     @commands.has_permissions(administrator=True)
     async def reset_tally(self, ctx, counter_name):
         """
         Resets tally_counter to zero for a user input tracker_name
         """
-        sql = "UPDATE counters SET tally_counter=0 WHERE name_of_counter = %s"
-        val = counter_name
+        sql = "UPDATE counters SET tally_counter=0 WHERE name_of_counter = ?"
+        val = (counter_name,)
         try:
-            db_conn, db_cursor = connect_db()
-            db_cursor.execute(sql, (val,))
-            db_conn.commit()
+            conn, cursor = connect_db()
+            cursor.execute(sql, val)
+            conn.commit()
             await ctx.send(f"```success. {counter_name} is now 0```")
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
         finally:
-            db_cursor.close()
-            db_conn.close()
+            cursor.close()
+            conn.close()
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -78,20 +73,20 @@ class Counter(commands.Cog):
         """
         Create an entry in the Database to keep a tally of
         """
-        sql = "INSERT INTO counters (id, name_of_counter, tally_counter) VALUES (id, %s, %s)"
+        sql = "INSERT INTO counters (name_of_counter, tally_counter) VALUES (?, ?)"
         val = (counter_name, 0)
         try:
-            db_conn, db_cursor = connect_db()
-            db_cursor.execute(sql, val)
-            db_conn.commit()
+            conn, cursor = connect_db()
+            cursor.execute(sql, val)
+            conn.commit()
             await ctx.send(f"```success. {counter_name} is now being counted!```")
             get_counters()
 
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
         finally:
-            db_cursor.close()
-            db_conn.close()
+            cursor.close()
+            conn.close()
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -99,22 +94,20 @@ class Counter(commands.Cog):
         """
         Delete an entry in the Database
         """
-        sql = "DELETE FROM counters WHERE name_of_counter = %s"
-        # must be a list, tuple or dict because of how create_counter is entered
-        # we opt for tuple here with the second value left empty
+        sql = "DELETE FROM counters WHERE name_of_counter = ?"
         val = (counter_name,)
         try:
-            db_conn, db_cursor = connect_db()
-            db_cursor.execute(sql, val)
-            db_conn.commit()
+            conn, cursor = connect_db()
+            cursor.execute(sql, val)
+            conn.commit()
             await ctx.send(f"```success. {counter_name} has now been deleted!```")
             get_counters()
 
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
         finally:
-            db_cursor.close()
-            db_conn.close()
+            cursor.close()
+            conn.close()
 
     @commands.command(aliases=["list_all"])
     @commands.has_permissions(administrator=True)
@@ -129,9 +122,9 @@ class Counter(commands.Cog):
             for c in counters_from_db:
                 c_name = c[0]
                 c_tally = c[1]
-                counter_string += f'{c_name}\t-\t{str(c_tally)}\n'
+                counter_string += f"{c_name}\t-\t{str(c_tally)}\n"
 
-            await ctx.send(f'```{counter_string}```')
+            await ctx.send(f"```{counter_string}```")
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
 
@@ -144,12 +137,11 @@ def get_counters():
     global counters_from_db
     counter_names = []
     counters_from_db = []
-    db_conn, db_cursor = connect_db()
+    conn, cursor = connect_db()
 
     try:
-        db_cursor.execute(
-            "SELECT name_of_counter, tally_counter FROM counters")
-        rows = db_cursor.fetchall()
+        cursor.execute("SELECT name_of_counter, tally_counter FROM counters")
+        rows = cursor.fetchall()
 
         for row in rows:
             counter_names.append(row[0])
@@ -157,27 +149,41 @@ def get_counters():
     except Exception as err:
         print("Something went wrong: {}".format(err))
     finally:
-        db_cursor.close()
-        db_conn.close()
+        cursor.close()
+        conn.close()
 
 
 def connect_db():
     """
     Function that connects to the database and returns a connection object and cursor object
     """
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password=os.getenv("PASSWORD"),
-            database=os.getenv("TARGET"))
-        my_cursor = mydb.cursor()
-        
-        return mydb, my_cursor
-    
-    except Exception as err:
-        print("Something went wrong: {}".format(err))
-        return 200
+    # Check if the database file exists
+    if not os.path.exists("obama.db"):
+        # Connect to SQLite database (creates a new file if it doesn't exist)
+        conn = sqlite3.connect("obama.db")
+        cursor = conn.cursor()
+
+        # Create the counters table
+        cursor.execute(
+            """
+            CREATE TABLE counters (
+                id INTEGER PRIMARY KEY,
+                name_of_counter TEXT NOT NULL,
+                tally_counter INTEGER NOT NULL
+            )
+        """
+        )
+
+        # Commit the changes
+        conn.commit()
+
+    else:
+        # If the database file exists, connect to it
+        conn = sqlite3.connect("obama.db")
+        cursor = conn.cursor()
+
+    return conn, cursor
+
 
 async def setup(bot):
     await bot.add_cog(Counter(bot))

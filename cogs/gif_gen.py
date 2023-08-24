@@ -25,9 +25,10 @@ class Gif_gen(commands.Cog):
         self.bot = bot
 
         # Configure the logger in the cog to save logs to the file
-        file_handler = logging.FileHandler('bot.log')
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        file_handler = logging.FileHandler("bot.log")
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
         logger.addHandler(file_handler)
 
     @commands.Cog.listener()
@@ -35,34 +36,31 @@ class Gif_gen(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
-    @commands.command(aliases=['gq', 'gif', 'giphy'])
+    @commands.command(aliases=["gq", "gif", "giphy"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def giphyquery(self, ctx, *query):
         """
         Uses giphy api to search for gifs using user input query strings
         Picks 10 gifs and then randomly chooses 1 to send
         """
-        params = parse.urlencode({
-            "q": query,
-            "api_key": giphy_key,
-            "limit": "10"
-        })
+        params = parse.urlencode({"q": query, "api_key": giphy_key, "limit": "10"})
         try:
             with request.urlopen("".join((url, "?", params))) as response:
                 data = json.loads(response.read())
                 # if there are no gifs returned we edit the bot's response
                 if len(data["data"]) == 0:
                     raise Exception(
-                        f"No gifs found for {query}, try again with a different search query")
+                        f"No gifs found for {query}, try again with a different search query"
+                    )
                 else:
                     selection = random.randint(0, 9)
                     link = data["data"][selection]["embed_url"]
-                    await ctx.send(f'{link}')
+                    await ctx.send(f"{link}")
         except Exception as e:
             logger.error(e)
-            await ctx.send(f'```{e}```')
+            await ctx.send(f"```{e}```")
 
 
 async def setup(bot):

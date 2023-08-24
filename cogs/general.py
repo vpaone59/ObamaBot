@@ -20,34 +20,34 @@ class General(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f'{self} ready')
+        print(f"{self} ready")
 
-    @commands.command(aliases=['hey', 'hi'])
+    @commands.command(aliases=["hey", "hi"])
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def hello(self, ctx):
         """
         Reply mention to the user
         """
-        await ctx.channel.send(f'Hello {ctx.author.mention}!')
+        await ctx.channel.send(f"Hello {ctx.author.mention}!")
 
-    @commands.command(name='hiall')
+    @commands.command(name="hiall")
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def hello_everyone(self, ctx):
         """
         Reply mention to all users
         """
-        await ctx.send(f'Hello {ctx.message.guild.default_role}!')
+        await ctx.send(f"Hello {ctx.message.guild.default_role}!")
 
-    @commands.command(name='ping', aliases=['p'])
+    @commands.command(name="ping", aliases=["p"])
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def ping(self, ctx):
         """
         Send ping to server
         """
         bot_latency = round(self.bot.latency * 1000, 2)
-        await ctx.send(f'pong {bot_latency}ms')
+        await ctx.send(f"pong {bot_latency}ms")
 
-    @commands.command(name='fibonacci', aliases=['fib'])
+    @commands.command(name="fibonacci", aliases=["fib"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def fib(self, ctx, num):
         """
@@ -72,7 +72,7 @@ def fibonacci(n):
         print(f"User input {n}: Fib({n}) = 1")
         return 1
     else:
-        fib = fibonacci(n-1) + fibonacci(n-2)
+        fib = fibonacci(n - 1) + fibonacci(n - 2)
         return fib
 
 

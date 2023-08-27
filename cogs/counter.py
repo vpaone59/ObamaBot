@@ -156,17 +156,20 @@ def get_counters():
 def connect_db():
     """
     Function that connects to the database and returns a connection object and cursor object
+    Requires DB_PATH environment variable to be set
     """
+    db_path = os.path.expanduser(os.getenv("DB_PATH"))
+
     # Check if the database file exists
-    if not os.path.exists("obama.db"):
+    if not os.path.exists(db_path):
         # Connect to SQLite database (creates a new file if it doesn't exist)
-        conn = sqlite3.connect("obama.db")
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Create the counters table
         cursor.execute(
             """
-            CREATE TABLE counters (
+            CREATE TABLE IF NOT EXISTS counters (
                 id INTEGER PRIMARY KEY,
                 name_of_counter TEXT NOT NULL,
                 tally_counter INTEGER NOT NULL
@@ -179,7 +182,7 @@ def connect_db():
 
     else:
         # If the database file exists, connect to it
-        conn = sqlite3.connect("obama.db")
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
     return conn, cursor

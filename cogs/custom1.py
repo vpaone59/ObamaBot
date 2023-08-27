@@ -43,23 +43,23 @@ class Custom1(commands.Cog):
             return
 
         # if DJ is @ mentioned
-        for user in message.mentions:
-            if user.id == 123107464240562180:
-                # if user.id == 965414583860883456: # dog dev user ID
-                file_name = get_random_batman_deej_file()
-                if file_name:
-                    file_path = os.path.join("gifs/memes", file_name)
-                    await message.channel.send(file=discord.File(file_path))
-                break  # Once the user is found, we can break out of the loop
+        # for user in message.mentions:
+        #     if user.id == 123107464240562180:
+        #         # if user.id == 965414583860883456: # dog dev user ID
+        #         file_name = get_random_batman_deej_file()
+        #         if file_name:
+        #             file_path = os.path.join("gifs/memes", file_name)
+        #             await message.channel.send(file=discord.File(file_path))
+        #         break  # Once the user is found, we can break out of the loop
 
-        # if Walter sends a message the bot will always send the picture below
-        if messageAuthor.id == 247936308733935616:
-            await message.channel.send(file=discord.File("gifs/weird/boner_alert.jpg"))
+        # # if Walter sends a message the bot will always send the picture below
+        # if messageAuthor.id == 247936308733935616:
+        #     await message.channel.send(file=discord.File("gifs/weird/boner_alert.jpg"))
 
-        if message.guild.id == 842545435050508328:
-            if string_message.startswith("INC"):
-                format_link = format_incident_link(string_message)
-                await message.channel.send(f"{format_link}")
+        # if message.guild.id == 842545435050508328:
+        #     if string_message.startswith("INC"):
+        #         format_link = format_incident_link(string_message)
+        #         await message.channel.send(f"{format_link}")
 
     @commands.command(aliases=["bee", "b"])
     @commands.cooldown(1, 10, commands.BucketType.user)

@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  bot:
+    build: .
+    container_name: python3-obamabot
+    volumes:
+      - C:\Users\vpaon\Documents\DB\obama.db:/app/database
+    environment:
+      - DB_PATH=/app/database/obama.db
+    command: [ "python3", "ObamaBot.py" ]

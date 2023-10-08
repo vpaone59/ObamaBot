@@ -75,9 +75,15 @@ class Custom1(commands.Cog):
         """
         Send a picture of Reeves!
         """
-        await ctx.channel.send(
-            file=discord.File("gifs/weird/Reeves/Reeves_gun_permit.jpg")
-        )
+        await ctx.channel.send(file=discord.File("gifs/reeves_gun_permit.png"))
+
+    @commands.command(aliases=["dumpydave"])
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def dumpy(self, ctx):
+        """
+        Send a picture of Dave's fat ass
+        """
+        await ctx.channel.send(file=discord.File("gifs/dumpy_dave.png"))
 
 
 def format_incident_link(incident_number):

@@ -39,7 +39,10 @@ class Media(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def obama_msg(self, message):
-        # listens for an on_message hit and then runs the following
+        """
+        Whenever a message is sent in any channel and guild
+        """
+        # this is to prevent the bot from replying to itself
         if message.author == self.bot.user or message.author.bot:
             return
 
@@ -97,9 +100,9 @@ class Media(commands.Cog):
             file=discord.File("gifs/obama/obama-sleep.jpeg"),
         )
 
-    @commands.command(aliases=["balls"])
+    @commands.command(aliases=["ball", "balls"])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def ball(self, ctx):
+    async def basketball(self, ctx):
         """
         Reply with media
         """
@@ -108,7 +111,7 @@ class Media(commands.Cog):
             file=discord.File("gifs/obama/obama-basketball.jpg"),
         )
 
-    @commands.command(aliases=["monkey", "m"])
+    @commands.command(aliases=["monkey", "m", "gorilla"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def monkey_falling(self, ctx):
         """
@@ -141,7 +144,7 @@ class Media(commands.Cog):
         """
         Reply with media
         """
-        await ctx.channel.send("<:obamacare:844291609663111208>")
+        await ctx.channel.send("<:obamer:844291609771245568>")
 
     @commands.command(aliases=["coord"])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -149,7 +152,7 @@ class Media(commands.Cog):
         """
         Reply with media
         """
-        await ctx.channel.send(":BatChest: :point_up:")
+        await ctx.channel.send("<:BatChest:871488841050112021> :point_up:")
 
     @commands.command(aliases=["o"])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -177,7 +180,7 @@ class Media(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def lip_bite(self, ctx):
+    async def kinky(self, ctx):
         """
         Reply with media
         """

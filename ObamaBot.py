@@ -22,15 +22,15 @@ intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
 
 """
-Logger setup. Deletes previous bot.log file,
-creates a logger object,
-creates a stream handler for printing logs to the shell,
-creates a file handler for saving logs with date/time
+Logger setup
+creates a logger object
+creates a stream handler for printing logs to the shell
+creates a file handler for saving logs with date/time to bot.log
 """
-# Delete existing log file if it exists
 log_file = "bot.log"
-if os.path.exists(log_file):
-    os.remove(log_file)
+if not os.path.exists(log_file):  # Check if the file does not exist
+    with open(log_file, "w"):  # Create the file if it does not exist
+        pass
 logging.basicConfig(level=logging.INFO)  # Set the logging level to INFO
 logger = logging.getLogger(__name__)
 # Configure the logger to send logs to stdout

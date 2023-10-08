@@ -58,6 +58,14 @@ class General(commands.Cog):
         result = fibonacci(n)
         await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
 
+    @commands.command(name="current_guilds", aliases=["guilds", "servers"])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def current_guilds(self, ctx):
+        """
+        Return the number of guilds(servers) this bot is currently in
+        """
+        await ctx.channel.send("I'm in " + str(len(self.bot.guilds)) + " servers!")
+
 
 def fibonacci(n):
     """

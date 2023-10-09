@@ -55,7 +55,7 @@ class Gif_gen(commands.Cog):
                         f"No gifs found for {query}, try again with a different search query"
                     )
                 else:
-                    selection = random.randint(0, 9)
+                    selection = random.randint(0, len(data["data"]) - 1)
                     link = data["data"][selection]["embed_url"]
                     await ctx.send(f"{link}")
         except Exception as e:

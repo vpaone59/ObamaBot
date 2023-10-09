@@ -59,7 +59,7 @@ class Gif_gen(commands.Cog):
                     link = data["data"][selection]["embed_url"]
                     await ctx.send(f"{link}")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
             await ctx.send(f"```{e}```")
 
 

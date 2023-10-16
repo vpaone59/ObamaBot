@@ -41,7 +41,11 @@ class General(commands.Cog):
         """
         Reply mention to the user
         """
-        await ctx.channel.send(f"Hello {ctx.author.mention}!")
+        try:
+            await ctx.channel.send(f"Hello {ctx.uthor.mention}!")
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="hiall")
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -49,7 +53,11 @@ class General(commands.Cog):
         """
         Reply mention to all users
         """
-        await ctx.send(f"Hello {ctx.message.guild.default_role}!")
+        try:
+            await ctx.send(f"Hello {ctx.message.guild.default_role}!")
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="ping", aliases=["p"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -57,8 +65,12 @@ class General(commands.Cog):
         """
         Send ping to server
         """
-        bot_latency = round(self.bot.latency * 1000, 2)
-        await ctx.send(f"pong {bot_latency}ms")
+        try:
+            bot_latency = round(self.bot.latency * 1000, 2)
+            await ctx.send(f"pong {bot_latency}ms")
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="fibonacci", aliases=["fib"])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -67,9 +79,14 @@ class General(commands.Cog):
         Calculate fibonacci of the parameter input
         paramter num: number in the fibonacci sequence to calculate
         """
-        n = int(num)
-        result = fibonacci(n)
-        await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
+        try:
+            n = int(num)
+            result = fibonacci(n)
+            await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
+
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="current_guilds", aliases=["guilds", "servers"])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -77,7 +94,11 @@ class General(commands.Cog):
         """
         Return the number of guilds(servers) this bot is currently in
         """
-        await ctx.channel.send("I'm in " + str(len(self.bot.guilds)) + " servers!")
+        try:
+            await ctx.channel.send("I'm in " + str(len(self.bot.guilds)) + " servers!")
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
 
 def fibonacci(n):

@@ -27,11 +27,13 @@ creates a logger object
 creates a stream handler for printing logs to the shell
 creates a file handler for saving logs with date/time to bot.log
 """
-log_file = "bot.log"
-if not os.path.exists(log_file):  # Check if the file does not exist
-    with open(log_file, "w"):  # Create the file if it does not exist
+LOG_FILE = "bot.log"
+if not os.path.exists(LOG_FILE):  # Check if the file does not exist
+    with open(LOG_FILE, "w", encoding="utf-8"):  # Create the file if it does not exist
         pass
-logging.basicConfig(level=logging.INFO)  # Set the logging level to INFO
+
+# Set the logging level to INFO
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 # Configure the logger to send logs to stdout
 # stream_handler = logging.StreamHandler()

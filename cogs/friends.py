@@ -56,7 +56,7 @@ class Friends(commands.Cog):
         if string_message.startswith(f'{os.getenv("PREFIX")}'):
             return
 
-        if str(message.guild.id) in FRIEND_GUILDS:
+        if not str(message.guild.id) in FRIEND_GUILDS:
             return
 
         # if DJ is @ mentioned

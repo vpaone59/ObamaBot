@@ -15,12 +15,14 @@ BEE_REACTS = [
     ":bee: :broom: <:feelsobama:842634906999193620>",
     "<:obamajoy:842822700912476190> :fire: :bee: :fire:",
 ]
+FRIEND_GUILDS = os.getenv("FRIEND_GUILD_IDS")
 logger = logging.getLogger(__name__)
 
 
-class LadsCustom(commands.Cog):
+class Friends(commands.Cog):
     """
-    custom commands made for a specific discord guild
+    Custom commands made for specific guilds
+    For friends :)
     """
 
     def __init__(self, bot):
@@ -52,6 +54,9 @@ class LadsCustom(commands.Cog):
         string_message = str(message.content)
         # return whenever a prefix / command message is detected
         if string_message.startswith(f'{os.getenv("PREFIX")}'):
+            return
+
+        if str(message.guild.id) in FRIEND_GUILDS:
             return
 
         # if DJ is @ mentioned
@@ -134,4 +139,4 @@ def get_random_batman_deej_file():
 
 
 async def setup(bot):
-    await bot.add_cog(LadsCustom(bot))
+    await bot.add_cog(Friends(bot))

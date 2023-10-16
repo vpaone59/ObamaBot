@@ -20,6 +20,9 @@ banned.json
 # virtual environments
 /.venv
 
+# vs code
+.vscode
+
 # other
 /genius
 /Other
@@ -31,3 +34,4 @@ bot_startup.bat
 bot.log
 try.py
 obama.db
+lads

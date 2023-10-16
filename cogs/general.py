@@ -4,7 +4,10 @@ General Commands Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 These are general use commands that any bot should have by default.
 """
 
+import logging
 from discord.ext import commands
+
+logger = logging.getLogger(__name__)
 
 
 class General(commands.Cog):
@@ -14,6 +17,16 @@ class General(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+        # Configure the logger to save logs to bot.log
+        if not logger.handlers:
+            file_handler = logging.FileHandler("bot.log")
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
+            logger.addHandler(file_handler)
 
     @commands.Cog.listener()
     async def on_ready(self):

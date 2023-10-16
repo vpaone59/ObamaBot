@@ -4,14 +4,13 @@ Gif Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 import random
 import os
 import json
-import random
+import logging
 from urllib import parse, request
 from discord.ext import commands
-import logging
 
 # grab giphy key & assign url to variable
 giphy_key = os.getenv("GIPHY_KEY")
-url = "http://api.giphy.com/v1/gifs/search"
+URL = "http://api.giphy.com/v1/gifs/search"
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +23,15 @@ class Gif_gen(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        # Configure the logger in the cog to save logs to the file
-        file_handler = logging.FileHandler("bot.log")
-        file_handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        )
-        logger.addHandler(file_handler)
+        # Configure the logger to save logs to bot.log
+        if not logger.handlers:
+            file_handler = logging.FileHandler("bot.log")
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
+            logger.addHandler(file_handler)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -47,7 +49,7 @@ class Gif_gen(commands.Cog):
         """
         params = parse.urlencode({"q": query, "api_key": giphy_key, "limit": "10"})
         try:
-            with request.urlopen("".join((url, "?", params))) as response:
+            with request.urlopen("".join((URL, "?", params))) as response:
                 data = json.loads(response.read())
                 # if there are no gifs returned we edit the bot's response
                 if len(data["data"]) == 0:
@@ -64,4 +66,5 @@ class Gif_gen(commands.Cog):
 
 
 async def setup(bot):
+    """ """
     await bot.add_cog(Gif_gen(bot))

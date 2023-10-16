@@ -5,6 +5,7 @@ https://github.com/vpaone59
 import os
 from datetime import datetime
 from discord.ext import commands
+import logging
 from googleapiclient.discovery import build
 import googleapiclient.discovery
 from dotenv import load_dotenv
@@ -12,7 +13,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-channel_id = "UCd03Ksc7VNypelv_TM3SjSg"
+rmt_channel_id = "UCd03Ksc7VNypelv_TM3SjSg"
+logger = logging.getLogger(__name__)
 
 
 class YeedleTube(commands.Cog):
@@ -23,12 +25,22 @@ class YeedleTube(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+        # Configure the logger to save logs to bot.log
+        if not logger.handlers:
+            file_handler = logging.FileHandler("bot.log")
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
+            logger.addHandler(file_handler)
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self} ready")
 
     @commands.command(aliases=["rmt", "glv", "danny"])
-    async def get_latest_video(self, ctx, channel_id=channel_id):
+    async def get_latest_video(self, ctx, channel_id=rmt_channel_id):
         """
         Get the most recent upload from any YouTube channel by their channel ID
         Default channel ID is set to RateMyTakeaway
@@ -71,6 +83,7 @@ class YeedleTube(commands.Cog):
             )
 
         except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
             await ctx.send(f"{e}")
 
 

@@ -15,7 +15,7 @@ URL = "http://api.giphy.com/v1/gifs/search"
 logger = logging.getLogger(__name__)
 
 
-class Gif_gen(commands.Cog):
+class GifGenerator(commands.Cog):
     """
     giphy api - gif generator via query
     """
@@ -67,4 +67,4 @@ class Gif_gen(commands.Cog):
 
 async def setup(bot):
     """ """
-    await bot.add_cog(Gif_gen(bot))
+    await bot.add_cog(GifGenerator(bot))

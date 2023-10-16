@@ -6,23 +6,35 @@ This Cog is custom made for a specific server and will not work in normal server
 
 import os
 import random
+import logging
 import discord
 from discord.ext import commands
 
-bee_reacts = [
+BEE_REACTS = [
     "<:obamagiga:844300314936213565> :point_right: :bee:",
     ":bee: :broom: <:feelsobama:842634906999193620>",
     "<:obamajoy:842822700912476190> :fire: :bee: :fire:",
 ]
+logger = logging.getLogger(__name__)
 
 
-class Custom1(commands.Cog):
+class LadsCustom(commands.Cog):
     """
     custom commands made for a specific discord guild
     """
 
     def __init__(self, bot):
         self.bot = bot
+
+        # Configure the logger to save logs to bot.log
+        if not logger.handlers:
+            file_handler = logging.FileHandler("bot.log")
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
+            logger.addHandler(file_handler)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -67,7 +79,11 @@ class Custom1(commands.Cog):
         """
         Random reaction for a bees command
         """
-        await ctx.channel.send(random.choice(bee_reacts))
+        try:
+            await ctx.channel.send(random.choice(BEE_REACTS))
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(aliases=["reeve", "reevez", "reeves!"])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -75,7 +91,11 @@ class Custom1(commands.Cog):
         """
         Send a picture of Reeves!
         """
-        await ctx.channel.send(file=discord.File("gifs/lads/reeves_gun_permit.png"))
+        try:
+            await ctx.channel.send(file=discord.File("gifs/lads/reeves_gun_permit.png"))
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(aliases=["dumpydave"])
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -83,7 +103,11 @@ class Custom1(commands.Cog):
         """
         Send a picture of Dave's fat ass
         """
-        await ctx.channel.send(file=discord.File("gifs/lads/dumpy_dave.png"))
+        try:
+            await ctx.channel.send(file=discord.File("gifs/lads/dumpy_dave.png"))
+        except Exception as e:
+            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            await ctx.channel.send(f"Error {__name__}: {e}")
 
 
 def format_incident_link(incident_number):
@@ -110,4 +134,4 @@ def get_random_batman_deej_file():
 
 
 async def setup(bot):
-    await bot.add_cog(Custom1(bot))
+    await bot.add_cog(LadsCustom(bot))

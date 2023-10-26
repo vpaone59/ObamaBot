@@ -54,7 +54,7 @@ class Media(commands.Cog):
         """
         await ctx.send(file=discord.File("gifs/memes/wednesday.jpg"))
 
-    @commands.command(aliases=["c"])
+    @commands.command()
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def cry(self, ctx):
         """

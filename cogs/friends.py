@@ -109,7 +109,7 @@ class Friends(commands.Cog):
         Send a picture of Dave's fat ass
         """
         try:
-            await ctx.channel.send(file=discord.File("gifs/lads/dumpy_dave.png"))
+            await ctx.channel.send(file=discord.File("gifs/lads/dumpy_dave_2.png"))
         except Exception as e:
             logger.error(f"USER: {ctx.message.author} ERROR: {e}")
             await ctx.channel.send(f"Error {__name__}: {e}")

@@ -52,7 +52,7 @@ class Counter(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def reset_tally(self, ctx, counter_name):
         """
-        Resets tally_counter to zero for a user input tracker_name
+        Resets tally to zero for a user input counter name
         """
         sql = "UPDATE counters SET tally_counter=0 WHERE name_of_counter = ?"
         val = (counter_name,)
@@ -71,7 +71,7 @@ class Counter(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def create_counter(self, ctx, counter_name):
         """
-        Create an entry in the Database to keep a tally of
+        Create a counter entry in the Database to keep a tally of
         """
         sql = "INSERT INTO counters (name_of_counter, tally_counter) VALUES (?, ?)"
         val = (counter_name, 0)
@@ -92,7 +92,7 @@ class Counter(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def delete_counter(self, ctx, counter_name):
         """
-        Delete an entry in the Database
+        Delete a counter entry in the Database by its name
         """
         sql = "DELETE FROM counters WHERE name_of_counter = ?"
         val = (counter_name,)
@@ -109,7 +109,7 @@ class Counter(commands.Cog):
             cursor.close()
             conn.close()
 
-    @commands.command(aliases=["list_all"])
+    @commands.command(aliases=["list", "tally"])
     @commands.has_permissions(administrator=True)
     async def list_counters(self, ctx):
         """
@@ -155,7 +155,7 @@ def get_counters():
 
 def connect_db():
     """
-    Function that connects to the database and returns a connection object and cursor object
+    Function that connects to the database and returns a connection object and cursor object.
     Requires DB_PATH environment variable to be set
     """
     db_path = os.path.expanduser(os.getenv("DB_PATH"))

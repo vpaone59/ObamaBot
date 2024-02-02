@@ -26,9 +26,8 @@ banned.json
 # other
 /genius
 /Other
-gifs/catcam
-gifs/weird
-pixel_obama.png
+/gifs
+.png
 /CatBot
 bot_startup.bat
 bot.log

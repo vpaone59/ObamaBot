@@ -9,3 +9,4 @@ services:
     environment:
       - DB_PATH=/app/database/obama.db
     command: [ "python3", "ObamaBot.py" ]
+    restart: unless-stopped

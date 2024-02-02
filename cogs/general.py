@@ -42,7 +42,7 @@ class General(commands.Cog):
         Reply mention to the user
         """
         try:
-            await ctx.channel.send(f"Hello {ctx.uthor.mention}!")
+            await ctx.channel.send(f"Hello {ctx.author.mention}!")
         except Exception as e:
             logger.error(f"USER: {ctx.message.author} ERROR: {e}")
             await ctx.channel.send(f"Error {__name__}: {e}")

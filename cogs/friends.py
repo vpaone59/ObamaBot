@@ -56,22 +56,32 @@ class Friends(commands.Cog):
         if string_message.startswith(f'{os.getenv("PREFIX")}'):
             return
 
-        if not str(message.guild.id) in FRIEND_GUILDS:
+        if str(message.guild.id) not in FRIEND_GUILDS:
             return
 
-        # if DJ is @ mentioned
+        # If Ethan (ID= 166964846179385344) sends a message, react with the emoji
+        if messageAuthor.id == 166964846179385344:
+            await message.add_reaction("♿")
+            return
+
+        # if DJ (ID= 123107464240562180) is @ mentioned
         # for user in message.mentions:
         #     if user.id == 123107464240562180:
-        #         # if user.id == 965414583860883456: # dog dev user ID
         #         file_name = get_random_batman_deej_file()
         #         if file_name:
         #             file_path = os.path.join("gifs/memes", file_name)
         #             await message.channel.send(file=discord.File(file_path))
         #         break  # Once the user is found, we can break out of the loop
 
-        # # if Walter sends a message the bot will always send the picture below
-        # if messageAuthor.id == 247936308733935616:
-        #     await message.channel.send(file=discord.File("gifs/weird/boner_alert.jpg"))
+        # if Walter (ID= 247936308733935616) sends a message
+        if messageAuthor.id == 965414583860883456:
+            walter_int = random.randint(1, 3)
+            if walter_int == 1:
+                await message.channel.send(
+                    file=discord.File("gifs/weird/boner_alert.jpg")
+                )
+            else:
+                return
 
         # if message.guild.id == 842545435050508328:
         #     if string_message.startswith("INC"):

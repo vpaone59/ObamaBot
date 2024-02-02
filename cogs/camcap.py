@@ -43,7 +43,7 @@ class Camcap(commands.Cog):
         frame_counter = 0
         if cam_num > 3 or cam_num == 0 or cam_num < -1:
             await ctx.send(
-                f"INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random."
+                "INDEX ERROR: Cameras available #s 1 2 3. Use -1 or leave empty for random."
             )
             return
         elif cam_num == -1:

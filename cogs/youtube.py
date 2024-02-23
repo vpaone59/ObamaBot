@@ -6,20 +6,19 @@ import os
 from datetime import datetime
 from discord.ext import commands
 import logging
-from googleapiclient.discovery import build
 import googleapiclient.discovery
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-rmt_channel_id = "UCd03Ksc7VNypelv_TM3SjSg"
+ratemytakeaway_channel_id = "UCd03Ksc7VNypelv_TM3SjSg"
 logger = logging.getLogger(__name__)
 
 
-class YeedleTube(commands.Cog):
+class Youtube(commands.Cog):
     """
-    Class
+    YouTube API integrations Class
     """
 
     def __init__(self, bot):
@@ -39,11 +38,11 @@ class YeedleTube(commands.Cog):
     async def on_ready(self):
         print(f"{self} ready")
 
-    @commands.command(aliases=["rmt", "glv", "danny"])
-    async def get_latest_video(self, ctx, channel_id=rmt_channel_id):
+    @commands.command(aliases=["rmt", "danny"])
+    async def get_latest_video(self, ctx, channel_id=ratemytakeaway_channel_id):
         """
         Get the most recent upload from any YouTube channel by their channel ID
-        Default channel ID is set to RateMyTakeaway
+        Default channel ID is set to Rate My Takeaway's channel ID
         """
         youtube = googleapiclient.discovery.build(
             "youtube", "v3", developerKey=os.getenv("YOUTUBE_API")
@@ -88,4 +87,4 @@ class YeedleTube(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(YeedleTube(bot))
+    await bot.add_cog(Youtube(bot))

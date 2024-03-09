@@ -8,5 +8,5 @@ services:
       - C:\Users\vpaon\Documents\DB\obama.db:/app/database/obama.db
     environment:
       - DB_PATH=/app/database/obama.db
-    command: [ "python3", "ObamaBot.py" ]
+    command: [ "python3", "main.py" ]
     restart: unless-stopped

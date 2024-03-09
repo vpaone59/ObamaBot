@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 Must have a Discord Bot Token ready. Place Token in the SAMPLE.env file. Rename SAMPLE.env file to ".env" (without quotes).
 
-python (or python3) ObamaBot.py
+python (or python3) main.py
 
 ## Running with Docker:
 ### When running with Docker you cannot have any code that accesses USB elements. I've found that the container will not start at all if camcap.py is included in the Cogs.

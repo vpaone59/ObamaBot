@@ -17,8 +17,6 @@ ball_phrases = [
 
 obama_pics = os.listdir(os.getcwd() + "/gifs/obama")
 obama_dir = "gifs/obama/"
-koth_pics = os.listdir(os.getcwd() + "/gifs/memes/koth")
-koth_dir = "gifs/memes/koth/"
 
 
 class Media(commands.Cog):
@@ -85,7 +83,7 @@ class Media(commands.Cog):
         Reply with media
         """
         await ctx.send(
-            f"Goodmorning my fellow Americans!",
+            "Goodmorning my fellow Americans!",
             file=discord.File("gifs/obama/obama-smile.jpg"),
         )
 
@@ -96,7 +94,7 @@ class Media(commands.Cog):
         Reply with media
         """
         await ctx.send(
-            f"Goodnight and God Bless!",
+            "Goodnight and God Bless!",
             file=discord.File("gifs/obama/obama-sleep.jpeg"),
         )
 
@@ -134,7 +132,7 @@ class Media(commands.Cog):
         Reply with media
         """
         await ctx.channel.send(
-            f"You're welcome! <:obamacare:844291609663111208>\n",
+            "You're welcome! <:obamacare:844291609663111208>\n",
             file=discord.File("gifs/obama/obama-smile.jpg"),
         )
 
@@ -193,16 +191,6 @@ class Media(commands.Cog):
         Reply with media
         """
         await ctx.channel.send(file=discord.File("gifs/obama/obama-wink.gif"))
-
-    @commands.command()
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def what(self, ctx):
-        """
-        Reply with media
-        """
-        koth_meme = random.choice(koth_pics)
-        koth_meme_path = os.path.join(koth_dir, koth_meme)
-        await ctx.channel.send(file=discord.File(koth_meme_path))
 
     @commands.command(aliases=["pixel"])
     @commands.cooldown(1, 3, commands.BucketType.user)

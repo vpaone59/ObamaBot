@@ -1,6 +1,7 @@
 """
 Gif Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 """
+
 import random
 import os
 import json

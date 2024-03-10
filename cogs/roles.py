@@ -1,6 +1,7 @@
 """
 Roles Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 """
+
 import discord
 from discord.ext import commands
 from discord.utils import get

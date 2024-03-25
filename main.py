@@ -16,7 +16,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 # Configure logging using the setup_logging function
-logger = setup_logging()
+logger = setup_logging(__name__)
 
 # Load environment variables from a .env file
 load_dotenv()

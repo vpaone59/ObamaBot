@@ -8,7 +8,6 @@ There is no serious political affiliation. This is all in good fun.
 
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from typing import Literal, Optional
-import logging
 from logging_config import setup_logging
 import os
 import asyncio
@@ -17,9 +16,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 # Configure logging using the setup_logging function
-setup_logging()
-# Retrieve the configured logger instance
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -28,7 +25,6 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-# logger = None  # Initialize logger as None for later configuration
 
 
 async def main():

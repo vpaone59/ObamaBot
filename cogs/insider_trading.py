@@ -2,13 +2,11 @@
 https://github.com/vpaone59
 """
 
-import discord
-from discord.ext import commands
-from discord import app_commands
-from polygon import RESTClient
 import os
 import datetime
 import requests
+from discord.ext import commands
+from polygon import RESTClient
 
 polygon_key = os.getenv("POLYGON_API_KEY")
 client = RESTClient(polygon_key)

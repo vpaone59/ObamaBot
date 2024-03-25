@@ -1,67 +1,54 @@
 """
 Vincent Paone
 Project began 4/20/2022 --
-ObamaBot - main file. Run this file to start the bot.
+ObamaBot - Main file. Run this file to start the bot.
 
-There is no serious political offiliation. This is all in good fun.
+There is no serious political affiliation. This is all in good fun.
 """
 
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from typing import Literal, Optional
 import logging
+from logging_config import setup_logging
 import os
 import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+# Load environment variables from a .env file
 load_dotenv()
 
+# Configure Discord bot intents and initialize a placeholder logger
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-
-"""
-Logger setup
-creates a logger object
-creates a stream handler for printing logs to the shell
-creates a file handler for saving logs with date/time to bot.log
-"""
-LOG_FILE = "bot.log"
-if not os.path.exists(LOG_FILE):  # Check if the file does not exist
-    with open(LOG_FILE, "w", encoding="utf-8"):  # Create the file if it does not exist
-        pass
-
-# Set the logging level to INFO
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger(__name__)
-# Configure the logger to send logs to stdout
-# stream_handler = logging.StreamHandler()
-# logger.addHandler(stream_handler)
-# Configure the logger to save logs to a file
-file_handler = logging.FileHandler("bot.log")
-file_handler.setFormatter(
-    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-)
-logger.addHandler(file_handler)
+logger = None  # Initialize logger as None for later configuration
 
 
 async def main():
     """
-    Main function that starts the Bot
+    The main function that starts the Discord bot.
     """
+    # Configure logging using the setup_logging function
+    setup_logging()
+    global logger
+    # Retrieve the configured logger instance
+    logger = logging.getLogger(__name__)
+
     async with bot:
         await bot.start(os.getenv("DISCORD_TOKEN"))
         logger.info(f'Starting bot with {os.getenv("DISCORD_TOKEN")}')
-        # on_ready will run next
+        # on_ready event will be called next
 
 
 @bot.event
 async def on_ready():
     """
-    Runs once the bot establishes a connection with Discord
+    Runs once the bot establishes a connection with Discord.
     """
     logger.info(f"Logged in as {bot.user}")
+
     try:
         await load_all_cogs()
     except Exception as e:
@@ -71,24 +58,22 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     """
-    every time there is a message in any channel in any guild, this runs
-    param message - The message that was last sent to the channel
+    This function is called whenever a message is sent in any channel of any guild.
+
+    Args:
+        message: The message object containing information about the sent message.
     """
-    # ignore messages sent from the bot itself and other bots
-    # prevents infinite replying
+    # Ignore messages from the bot itself and other bots to prevent infinite loops
     if message.author == bot.user or message.author.bot:
         return
 
-    # messageAuthor = message.author
-    # user_message = str(message.content)
-
-    # necessary to process the bot's message
+    # Process the message using the bot's command processing functionality
     await bot.process_commands(message)
 
 
 async def load_all_cogs():
     """
-    Function for loading all Cog .py files in /cogs directory
+    Loads all Cog (Python) files from the /cogs directory.
     """
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
@@ -99,14 +84,15 @@ async def load_all_cogs():
                 logger.error({e})
 
 
-@bot.command(aliases=["load"], help="Load a Cog file")
+@bot.command(aliases=["load"], help="Loads a Cog file")
 @commands.has_permissions(administrator=True)
 async def load_cog(ctx, cog_name):
     """
-    Load a Cog file, do -load "name of cog file"
-    Only a user with Administrator role should be able to run this command
-    param: ctx - The context in which the command has been executed
-    param: extension - The name of the Cog file you want to load
+    Loads a specific Cog file.
+
+    Args:
+        ctx: The context object containing information about the command invocation.
+        cog_name: The name of the Cog file to load (without the .py extension).
     """
     try:
         await bot.load_extension(f"cogs.{cog_name}")
@@ -123,9 +109,9 @@ async def load_cog(ctx, cog_name):
 @commands.has_permissions(administrator=True)
 async def unload_cog(ctx, cog_name):
     """
-    Unload a Cog file, do -unload "name of cog file"
+    Unload a Cog file
     Only a user with Administrator role should be able to run this command
-    param: ctx- The context of which the command is entered
+    param: ctx - The context of which the command is entered
     param: extension - The name of the Cog file to unload
     """
     try:

@@ -1,5 +1,7 @@
 """
-Gif Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+GIF Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+
+Utilizes the Giphy API
 """
 
 import random
@@ -9,7 +11,7 @@ from logging_config import setup_logging
 from urllib import parse, request
 from discord.ext import commands
 
-# grab giphy key & assign url to variable
+# Grab Giphy key & assign url to variable
 giphy_key = os.getenv("GIPHY_KEY")
 URL = "http://api.giphy.com/v1/gifs/search"
 
@@ -18,7 +20,7 @@ logger = setup_logging(__name__)
 
 class Gif_Generator(commands.Cog):
     """
-    giphy api - gif generator via query
+    Giphy API - Generate GIFs via a query in a Discord command
     """
 
     def __init__(self, bot):

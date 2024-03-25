@@ -30,8 +30,3 @@ def setup_logging(logger_name=__name__, log_file="/logs/bot.log"):
     logger.addHandler(stream_handler)
 
     return logger
-
-
-if __name__ == "__main__":
-    logger = setup_logging()
-    logger.info("Logging configured successfully.")

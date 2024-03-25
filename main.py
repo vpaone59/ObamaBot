@@ -16,6 +16,11 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+# Configure logging using the setup_logging function
+setup_logging()
+# Retrieve the configured logger instance
+logger = logging.getLogger(__name__)
+
 # Load environment variables from a .env file
 load_dotenv()
 
@@ -23,19 +28,13 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-logger = None  # Initialize logger as None for later configuration
+# logger = None  # Initialize logger as None for later configuration
 
 
 async def main():
     """
     The main function that starts the Discord bot.
     """
-    # Configure logging using the setup_logging function
-    setup_logging()
-    global logger
-    # Retrieve the configured logger instance
-    logger = logging.getLogger(__name__)
-
     async with bot:
         await bot.start(os.getenv("DISCORD_TOKEN"))
         logger.info(f'Starting bot with {os.getenv("DISCORD_TOKEN")}')
@@ -90,9 +89,8 @@ async def load_cog(ctx, cog_name):
     """
     Loads a specific Cog file.
 
-    Args:
-        ctx: The context object containing information about the command invocation.
-        cog_name: The name of the Cog file to load (without the .py extension).
+    param: ctx - The context object containing information about the command invocation.
+    param: cog_name - The name of the Cog file to load (without the .py extension).
     """
     try:
         await bot.load_extension(f"cogs.{cog_name}")

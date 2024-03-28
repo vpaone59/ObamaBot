@@ -6,8 +6,8 @@ services:
     container_name: python3-obamabot
     volumes:
       # files must exist on the local host system prior to running container
-      - C:\Users\vpaon\Documents\logs\ObamaBot\bot.log:/logs/bot.log
-      - C:\Users\vpaon\Documents\DB\obama.db:/app/database/obama.db
+      - ~\Documents\logs\ObamaBot\bot.log:/logs/bot.log
+      - ~\Documents\DB\obama.db:/app/database/obama.db
     environment:
       - DB_PATH=/app/database/obama.db
     command: [ "python3", "main.py" ]

@@ -9,7 +9,7 @@ def setup_logging(logger_name=__name__, log_file="/logs/bot.log"):
     """
     # Create a logger with the name of the main module
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.INFO)  # Set the logging level to INFO
+    logger.setLevel(logging.DEBUG)  # Set the logging level to INFO
 
     # Create a file handler for logging to a file
     file_handler = logging.FileHandler(log_file)

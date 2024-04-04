@@ -4,7 +4,7 @@ Tasks Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 Setup tasks to run periodically in your server.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import asyncio
 import pytz
 import discord

@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 
 
-def setup_logging(logger_name=__name__, log_file="/logs/bot.log"):
+def setup_logging(logger_name=__name__, log_file="./logs/bot.log"):
     """
     Configures a logger for the bot.
     """

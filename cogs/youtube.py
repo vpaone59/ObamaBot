@@ -45,7 +45,7 @@ class Youtube(commands.Cog):
         Default channel ID is set to Rate My Takeaway's channel ID
         """
         youtube = googleapiclient.discovery.build(
-            "youtube", "v3", developerKey=os.getenv("YOUTUBE_API")
+            "youtube", "v3", developerKey=os.getenv("YOUTUBE_API_KEY")
         )
 
         # Setup for the first request to get the most recent video from the channel

@@ -2,21 +2,25 @@
 ObamaBot - Vincent Paone
 
 A general purpose Discord Bot. Contains Cogs specific to ObamaBot and other special Guilds/Servers.
+Migrating to discordpy 2.0 --- https://discordpy.readthedocs.io/en/latest/migrating.html
 
 ## Running locally without Docker:
-### requires Python3.8 >=
-### https://discordpy.readthedocs.io/en/latest/migrating.html
-pip install -r requirements.txt
-
 Must have a Discord Bot Token ready. Place Token in the SAMPLE.env file. Rename SAMPLE.env file to ".env" (without quotes).
+requires Python3.8 >=
 
-python (or python3) main.py
+pip install -r requirements.txt
+python main.py
 
 ## Running with Docker:
-### When running with Docker you cannot have any code that accesses USB elements. I've found that the container will not start at all if camcap.py is included in the Cogs.
-### You also cannot access any services that are running on the host machine with this simple configuration. The counter.py Cog will not work correctly with MySQL Server running on the host system and not within the same Docker container or another container on the same network.
-Build the container
-docker build . -t obama-bot --no-cache
+I recommend setting up the logging file map in the docker-compose.yml. You can update the left file path with the one on your host system.
+    ~\Documents\logs\ObamaBot\bot.log:/logs/bot.log 
 
-Run the container (-d for detached mode to not take over the current shell session)
+Optionally setup the SQLite database path on your host system.
+    ~\Documents\DB\obama.db:/app/database/obama.db
+
+### To build the container and then run it
+docker build . -t obama-bot
 docker run -d obama-bot
+
+### Run with docker-compose.yml
+docker compose up --build -d

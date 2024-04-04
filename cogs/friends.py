@@ -33,16 +33,6 @@ class Friends(commands.Cog):
         self.dj_enabled = False  # Flag for DJ functionality
         self.inc_enabled = False  # Flag for INC functionality
 
-        # Configure the logger to save logs to bot.log
-        if not logger.handlers:
-            file_handler = logging.FileHandler("bot.log")
-            file_handler.setFormatter(
-                logging.Formatter(
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-                )
-            )
-            logger.addHandler(file_handler)
-
     @commands.Cog.listener()
     async def on_ready(self):
         """

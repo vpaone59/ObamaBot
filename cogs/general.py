@@ -18,16 +18,6 @@ class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        # Configure the logger to save logs to bot.log
-        if not logger.handlers:
-            file_handler = logging.FileHandler("bot.log")
-            file_handler.setFormatter(
-                logging.Formatter(
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-                )
-            )
-            logger.addHandler(file_handler)
-
     @commands.Cog.listener()
     async def on_ready(self):
         """

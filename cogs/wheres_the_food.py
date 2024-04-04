@@ -22,8 +22,8 @@ class WheresTheFood(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_ready(self, ctx):
-        """ 
+    async def on_ready(self):
+        """
         Runs when the cog is loaded
         """
         print(f"{self} ready")

@@ -80,10 +80,7 @@ def find_restaurant(keyword, ctx):
     else:
         restaurant_status = "closed"
 
-    message_response = f"We found a result near you for {restaurant['name']}.\
-          It's located at {restaurant['formatted_address']} and is currently {restaurant_status}.\
-              \n This location has an Average Rating (out of 5⭐️) of {restaurant['rating']}⭐️,\
-                with {restaurant['user_ratings_total']} total customer ratings."
+    message_response = f"We found a result near you for {restaurant['name']}. It's located at {restaurant['formatted_address']} and is currently {restaurant_status}.\n This location has an Average Rating (out of 5⭐️) of {restaurant['rating']}⭐️, with {restaurant['user_ratings_total']} total customer ratings."
 
     return message_response
 

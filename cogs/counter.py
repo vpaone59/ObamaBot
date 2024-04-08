@@ -16,13 +16,6 @@ class Counter(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_ready(self):
-        """
-        runs when Cog is loaded and ready to use
-        """
-        logger.info("Cog ready", __name__)
-
-    @commands.Cog.listener()
     async def on_message(self, message):
         """
         On every message we are going to check if it matches an entry in the database
@@ -60,17 +53,15 @@ class Counter(commands.Cog):
             conn.commit()
             await ctx.send(f"```success. {counter_name} is now 0```")
             logger.info(
-                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                "SUCCESS! USER: %s VALUE: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
             )
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
             logger.error(
-                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                "FAILURE! USER: %s VALUE: %s ERROR: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
                 err,
             )
@@ -92,9 +83,8 @@ class Counter(commands.Cog):
             conn.commit()
             await ctx.send(f"```success. {counter_name} is now being counted!```")
             logger.info(
-                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                "SUCCESS! USER: %s VALUE: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
             )
             get_counters()
@@ -102,9 +92,8 @@ class Counter(commands.Cog):
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
             logger.error(
-                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                "FAILURE! USER: %s VALUE: %s ERROR: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
                 err,
             )
@@ -126,9 +115,8 @@ class Counter(commands.Cog):
             conn.commit()
             await ctx.send(f"```success. {counter_name} has now been deleted!```")
             logger.info(
-                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                "SUCCESS! USER: %s VALUE: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
             )
             get_counters()
@@ -136,9 +124,8 @@ class Counter(commands.Cog):
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
             logger.error(
-                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                "FAILURE! USER: %s VALUE: %s ERROR: %s",
                 ctx.message.author,
-                __name__,
                 counter_name,
                 err,
             )
@@ -182,9 +169,8 @@ class Counter(commands.Cog):
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
             logger.error(
-                "FAILURE! USER: %s FUNCTION: %s ERROR: %s",
+                "FAILURE! USER: %s ERROR: %s",
                 ctx.message.author,
-                __name__,
                 err,
             )
         finally:

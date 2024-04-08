@@ -7,6 +7,10 @@ def setup_logging(logger_name=__name__, log_file="./logs/bot.log"):
     """
     Configures a logger for the bot.
     """
+    # Check if logger with specified name already exists
+    if logger_name in logging.Logger.manager.loggerDict:
+        return logging.getLogger(logger_name)
+
     # Create a logger with the name of the module passed in
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)

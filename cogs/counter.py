@@ -1,9 +1,10 @@
 from discord.ext import commands
 import sqlite3
 import os
+from logging_config import setup_logging
 
-counter_names = []
-counters_from_db = []
+logger = setup_logging(__name__)
+DB_PATH = os.getenv("DB_PATH")
 
 
 class Counter(commands.Cog):
@@ -19,10 +20,7 @@ class Counter(commands.Cog):
         """
         runs when Cog is loaded and ready to use
         """
-        print(f"{self} ready")
-        # When this Cog first loads we grab a list of every entry in the DB name_of_counters column
-        # and add it to global variable list counters_from_db
-        get_counters()
+        logger.info("Cog ready", __name__)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -35,7 +33,7 @@ class Counter(commands.Cog):
             try:
                 conn, cursor = connect_db()
                 cursor.execute(
-                    f"UPDATE counters SET tally_counter=tally_counter + 1 WHERE name_of_counter = '{cap_message}'"
+                    f"UPDATE counters SET tally=tally + 1 WHERE name = '{cap_message}'"
                 )
                 conn.commit()
             except Exception as err:
@@ -54,15 +52,28 @@ class Counter(commands.Cog):
         """
         Resets tally to zero for a user input counter name
         """
-        sql = "UPDATE counters SET tally_counter=0 WHERE name_of_counter = ?"
+        sql = "UPDATE counters SET tally=0 WHERE name = ?"
         val = (counter_name,)
         try:
             conn, cursor = connect_db()
             cursor.execute(sql, val)
             conn.commit()
             await ctx.send(f"```success. {counter_name} is now 0```")
+            logger.info(
+                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+            )
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
+            logger.error(
+                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+                err,
+            )
         finally:
             cursor.close()
             conn.close()
@@ -73,17 +84,30 @@ class Counter(commands.Cog):
         """
         Create a counter entry in the Database to keep a tally of
         """
-        sql = "INSERT INTO counters (name_of_counter, tally_counter) VALUES (?, ?)"
+        sql = "INSERT INTO counters (name, tally) VALUES (?, ?)"
         val = (counter_name, 0)
         try:
             conn, cursor = connect_db()
             cursor.execute(sql, val)
             conn.commit()
             await ctx.send(f"```success. {counter_name} is now being counted!```")
+            logger.info(
+                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+            )
             get_counters()
 
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
+            logger.error(
+                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+                err,
+            )
         finally:
             cursor.close()
             conn.close()
@@ -94,17 +118,30 @@ class Counter(commands.Cog):
         """
         Delete a counter entry in the Database by its name
         """
-        sql = "DELETE FROM counters WHERE name_of_counter = ?"
+        sql = "DELETE FROM counters WHERE name = ?"
         val = (counter_name,)
         try:
             conn, cursor = connect_db()
             cursor.execute(sql, val)
             conn.commit()
             await ctx.send(f"```success. {counter_name} has now been deleted!```")
+            logger.info(
+                "SUCCESS! USER: %s FUNCTION: %s VALUE: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+            )
             get_counters()
 
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
+            logger.error(
+                "FAILURE! USER: %s FUNCTION: %s VALUE: %s ERROR: %s",
+                ctx.message.author,
+                __name__,
+                counter_name,
+                err,
+            )
         finally:
             cursor.close()
             conn.close()
@@ -115,18 +152,44 @@ class Counter(commands.Cog):
         """
         Command to get a list of the current counters from the database
         """
-        counter_string = "String - Tally\n"
+        response_string = "String - Tally\n"
 
         try:
             get_counters()
             for c in counters_from_db:
                 c_name = c[0]
                 c_tally = c[1]
-                counter_string += f"{c_name}\t-\t{str(c_tally)}\n"
+                response_string += f"{c_name}\t-\t{str(c_tally)}\n"
 
-            await ctx.send(f"```{counter_string}```")
+            await ctx.send(f"```{response_string}```")
+            logger.info("USER: %s", ctx.message.author)
         except Exception as err:
             await ctx.send("Something went wrong: {}".format(err))
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def list_tables(self, ctx):
+        """
+        Lists all tables in the database
+        """
+        try:
+            conn, cursor = connect_db()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = cursor.fetchall()
+            table_names = [table[0] for table in tables]
+            await ctx.send("Tables in the database: " + ", ".join(table_names))
+            logger.info("USER: %s", ctx.message.author)
+        except Exception as err:
+            await ctx.send("Something went wrong: {}".format(err))
+            logger.error(
+                "FAILURE! USER: %s FUNCTION: %s ERROR: %s",
+                ctx.message.author,
+                __name__,
+                err,
+            )
+        finally:
+            cursor.close()
+            conn.close()
 
 
 def get_counters():
@@ -140,7 +203,7 @@ def get_counters():
     conn, cursor = connect_db()
 
     try:
-        cursor.execute("SELECT name_of_counter, tally_counter FROM counters")
+        cursor.execute("SELECT name, tally FROM counters")
         rows = cursor.fetchall()
 
         for row in rows:
@@ -158,32 +221,13 @@ def connect_db():
     Function that connects to the database and returns a connection object and cursor object.
     Requires DB_PATH environment variable to be set
     """
-    db_path = os.path.expanduser(os.getenv("DB_PATH"))
 
-    # Check if the database file exists
-    if not os.path.exists(db_path):
-        # Connect to SQLite database (creates a new file if it doesn't exist)
-        conn = sqlite3.connect(db_path)
+    try:
+        conn = sqlite3.connect(DB_PATH)  # type: ignore
         cursor = conn.cursor()
-
-        # Create the counters table
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS counters (
-                id INTEGER PRIMARY KEY,
-                name_of_counter TEXT NOT NULL,
-                tally_counter INTEGER NOT NULL
-            )
-        """
-        )
-
-        # Commit the changes
-        conn.commit()
-
-    else:
-        # If the database file exists, connect to it
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        logger.info("Cursor created for sqlite DB file at: %s", DB_PATH)
+    except Exception as err:
+        logger.error("Failed to connect to sqlite DB file at: %s --- %s", DB_PATH, err)
 
     return conn, cursor
 

@@ -33,7 +33,7 @@ async def main():
     """
     async with bot:
         await bot.start(os.getenv("DISCORD_TOKEN"))
-        logger.info(f'Starting bot with {os.getenv("DISCORD_TOKEN")}')
+        logger.info("Starting bot with %s", os.getenv("DISCORD_TOKEN"))
         # on_ready event will be called next
 
 

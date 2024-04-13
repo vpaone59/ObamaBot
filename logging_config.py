@@ -1,6 +1,18 @@
 import logging
 from datetime import datetime
 import pytz
+import os
+
+# Create the log file and directory if it doesn't already exist
+log_dir = "./logs"
+log_file = os.path.join(log_dir, "bot.log")
+
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+if not os.path.exists(log_file):
+    with open(log_file, "w+"):
+        pass
 
 
 def setup_logging(logger_name=__name__, log_file="./logs/bot.log"):

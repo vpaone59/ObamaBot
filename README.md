@@ -15,11 +15,15 @@ pip install -r requirements.txt
 python main.py
 
 ## Running with Docker:
-I recommend setting up the logging file map in the docker-compose.yml. You can update the left file path with the one on your host system.
-    ~\Documents\logs\ObamaBot\bot.log:/logs/bot.log 
+I recommend setting up the logging file map in the docker-compose.yml. You can update the left file path with the one on your host system. Optionally you can map the SQLite database from the container to your host machine.
+!!! These files must exist on the host system. They will not be created automatically.
 
-Optionally setup the SQLite database path on your host system.
-    ~\Documents\DB\obama.db:/app/database/obama.db
+```
+volumes:
+    ~\Documents\code\logs\ObamaBot\bot.log:/app/logs/bot.log
+    ~\Documents\code\database\obamabot.db:/app/database/obamabot.db
+```
+
 
 ### To build the container and then run it
 docker build . -t obama-bot
@@ -27,3 +31,8 @@ docker run -d obama-bot
 
 ### Run with docker-compose.yml
 docker compose up --build -d
+
+### To push to Google Artifacts Repository
+Download and install Google Cloud CLI and Docker
+```docker tag {image_name} {repo_url/{image_name:{tag}}}```
+```docker push {repo_url/{image_name:{tag}}}```

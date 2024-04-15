@@ -9,10 +9,15 @@ Must have a Discord Bot Token ready. Place Token in the SAMPLE.env file. Rename 
 requires Python3.8 >=
 
 ### You'll need this install on the local machine before anything else.
+```
 pip install setuptools 
+```
+
 ### Activate a virtual environment
+```
 pip install -r requirements.txt
 python main.py
+```
 
 ## Running with Docker:
 I recommend setting up the logging file map in the docker-compose.yml. You can update the left file path with the one on your host system. Optionally you can map the SQLite database from the container to your host machine.
@@ -26,13 +31,26 @@ volumes:
 
 
 ### To build the container and then run it
+```
 docker build . -t obama-bot
+
 docker run -d obama-bot
+```
 
 ### Run with docker-compose.yml
+```
 docker compose up --build -d
+```
 
 ### To push to Google Artifacts Repository
 Download and install Google Cloud CLI and Docker
-```docker tag {image_name} {repo_url/{image_name:{tag}}}```
-```docker push {repo_url/{image_name:{tag}}}```
+
+```
+docker tag {image_name} {repo_url/{image_name:{tag}}}
+
+docker push {repo_url/{image_name:{tag}}}
+```
+
+## Troubleshooting
+entrypoint.sh:
+    If Docker is complaining about entrypoint.sh like ```python3-obamabot  | exec ./entrypoint.sh: no such file or directory``` then you need to convert entrypoint.sh from CRLF to LF so the script is recognized on the linux system.

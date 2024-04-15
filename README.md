@@ -42,7 +42,7 @@ docker run -d obama-bot
 docker compose up --build -d
 ```
 
-### To push to Google Artifacts Repository
+## To push to Google Artifacts Repository
 Download and install Google Cloud CLI and Docker
 
 ```

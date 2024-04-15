@@ -1,7 +1,7 @@
 # ObamaBot
-ObamaBot - Vincent Paone
+ObamaBot - by Vincent Paone
 
-A general purpose Discord Bot. Contains Cogs specific to ObamaBot and other special Guilds/Servers.
+A general purpose Discord Bot with some fun interactions. Used as a base to learn Python and have some fun with my friends.
 Migrating to discordpy 2.0 --- https://discordpy.readthedocs.io/en/latest/migrating.html
 
 ## Running locally without Docker:

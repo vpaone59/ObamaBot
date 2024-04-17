@@ -6,6 +6,6 @@ services:
     container_name: python3-obamabot
     volumes:
       # Map localhost machine files to the docker container. These files must exist prior to running the container.
-      - ~\Documents\code\logs\ObamaBot\bot.log:/app/logs/bot.log
-      - ~\Documents\code\database\obamabot.db:/app/database/obamabot.db
+      - ${LOG_FILE_PATH}:/app/logs/bot.log
+      - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
     restart: unless-stopped

@@ -24,7 +24,7 @@ class PredecessorStats(commands.Cog):
         logger.info("%s ready", self)
 
     @commands.command(aliases=["pred"])
-    async def get_player(self, ctx, *player_name):
+    async def pred_player_stats(self, ctx, *player_name):
         """
         Sends general information about the Predecessor player to the channel
         """
@@ -42,6 +42,36 @@ class PredecessorStats(commands.Cog):
             MMR: {player_info['mmr']}"
 
         await ctx.channel.send(response_message)
+
+    @commands.command(aliases=["predmh"])
+    async def pred_player_matches(self, ctx, *player_name):
+        """
+        Sends the match history of a Predecessor player to the channel
+        """
+        player_name = " ".join(player_name)
+        player_id = await get_player_id(player_name)
+        print(player_id, player_name)
+        if player_id:
+            player_match_history = await get_player_match_history(player_id)
+            print(player_match_history)
+            response_message = f"""
+Start Time: {player_match_history['start_time']}
+End Time: {player_match_history['end_time']}
+Player ID: {player_match_history['id']}
+Name: {player_match_history['display_name']}
+MMR: {player_match_history['mmr']}
+MMR Change: {player_match_history['mmr_change']}
+Minions Killed: {player_match_history['minions_killed']}
+Kills: {player_match_history['kills']}
+Deaths: {player_match_history['deaths']}
+Assists: {player_match_history['assists']}
+Total Damage Dealt to Heroes: {player_match_history['total_damage_dealt_to_heroes']}
+Total Damage Taken from Heroes: {player_match_history['total_damage_taken_from_heroes']}
+Gold Earned: {player_match_history['gold_earned']}
+                                """
+            await ctx.channel.send(response_message)
+        else:
+            await ctx.channel.send(f"Player '{player_name}' not found.")
 
 
 async def get_player_general(player_id):
@@ -73,6 +103,32 @@ async def get_player_id(player_name):
             return players_data[0]["id"]
         logger.info("Player '%s' not found.", player_name)
         return None
+    except requests.RequestException as e:
+        logger.error("Error fetching data: %s", e)
+        return None
+
+
+async def get_player_match_history(player_id):
+    """
+    Fetches the match history of a player from omeda.city API.
+    """
+    url = f"https://omeda.city/players/{player_id}/matches.json"
+    params = {"time_frame": "1D"}
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raise an error for bad status codes
+        matches_data = response.json()["matches"]
+        player_info = None
+        for match in matches_data:
+            for player in match["players"]:
+                if player["id"] == player_id:
+                    player_info = player
+                    player_info["start_time"] = match["start_time"]
+                    player_info["end_time"] = match["end_time"]
+                    break
+            if player_info:
+                break
+        return player_info
     except requests.RequestException as e:
         logger.error("Error fetching data: %s", e)
         return None

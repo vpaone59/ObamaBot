@@ -37,8 +37,6 @@ class PredecessorStats(commands.Cog):
             Rank: {player_info['rank']}\n\
             Active Rank: {player_info['rank_active']}\n\
             Rank Title: {player_info['rank_title']}\n\
-            Rank Image: (https://omeda.city{player_info['rank_image']})\n\
-            Ranked: {player_info['is_ranked']}\n\
             MMR: {player_info['mmr']}"
 
         await ctx.channel.send(response_message)

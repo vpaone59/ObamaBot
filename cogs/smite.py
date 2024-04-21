@@ -10,7 +10,7 @@ with open("./dynamic/smite_gods.json", "r") as file:
 available_types = ["mage", "warrior", "assassin", "guardian", "hunter"]
 
 
-class Smite_Shuffler(commands.Cog):
+class SmiteShuffler(commands.Cog):
     """
     Smite Shuffler Cog for ObamaBot
     """
@@ -32,8 +32,8 @@ class Smite_Shuffler(commands.Cog):
         number_of_synced_commands = await ctx.bot.tree.sync(guild=ctx.guild)
         await ctx.send(f"Synced {len(number_of_synced_commands)} commands.")
 
-    @commands.command()
-    async def gods(self, ctx):
+    @commands.command(aliases=["gods"])
+    async def get_all_gods(self, ctx):
         """
         List all current Gods
         """
@@ -50,8 +50,8 @@ class Smite_Shuffler(commands.Cog):
             count += 1
         await ctx.send(list_text)
 
-    @commands.command(aliases=["ss"])
-    async def shuffle(self, ctx, god_type: str = None):
+    @commands.command(aliases=["ss", "rg"])
+    async def get_random_god(self, ctx, god_type: str = None):
         """
         Chooses a random God. Optionally takes a god_type filter results
         """

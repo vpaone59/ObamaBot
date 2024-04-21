@@ -4,15 +4,16 @@ https://github.com/vpaone59
 
 import os
 from datetime import datetime
-from discord.ext import commands
 import logging
+from discord.ext import commands, tasks
 import googleapiclient.discovery
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-ratemytakeaway_channel_id = "UCd03Ksc7VNypelv_TM3SjSg"
+# Rate My Takeaway's YouTube channel ID
+RMT_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"
 logger = logging.getLogger(__name__)
 
 
@@ -23,13 +24,16 @@ class Youtube(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.check_latest_video.start()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"{self} ready")
+    @tasks.loop(hours=48)  # Loop every 48 hours (2 days)
+    async def check_latest_video(self):
+        # Check if the current time is 6:05 PM
+        now = datetime.now()
+        if now.hour == 18 and now.minute == 5:
+            await self.get_latest_video_task(RMT_CHANNEL_ID)
 
-    @commands.command(aliases=["rmt", "danny"])
-    async def get_latest_video(self, ctx, channel_id=ratemytakeaway_channel_id):
+    async def get_latest_video_task(self, channel_id):
         """
         Get the most recent upload from any YouTube channel by their channel ID
         Default channel ID is set to Rate My Takeaway's channel ID
@@ -51,29 +55,38 @@ class Youtube(commands.Cog):
             if "items" in video_response:
                 result = video_response["items"][0]
                 video_snippet = result["snippet"]
-                print(video_snippet)
 
                 # Convert the publishedAt string to a datetime object
-                publishedAt_str = video_snippet["publishedAt"]
-                published_at = datetime.strptime(publishedAt_str, "%Y-%m-%dT%H:%M:%SZ")
+                published_at_str = video_snippet["publishedAt"]
+                published_at = datetime.strptime(published_at_str, "%Y-%m-%dT%H:%M:%SZ")
                 # Format it in a readable way
-                formatted_publishedAt = published_at.strftime("%B %d, %Y %H:%M:%S")
+                formatted_published_at = published_at.strftime("%B %d, %Y %H:%M:%S")
 
                 latest_video = {
                     "title": video_snippet["title"],
                     "description": video_snippet["description"],
-                    "published_at": formatted_publishedAt,
+                    "published_at": formatted_published_at,
                     "thumbnail": video_snippet["thumbnails"]["medium"]["url"],
                     "video_url": f"https://www.youtube.com/watch?v={result['id']['videoId']}",
                 }
 
-            await ctx.send(
+            # Send the latest video information to a specific channel
+            channel = self.bot.get_channel(1107106046977257472)
+            await channel.send(
                 f"**{latest_video['title']}\n{latest_video['published_at']}**\n*{latest_video['description']}*\n{latest_video['video_url']}"
             )
 
         except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
-            await ctx.send(f"{e}")
+            # Log any errors that occur during the process
+            print(f"Error fetching latest video: {e}")
+
+    @commands.command(aliases=["rmt", "danny"])
+    async def get_latest_video(self, ctx, channel_id=RMT_CHANNEL_ID):
+        """
+        Get the most recent upload from any YouTube channel by their channel ID
+        Default channel ID is set to Rate My Takeaway's channel ID
+        """
+        await self.get_latest_video_task(channel_id)
 
 
 async def setup(bot):

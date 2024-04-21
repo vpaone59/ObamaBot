@@ -3,8 +3,8 @@ https://github.com/vpaone59
 """
 
 import logging
-import requests
 from datetime import datetime
+import requests
 from discord.ext import commands
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class PredecessorStats(commands.Cog):
     """
-    Class that connects with tha Predecessor Omeda.city API to return game information
+    Class that connects with tha Predecessor Omeda.city API to return game and player information
     """
 
     def __init__(self, bot):

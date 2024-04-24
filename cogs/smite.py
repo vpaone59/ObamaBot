@@ -1,10 +1,10 @@
+import random
+import json
 import discord
 from discord import app_commands
 from discord.ext import commands
-import random
-import json
 
-with open("./dynamic/smite_gods.json", "r") as file:
+with open("./dynamic/smite_gods.json", "r", encoding="utf-8") as file:
     god_list = json.load(file)
 
 available_types = ["mage", "warrior", "assassin", "guardian", "hunter"]
@@ -126,7 +126,7 @@ def add_god_to_list(name, type, pantheon):
         god_list["gods"].append(new_god)
         god_list["gods"].sort(key=lambda x: x["name"])
         # Write the data to the file
-        with open("./dynamic/smite_gods.json", "w") as file:
+        with open("./dynamic/smite_gods.json", "w", encoding="utf-8") as file:
             json.dump(god_list, file, indent=4)
         return f"```God Added\n---\nName: {name}\nPantheon: {pantheon}\nType: {type}```"
     except Exception as e:
@@ -150,7 +150,7 @@ def remove_god_from_list(name):
         try:
             removed_god = god_list["gods"].pop(index)
 
-            with open("./dynamic/smite_gods.json", "w") as file:
+            with open("./dynamic/smite_gods.json", "w", encoding="utf-8") as file:
                 json.dump(god_list, file, indent=4)
 
             return f"```God Removed\n---\nName: {removed_god['name']}\nPantheon: {removed_god['pantheon']}\nType: {removed_god['type']}```"

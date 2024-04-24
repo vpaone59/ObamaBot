@@ -1,30 +1,23 @@
-"""
-Vincent Paone
-Project began 4/20/2022 --
-ObamaBot - Main file. Run this file to start the bot.
-
-There is no serious political affiliation. This is all in good fun.
-"""
-
-from discord.ext.commands import Greedy, Context  # or a subclass of yours
-from typing import Literal, Optional
-from logging_config import setup_logging
 import os
 import asyncio
+from typing import Literal, Optional
 import discord
-from discord.ext import commands
 from dotenv import load_dotenv
+from discord.ext.commands import Greedy, Context  # or a subclass of yours
+from discord.ext import commands
+from logging_config import setup_logging
 
-# Configure logging using the setup_logging function
+# Initialize main logger for the bot
 logger = setup_logging(__name__)
 
-# Load environment variables from a .env file
+# Load environment variables from .env file
 load_dotenv()
 
-# Configure Discord bot intents and initialize a placeholder logger
+# Configure Discord bot intents and grab token
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
+BOT_TOKEN = os.getenv("DISCORD_TOKEN")
 
 
 async def main():
@@ -32,22 +25,23 @@ async def main():
     The main function that starts the Discord bot.
     """
     async with bot:
-        await bot.start(os.getenv("DISCORD_TOKEN"))
-        logger.info("Starting bot with %s", os.getenv("DISCORD_TOKEN"))
-        # on_ready event will be called next
+        await bot.start(BOT_TOKEN)
+        logger.info("TOKEN grabbed\n Starting bot")
 
 
 @bot.event
 async def on_ready():
     """
     Runs once the bot establishes a connection with Discord.
+
+    Load all cogs into the bot
     """
-    logger.info(f"Logged in as {bot.user}")
+    logger.info("Logged in as %s", bot.user)
 
     try:
         await load_all_cogs()
     except Exception as e:
-        logger.error(f"Bot not ready: {e}")
+        logger.error("Bot not ready: %s", e)
 
 
 @bot.event
@@ -62,21 +56,21 @@ async def on_message(message):
     if message.author == bot.user or message.author.bot:
         return
 
-    # Process the message using the bot's command processing functionality
+    # Need this line at the end of on_message functions
     await bot.process_commands(message)
 
 
 async def load_all_cogs():
     """
-    Loads all Cog (Python) files from the /cogs directory.
+    Loads all Cog files from the /cogs directory.
     """
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             try:
                 await bot.load_extension(f"cogs.{filename[:-3]}")
-                logger.info(f"{filename} loaded")
+                logger.info("%s loaded", filename)
             except Exception as e:
-                logger.error({e})
+                logger.error("%s - %s not loaded", e, filename)
 
 
 @bot.command(aliases=["load"], help="Loads a Cog file")
@@ -91,11 +85,13 @@ async def load_cog(ctx, cog_name):
     try:
         await bot.load_extension(f"cogs.{cog_name}")
         await ctx.send(f"```{cog_name}.py loaded```")
+
     except commands.ExtensionAlreadyLoaded as e:
-        logger.error({e})
         await ctx.send(f"```{cog_name}.py is already loaded\n{e}```")
+        logger.error("%s - %s already loaded", e, cog_name)
+
     except commands.ExtensionNotFound as e:
-        logger.error({e})
+        logger.error("%s - %s does not exist", e, cog_name)
         await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
 
 
@@ -104,18 +100,20 @@ async def load_cog(ctx, cog_name):
 async def unload_cog(ctx, cog_name):
     """
     Unload a Cog file
-    Only a user with Administrator role should be able to run this command
+
     param: ctx - The context of which the command is entered
     param: extension - The name of the Cog file to unload
     """
     try:
         await bot.unload_extension(f"cogs.{cog_name}")
         await ctx.send(f"```{cog_name}.py unloaded```")
+
     except commands.ExtensionNotLoaded as e:
-        logger.error({e})
+        logger.error("%s - %s is not loaded", e, cog_name)
         await ctx.send(f"```{cog_name}.py is not loaded\n{e}```")
+
     except commands.ExtensionNotFound as e:
-        logger.error({e})
+        logger.error("%s - %s does not exist", e, cog_name)
         await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
 
 
@@ -124,7 +122,7 @@ async def unload_cog(ctx, cog_name):
 async def reload_cog(ctx, cog_name=""):
     """
     Reload a specific Cog file or all Cogs by default
-    Only a user with Administrator role should be able to run this command
+
     param: ctx - The context in which the command has been executed
     param: cog_name - The name of the Cog file to reload
     """
@@ -137,7 +135,7 @@ async def reload_cog(ctx, cog_name=""):
                     await bot.reload_extension(f"cogs.{filename[:-3]}")
                     reloaded_cogs += " - " + filename
                 except Exception as e:
-                    logger.error({e})
+                    logger.error("%s", e)
                     failed += " - " + filename
         await ctx.send(
             f"```These Cogs were reloaded: {reloaded_cogs}\n\nThese Cogs failed to reload: {failed}```"
@@ -146,11 +144,13 @@ async def reload_cog(ctx, cog_name=""):
         try:
             await bot.reload_extension(f"cogs.{cog_name}")
             await ctx.send(f"```{cog_name}.py reloaded```")
+
         except commands.ExtensionNotFound as e:
-            logger.error({e})
+            logger.error("%s", e)
             await ctx.send(f"```{cog_name}.py not in directory\n{e}```")
+
         except Exception as e:
-            logger.error({e})
+            logger.error("%s", e)
             await ctx.send(f"```{cog_name}.py could not be reloaded \n{e}```")
 
 

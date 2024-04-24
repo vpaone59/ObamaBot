@@ -10,4 +10,7 @@ RUN pip3 install -r requirements.txt
 
 RUN chmod +x entrypoint.sh
 
+# Expose port 8080 for Cloud Run
+EXPOSE 8080
+
 ENTRYPOINT ["./entrypoint.sh"]

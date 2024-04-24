@@ -172,5 +172,5 @@ def god_check(name):
 
 async def setup(bot):
     await bot.add_cog(
-        Smite_Shuffler(bot), guilds=[discord.Object(id=1040708391921786901)]
+        SmiteShuffler(bot), guilds=[discord.Object(id=1040708391921786901)]
     )

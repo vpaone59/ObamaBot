@@ -7,18 +7,18 @@ Utilizes the Giphy API
 import random
 import os
 import json
-from logging_config import setup_logging
 from urllib import parse, request
 from discord.ext import commands
+from logging_config import setup_logging
 
 # Grab Giphy key & assign url to variable
-giphy_key = os.getenv("GIPHY_KEY")
+GIPHY_KEY = os.getenv("GIPHY_KEY")
 URL = "http://api.giphy.com/v1/gifs/search"
 
 logger = setup_logging(__name__)
 
 
-class Gif_Generator(commands.Cog):
+class GifGenerator(commands.Cog):
     """
     Giphy API - Generate GIFs via a query in a Discord command
     """
@@ -40,7 +40,7 @@ class Gif_Generator(commands.Cog):
         Uses giphy api to search for gifs using user input query strings
         Picks 10 gifs and then randomly chooses 1 to send
         """
-        params = parse.urlencode({"q": query, "api_key": giphy_key, "limit": "10"})
+        params = parse.urlencode({"q": query, "api_key": GIPHY_KEY, "limit": "10"})
 
         try:
             with request.urlopen("".join((URL, "?", params))) as response:
@@ -69,4 +69,4 @@ class Gif_Generator(commands.Cog):
 
 async def setup(bot):
     """ """
-    await bot.add_cog(Gif_Generator(bot))
+    await bot.add_cog(GifGenerator(bot))

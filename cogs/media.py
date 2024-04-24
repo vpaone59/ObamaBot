@@ -22,7 +22,7 @@ obama_dir = "gifs/obama/"
 class Media(commands.Cog):
     """
     Media cogs/commands for Obama Bot
-    These commands will send media to the Guild the command was run in
+    These commands will send media stored locally to the channel
     """
 
     def __init__(self, bot):

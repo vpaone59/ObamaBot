@@ -13,6 +13,8 @@ available_types = ["mage", "warrior", "assassin", "guardian", "hunter"]
 class SmiteShuffler(commands.Cog):
     """
     Smite Shuffler Cog for ObamaBot
+
+    This is also an example of how to use Slash commands
     """
 
     def __init__(self, bot):

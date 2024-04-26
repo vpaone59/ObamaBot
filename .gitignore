@@ -20,7 +20,6 @@ banned.json
 .vscode
 
 # other
-/gifs
 .bat
 *.log
-.db
+*.db

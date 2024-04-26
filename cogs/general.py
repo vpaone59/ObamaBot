@@ -5,6 +5,7 @@ These are general use commands that any bot should have by default.
 """
 
 import logging
+import discord
 from discord.ext import commands
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,28 @@ class General(commands.Cog):
         except Exception as e:
             logger.error(f"USER: {ctx.message.author} ERROR: {e}")
             await ctx.channel.send(f"Error {__name__}: {e}")
+
+    @commands.command(aliases=["gm"])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def goodmorning(self, ctx):
+        """
+        Reply with media
+        """
+        await ctx.send(
+            "Goodmorning my fellow Americans!",
+            file=discord.File("gifs/obama/obama-smile.jpg"),
+        )
+
+    @commands.command(aliases=["gn"])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def goodnight(self, ctx):
+        """
+        Reply with media
+        """
+        await ctx.send(
+            "Goodnight and God Bless!",
+            file=discord.File("gifs/obama/obama-sleep.jpeg"),
+        )
 
     @commands.command(name="fibonacci", aliases=["fib"])
     @commands.cooldown(1, 3, commands.BucketType.user)

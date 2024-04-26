@@ -51,20 +51,25 @@ MMR: {player_info['mmr']}"""
 
         if player_id:
             player_match_history = await get_player_match_history(player_id)
-            response_message = f"""
-Start Time: {player_match_history['start_time']}
-End Time: {player_match_history['end_time']}
+            end_time = datetime.strptime(
+                player_match_history["end_time"], "%B %d, %Y %I:%M:%S %p"
+            ).strftime("%I:%M:%S %p")
+
+            response_message = f"""```
+Game Time: {player_match_history['start_time']} - {end_time}
 Player ID: {player_match_history['id']}
 Name: {player_match_history['display_name']}
 MMR: {player_match_history['mmr']}
 MMR Change: {player_match_history['mmr_change']}
 Minions Killed: {player_match_history['minions_killed']}
+Level: {player_match_history['level']}
 Kills: {player_match_history['kills']}
 Deaths: {player_match_history['deaths']}
 Assists: {player_match_history['assists']}
 Total Damage Dealt to Heroes: {player_match_history['total_damage_dealt_to_heroes']}
 Total Damage Taken from Heroes: {player_match_history['total_damage_taken_from_heroes']}
-Gold Earned: {player_match_history['gold_earned']}"""
+Gold Earned: {player_match_history['gold_earned']}
+```"""
             await ctx.channel.send(response_message)
         else:
             await ctx.channel.send(f"Player '{player_name}' not found.")

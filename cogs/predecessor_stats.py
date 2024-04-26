@@ -56,8 +56,8 @@ MMR: {player_info['mmr']}"""
             ).strftime("%I:%M:%S %p")
 
             response_message = f"""```
-Game Time: {player_match_history['start_time']} - {end_time}
 Player ID: {player_match_history['id']}
+Game Time: {player_match_history['start_time']} - {end_time}
 Name: {player_match_history['display_name']}
 MMR: {player_match_history['mmr']}
 MMR Change: {player_match_history['mmr_change']}

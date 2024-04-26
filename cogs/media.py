@@ -48,15 +48,12 @@ class Media(commands.Cog):
             file=discord.File("media/obama-smile.jpg"),
         )
 
-    @commands.command(aliases=["joe", "biden", "brandon"])
+    @commands.command(aliases=["joe", "biden", "brandon", "jack"])
     async def joe_biden(self, ctx):
         """
         Reply with media
         """
-        await ctx.channel.send(
-            "You're welcome! <:obamacare:844291609663111208>\n",
-            file=discord.File("media/biden-smile.jpg"),
-        )
+        await ctx.channel.send(file=discord.File("media/biden-smile.png"))
 
 
 async def setup(bot):

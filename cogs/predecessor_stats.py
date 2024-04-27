@@ -3,7 +3,7 @@ https://github.com/vpaone59
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import requests
 from discord.ext import commands
 
@@ -23,8 +23,8 @@ class PredecessorStats(commands.Cog):
         """ """
         logger.info("%s ready", self)
 
-    @commands.command(aliases=["stats"])
-    async def get_player_stats(self, ctx, *player_name):
+    @commands.command()
+    async def stats(self, ctx, *player_name):
         """
         Sends general information about the Predecessor player to the channel
         """
@@ -41,8 +41,8 @@ MMR: {player_info['mmr']}```"""
 
         await ctx.channel.send(response_message)
 
-    @commands.command(aliases=["lg"])
-    async def get_last_match_stats(self, ctx, *player_name):
+    @commands.command(aliases=["lg" "last"])
+    async def last(self, ctx, *player_name):
         """
         Sends the match history of a Predecessor player to the channel
         """
@@ -51,13 +51,27 @@ MMR: {player_info['mmr']}```"""
 
         if player_id:
             player_match_history = await get_player_match_history(player_id)
-            end_time = datetime.strptime(
-                player_match_history["end_time"], "%B %d, %Y %I:%M:%S %p"
-            ).strftime("%I:%M:%S %p")
+
+            start_time = (
+                datetime.strptime(
+                    player_match_history["start_time"], "%B %d, %Y %I:%M:%S %p"
+                )
+                .replace(tzinfo=timezone.utc)
+                .astimezone(timezone(timedelta(hours=-5)))
+            )
+
+            # Convert end_time to EST
+            end_time = (
+                datetime.strptime(
+                    player_match_history["end_time"], "%B %d, %Y %I:%M:%S %p"
+                )
+                .replace(tzinfo=timezone.utc)
+                .astimezone(timezone(timedelta(hours=-5)))
+            )
 
             response_message = f"""```
 Player ID: {player_match_history['id']}
-Game Time: {player_match_history['start_time']} - {end_time}
+Game Time: {start_time.strftime("%B %d, %Y")} {start_time.strftime("%I:%M:%S %p")} - {end_time.strftime("%I:%M:%S %p")}
 Name: {player_match_history['display_name']}
 MMR: {player_match_history['mmr']}
 MMR Change: {player_match_history['mmr_change']}
@@ -72,6 +86,46 @@ Gold Earned: {player_match_history['gold_earned']}```"""
             await ctx.channel.send(response_message)
         else:
             await ctx.channel.send(f"Player '{player_name}' not found.")
+
+    @commands.command()
+    async def hero_stats(self, ctx, *player_name):
+        """
+        Displays hero statistics for a player.
+        """
+        player_id = await get_player_id(player_name)
+
+        if player_id:
+            player_hero_stats = await get_player_hero_stats(player_id)
+
+            if player_hero_stats:
+                hero_stats = player_hero_stats.get("hero_statistics", [])
+                # Initialize an empty string to store the formatted hero stats message
+                formatted_stats = ""
+
+                for hero in hero_stats:
+                    # Extract hero stats
+                    hero_name = hero["display_name"]
+                    win_rate = hero["winrate"]
+                    kda = hero["avg_kdar"]
+                    total_kills = hero["kills"]
+                    total_deaths = hero["deaths"]
+                    total_assists = hero["assists"]
+
+                    # Format hero stats
+                    formatted_stats += f"**{hero_name}**\n"
+                    formatted_stats += f"Winrate: {win_rate}\n"
+                    formatted_stats += f"KDA: {kda}\n"
+                    formatted_stats += f"Total Kills: {total_kills}\n"
+                    formatted_stats += f"Total Deaths: {total_deaths}\n"
+                    formatted_stats += f"Total Assists: {total_assists}\n\n"
+
+                    # Send the formatted hero stats to the channel
+                await ctx.send(formatted_stats)
+
+            else:
+                await ctx.send("No hero statistics found for the player.")
+        else:
+            await ctx.send(f"Player '{player_name}' not found.")
 
 
 async def get_player(player_id):
@@ -131,6 +185,24 @@ async def get_player_match_history(player_id):
         return player_info
     except requests.RequestException as e:
         logger.error("Error fetching data: %s : Player Id - %s", e, player_id)
+        return None
+
+
+async def get_player_hero_stats(player_id):
+    """
+    Fetches hero stats for the player ID from the Omeda.city API.
+    """
+    url = f"https://omeda.city/players/{player_id}/hero_statistics.json"
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()  # Raise an error for bad status codes
+        player_hero_data = response.json()
+        if player_hero_data:
+            return player_hero_data
+        logger.info("Player '%s' not found.", player_id)
+        return None
+    except requests.RequestException as e:
+        logger.error("Error fetching data: %s", e)
         return None
 
 

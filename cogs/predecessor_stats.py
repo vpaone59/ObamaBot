@@ -43,7 +43,7 @@ MMR: {player_info['mmr']}```"""
 
         await ctx.channel.send(response_message)
 
-    @commands.command(aliases=["lg", "last"])
+    @commands.command(aliases=["lg"])
     async def last(self, ctx, *player_name):
         """
         Sends the match history of a Predecessor player to the channel

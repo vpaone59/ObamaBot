@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class PredecessorStats(commands.Cog):
     """
-    Class that connects with tha Predecessor Omeda.city API to return game and player information
+    Cog that connects with the Omeda.city Predecessor API to return game and player information
     """
 
     def __init__(self, bot):
@@ -20,7 +20,9 @@ class PredecessorStats(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        """ """
+        """
+        Runs once the Cog successfully loads
+        """
         logger.info("%s ready", self)
 
     @commands.command()

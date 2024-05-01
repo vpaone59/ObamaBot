@@ -6,8 +6,9 @@ import logging
 from datetime import datetime, timezone, timedelta
 import requests
 from discord.ext import commands
+from logging_config import setup_logging
 
-logger = logging.getLogger(__name__)
+logger = setup_logging(__name__)
 
 
 class PredecessorStats(commands.Cog):
@@ -89,7 +90,7 @@ Gold Earned: {player_match_history['gold_earned']}```"""
         else:
             await ctx.channel.send(f"Player '{player_name}' not found.")
 
-    @commands.command()
+    @commands.command(aliases=["heroes"])
     async def hero_stats(self, ctx, *player_name):
         """
         Displays hero statistics for a player.
@@ -111,18 +112,25 @@ Gold Earned: {player_match_history['gold_earned']}```"""
                     kda = hero["avg_kdar"]
                     total_kills = hero["kills"]
                     total_deaths = hero["deaths"]
-                    total_assists = hero["assists"]
 
                     # Format hero stats
                     formatted_stats += f"**{hero_name}**\n"
                     formatted_stats += f"Winrate: {win_rate}\n"
                     formatted_stats += f"KDA: {kda}\n"
                     formatted_stats += f"Total Kills: {total_kills}\n"
-                    formatted_stats += f"Total Deaths: {total_deaths}\n"
-                    formatted_stats += f"Total Assists: {total_assists}\n\n"
+                    formatted_stats += f"Total Deaths: {total_deaths}\n\n"
 
-                    # Send the formatted hero stats to the channel
-                await ctx.send(formatted_stats)
+                # Send the formatted hero stats to the channel
+                try:
+                    await ctx.send(formatted_stats)
+                except Exception as e:
+                    logger.info(
+                        "ERROR %s --- player_id: %s --- player_name: %s",
+                        e,
+                        player_id,
+                        player_name,
+                    )
+                    await ctx.send(e)
 
             else:
                 await ctx.send("No hero statistics found for the player.")

@@ -2,7 +2,6 @@
 https://github.com/vpaone59
 """
 
-import logging
 from datetime import datetime, timezone, timedelta
 import requests
 from discord.ext import commands

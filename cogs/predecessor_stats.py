@@ -111,14 +111,12 @@ Gold Earned: {player_match_history['gold_earned']}```"""
                     win_rate = hero["winrate"]
                     kda = hero["avg_kdar"]
                     total_kills = hero["kills"]
-                    total_deaths = hero["deaths"]
 
                     # Format hero stats
                     formatted_stats += f"**{hero_name}**\n"
                     formatted_stats += f"Winrate: {win_rate}\n"
                     formatted_stats += f"KDA: {kda}\n"
                     formatted_stats += f"Total Kills: {total_kills}\n"
-                    formatted_stats += f"Total Deaths: {total_deaths}\n\n"
 
                 # Send the formatted hero stats to the channel
                 try:

@@ -7,7 +7,7 @@ from discord.ext import commands
 with open("./dynamic/smite_gods.json", "r", encoding="utf-8") as file:
     god_list = json.load(file)
 
-available_types = ["mage", "warrior", "assassin", "guardian", "hunter"]
+smite_god_class_list = ["mage", "warrior", "assassin", "guardian", "hunter"]
 
 
 class SmiteShuffler(commands.Cog):
@@ -52,16 +52,16 @@ class SmiteShuffler(commands.Cog):
             count += 1
         await ctx.send(list_text)
 
-    @commands.command(aliases=["ss", "rg"])
+    @commands.command(aliases=["ss"])
     async def get_random_god(self, ctx, god_type: str = None):
         """
-        Chooses a random God. Optionally takes a god_type filter results
+        Chooses a random God. Optionally takes a god type to filter return
         """
         if god_type is None:
             shuffle_gods = god_list["gods"]
         else:
-            if god_type.lower() not in available_types:
-                await ctx.send(f"{god_type} is not one of {available_types}")
+            if god_type.lower() not in smite_god_class_list:
+                await ctx.send(f"{god_type} is not one of {smite_god_class_list}")
                 return
             else:
                 shuffle_gods = [
@@ -86,9 +86,9 @@ class SmiteShuffler(commands.Cog):
         """
         Add a God to the God list
         """
-        if god_type.lower() not in available_types:
+        if god_type.lower() not in smite_god_class_list:
             await interaction.response.send_message(
-                f"{god_type} is not one of {available_types}"
+                f"{god_type} is not one of {smite_god_class_list}"
             )
         else:
             response = add_god_to_list(god_name, god_type, god_pantheon)

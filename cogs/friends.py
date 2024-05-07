@@ -6,7 +6,6 @@ This Cog is custom made for a specific server and will not work in normal server
 
 import os
 import random
-import logging
 import discord
 from discord.ext import commands
 from logging_config import setup_logging
@@ -25,8 +24,7 @@ class Friends(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ethan_enabled = False  # Flag for Ethan reactions
-        self.walter_enabled = False  # Flag for Walter reactions
-        self.inc_enabled = False  # Flag for INC functionality
+        # self.inc_enabled = False  # Flag for INC functionality
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -52,14 +50,6 @@ class Friends(commands.Cog):
         # Ethan reactions (toggleable)
         if self.ethan_enabled and message.author.id == 166964846179385344:
             await message.add_reaction("♿")
-
-        # Walter reactions (toggleable)
-        if self.walter_enabled and message.author.id == 965414583860883456:
-            walter_int = random.randint(1, 3)
-            if walter_int == 1:
-                await message.channel.send(
-                    file=discord.File("gifs/weird/boner_alert.jpg")
-                )
 
         # if message.guild.id == 842545435050508328:
         #     if string_message.startswith("INC"):

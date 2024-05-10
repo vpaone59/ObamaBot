@@ -5,11 +5,9 @@ https://github.com/vpaone59
 import os
 import logging
 from discord.ext import commands
-import googlemaps
 import requests
 
 GOOGLE_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-gmaps = googlemaps.Client(key=GOOGLE_KEY)
 logger = logging.getLogger(__name__)
 
 

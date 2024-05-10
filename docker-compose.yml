@@ -9,7 +9,13 @@ services:
       - ${LOG_FILE_PATH}:/app/logs/bot.log
       - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
     environment:
+      # When using docker you'll need to just define the environment variables here because the .env file is ignored by docker.
+      # Docker compose will read the .env file and set the environment variables for you.
       - DISCORD_TOKEN
       - PREFIX
+      - LOG_FILE_PATH
+      - DATABASE_FILE_PATH
       - GIPHY_KEY
+      - YOUTUBE_API_KEY
+      - GOOGLE_MAPS_API_KEY
     restart: unless-stopped

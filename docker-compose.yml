@@ -8,4 +8,8 @@ services:
       # Map localhost machine files to the docker container. These files must exist prior to running the container.
       - ${LOG_FILE_PATH}:/app/logs/bot.log
       - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
+    environment:
+      - DISCORD_TOKEN
+      - PREFIX
+      - GIPHY_KEY
     restart: unless-stopped

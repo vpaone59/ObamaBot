@@ -29,6 +29,7 @@ volumes:
     ~\Documents\code\database\obamabot.db:/app/database/obamabot.db
 ```
 
+The .env file is ignored by Docker, so you need to simply define the environment variables you want to use in docker-compose.yml before running the container. Some of these are done for you like the necessary ones DISCORD_TOKEN and PREFIX.
 
 ### To build the container and then run it
 ```

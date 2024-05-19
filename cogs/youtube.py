@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Rate My Takeaway's YouTube channel ID
-RMT_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"
+RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"
 logger = logging.getLogger(__name__)
 
 
@@ -24,34 +24,47 @@ class Youtube(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.check_latest_video.start()
+        self.check_current_time_for_task.start()
 
     @tasks.loop(hours=48)  # Loop every 48 hours (2 days)
-    async def check_latest_video(self):
+    async def check_current_time_for_task(self):
+        """
+        Check if the current time is 6:05 PM and fetch the latest video from Rate My Takeaway's channel
+        """
         # Check if the current time is 6:05 PM
         now = datetime.now()
         if now.hour == 18 and now.minute == 5:
-            await self.get_latest_video_task(RMT_CHANNEL_ID)
+            await self.get_latest_video_task(RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID)
 
-    async def get_latest_video_task(self, channel_id):
+    @commands.command(aliases=["rmt", "danny"])
+    async def get_latest_video(
+        self, ctx, youtube_channel_id=RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
+    ):
         """
         Get the most recent upload from any YouTube channel by their channel ID
         Default channel ID is set to Rate My Takeaway's channel ID
         """
-        youtube = googleapiclient.discovery.build(
+        await self.get_latest_video_task(ctx.message.channel, youtube_channel_id)
+
+    async def get_latest_video_task(self, discord_channel_id, youtube_channel_id):
+        """
+        Get the most recent upload from any YouTube channel by their channel ID
+        Default channel ID is set to Rate My Takeaway's channel ID
+        """
+        youtube_client = googleapiclient.discovery.build(
             "youtube", "v3", developerKey=os.getenv("YOUTUBE_API_KEY")
         )
 
         # Setup for the first request to get the most recent video from the channel
-        yt_video_request = youtube.search().list(
+        youtube_video_request = youtube_client.search().list(
             part="snippet",
-            channelId=channel_id,
+            channelId=youtube_channel_id,
             order="date",  # Order by date so we know it is the most recent
             maxResults=1,  # Fetch one result aka most recent video
         )
 
         try:
-            video_response = yt_video_request.execute()
+            video_response = youtube_video_request.execute()
             if "items" in video_response:
                 result = video_response["items"][0]
                 video_snippet = result["snippet"]
@@ -70,23 +83,13 @@ class Youtube(commands.Cog):
                     "video_url": f"https://www.youtube.com/watch?v={result['id']['videoId']}",
                 }
 
-            # Send the latest video information to a specific channel
-            channel = self.bot.get_channel(1107106046977257472)
-            await channel.send(
+            await discord_channel_id.send(
                 f"**{latest_video['title']}\n{latest_video['published_at']}**\n*{latest_video['description']}*\n{latest_video['video_url']}"
             )
 
         except Exception as e:
             # Log any errors that occur during the process
             print(f"Error fetching latest video: {e}")
-
-    @commands.command(aliases=["rmt", "danny"])
-    async def get_latest_video(self, ctx, channel_id=RMT_CHANNEL_ID):
-        """
-        Get the most recent upload from any YouTube channel by their channel ID
-        Default channel ID is set to Rate My Takeaway's channel ID
-        """
-        await self.get_latest_video_task(channel_id)
 
 
 async def setup(bot):

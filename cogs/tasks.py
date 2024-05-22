@@ -5,10 +5,14 @@ Setup tasks to run periodically in your server.
 """
 
 from datetime import datetime
-import asyncio
-import pytz
-import discord
 from discord.ext import commands, tasks
+from cogs.youtube import (
+    RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID,
+    query_latest_youtube_video_from_channel_id,
+)
+from logging_config import setup_logging
+
+logger = setup_logging()
 
 
 class Tasks(commands.Cog):
@@ -18,7 +22,8 @@ class Tasks(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.tasks = []
+        self.tasks = {}
+        self.task_channels = {}
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -27,171 +32,109 @@ class Tasks(commands.Cog):
         """
         print(f"{self} ready")
 
+    @commands.command(aliases=["start task", "run task", "start", "run"])
+    async def start_task(self, ctx, task_name: str):
+        """
+        Start a task with the given name.
+        """
+        task = getattr(self, task_name, None)
+        if task is None or not isinstance(task, tasks.Loop):
+            await ctx.send(f"No task found with the name {task_name}.")
+            return
+
+        if task.is_running():
+            await ctx.send(f"The task {task_name} is already running.")
+            return
+
+        task.start()
+        self.tasks[task_name] = task
+        self.task_channels[task_name] = (
+            ctx.channel.id
+        )  # Store the channel ID with the task
+        await ctx.send(f"The task {task_name} has been started.")
+
+    @commands.command(aliases=["stop task", "end task", "stop", "end"])
+    async def stop_task(self, ctx, task_name: str):
+        """
+        Stop a task with the given name.
+        """
+        task = self.tasks.get(task_name)
+        if task is None:
+            await ctx.send(f"Task '{task_name}' is not running in this channel")
+            return
+
+        try:
+            task.cancel()
+            del self.tasks[task_name]
+            await ctx.send(f"Task '{task_name}' stopped")
+        except Exception as e:
+            print(f"ERROR {e}")
+            await ctx.send(f"ERROR {e}")
+
     @commands.command(aliases=["tasks", "status"])
-    async def tasks_status(self, ctx):
+    async def show_tasks_status(self, ctx):
         """
-        Show the status of all currently running tasks.
+        Show the status and details of all tasks.
         """
-        running_tasks = "Running Tasks:\n"
-        for task in self.tasks:
-            running_tasks += f"{task}\n"
+        if not self.tasks:
+            await ctx.send("No tasks have been started yet.")
+            return
 
-        if self.tasks:
-            message = running_tasks
-        else:
-            message = "There are no running tasks."
+        for task_name, task in self.tasks.items():
+            status = "running" if task.is_running() else "stopped"
+            channel_id = self.task_channels.get(task_name)
+            channel_info = f" (in channel <#{channel_id}>)" if channel_id else ""
 
-        await ctx.send(f"{message}")
+            next_iteration = task.next_iteration
+            if next_iteration is not None:
+                next_iteration_str = next_iteration.strftime("%m-%d-%y %H:%M:%S")
+                next_iteration_info = f", next run at {next_iteration_str}"
+            else:
+                next_iteration_info = ""
 
-    @tasks.loop(seconds=0, minutes=1, hours=0)
-    async def custom_task(self, channel, content):
-        """
-        Custom task created by the user. Only one of these can exist at a time
-        """
-        await channel.send(f"{content}")
-
-    @commands.command(aliases=["cct"])
-    async def create_custom_task(self, ctx):
-        """
-        Start a new custom task with customizable time interval
-        """
-        if self.custom_task.is_running():
             await ctx.send(
-                f"A custom task is already running! Stop this task before running another custom task. Use !tasks to see the running tasks."
+                f"Task '{task_name}' is {status}{channel_info}{next_iteration_info}"
+            )
+
+    @tasks.loop(minutes=1)
+    async def ratemytakeaway_task(self):
+        """
+        Task to fetch the latest video from Rate My Takeaway's channel
+        """
+        # Get the channel ID associated with the task
+        channel_id = self.task_channels.get("ratemytakeaway_task")  # Get channel ID
+        if channel_id is None:
+            logger.error(
+                "No channel associated with ratemytakeaway_task, but task is running. I would stop the task to avoid errors."
             )
             return
 
-        def check(
-            message,
-        ):  # a check to ensure the prompts aren't interrupted by other user's / bot's messages
-            return message.author == ctx.author and message.channel == ctx.channel
+        channel = self.bot.get_channel(channel_id)
 
-        # prompt the user for a task name and if it already exists prompt again
-        while True:
-            try:
-                await ctx.send(
-                    "Name the task, must be one word. Type 'cancel' to stop task creation"
-                )
-                task_name = await self.bot.wait_for(
-                    "message", timeout=30.0, check=check
-                )
-                task_name = task_name.content.strip()
-                # if the user enters 'cancel' then the command will stop
-                if task_name == "cancel":
-                    await ctx.send("Canceled task creation")
-                    return
-                # Check if the task name already exists
-                if task_name.lower() in [task.lower() for task in self.tasks]:
-                    await ctx.send(
-                        "A task with this name already exists. Please choose a different name. Use !tasks to see the list of currently running tasks."
-                    )
-                else:
-                    break
-            except asyncio.TimeoutError:
-                await ctx.send("Task creation timed out.")
-                return
+        if channel is None:
+            logger.error("Could not find channel with ID - %s", channel_id)
+            return
 
-        # prompt the user for the content of their custom task
-        while True:
-            try:
-                await ctx.send("Enter the content of the task:")
-                task_content = await self.bot.wait_for(
-                    "message", timeout=30.0, check=check
-                )
-                task_content = task_content.content
-                if len(task_content) > 100:
-                    await ctx.send(
-                        f"Task content length too long, must be less than 100 characters. Current length {len(task_content)}"
-                    )
-                else:
-                    break
-            except asyncio.TimeoutError:
-                await ctx.send("Task creation timed out.")
-                return
-
-        # prompt the user for the time interval their custom task will loop on
-        while True:
-            try:
-                await ctx.send(
-                    "Enter the task interval in seconds, minutes, and hours (separated by spaces).\n\
-                       (seconds > 1) (minutes >= 0) (hours >= 0)"
-                )
-                response = await self.bot.wait_for("message", timeout=60.0, check=check)
-                interval_time = response.content.strip().split()
-                if len(interval_time) == 1:
-                    seconds = int(interval_time[0])
-                    minutes = 0
-                    hours = 0
-                elif len(interval_time) == 2:
-                    seconds = int(interval_time[0])
-                    minutes = int(interval_time[1])
-                    hours = 0
-                elif len(interval_time) >= 3:
-                    seconds = int(interval_time[0])
-                    minutes = int(interval_time[1])
-                    hours = int(interval_time[2])
-                if seconds <= 1 or minutes < 0 or hours < 0:
-                    raise ValueError("Invalid time interval.")
-                else:
-                    self.custom_task.change_interval(
-                        seconds=seconds, minutes=minutes, hours=hours
-                    )
-                    self.custom_task.start(ctx.channel, task_content)
-                    self.tasks.append(task_name)
-                    await ctx.send(
-                        f"Task '{task_name}' was started in this channel and is running on a loop of: {hours}h: {minutes}m: {seconds}s"
-                    )
-                    break
-            except Exception as e:
-                await ctx.send(f"ERROR {e}")
-
-    @commands.command(aliases=["stop"])
-    async def stop_task(self, ctx, task_name):
-        """
-        Stops a task by its task_name
-        """
-        try:
-            for task in self.tasks:
-                if task.lower() == task_name.lower():
-                    # Stop the task and remove it from the task list
-                    self.custom_task.cancel()
-                    self.tasks.remove(task)
-                    await ctx.send(f"```Task '{task_name}' stopped```")
-                    return
-            await ctx.send(f"```Task '{task_name}' is not running in this channel```")
-        except Exception as e:
-            print(f"ERROR {e}")
-            await ctx.send(f"```ERROR {e}```")
+        # Check if the current time is 6:05 PM to fetch the latest video
+        now = datetime.now()
+        if now.hour == 18 and now.minute == 5:
+            logger.info("Fetching latest video from Rate My Takeaway's channel")
+            latest_video = query_latest_youtube_video_from_channel_id(
+                RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
+            )
+            logger.info(
+                "Fetched the latest video from Rate My Takeaway's channel - %s",
+                latest_video,
+            )
+            await channel.send(
+                f"Fetched the latest video from Rate My Takeaway's channel\nHere are the details: {latest_video['title']} - {latest_video['video_url']}"
+            )
         else:
-            await ctx.send(f"```Task '{task_name}' was *not* stopped```")
-
-    @commands.command(aliases=["twm"])
-    async def toggle_wednesday_meme(self, ctx):
-        """
-        Toggle the Wednesday meme task
-        """
-        if self.wednesday_meme.is_running():
-            self.wednesday_meme.cancel()
-            self.tasks.remove("wednesday")
-            await ctx.send(f"```Wednesday meme task stopped in {ctx.channel}.```")
-        else:
-            self.wednesday_meme.start(ctx.channel)
-            self.tasks.append("wednesday")
-            await ctx.send(f"```Wednesday meme task started in {ctx.channel}.```")
-
-    @tasks.loop(hours=1)
-    async def wednesday_meme(self, channel):
-        # Check if today is Wednesday and the current time is 9:00am EST
-        now = datetime.now(pytz.timezone("US/Eastern"))
-
-        not_sent = True
-        if now.weekday() == 2 and now.hour == 9:
-            while not_sent:
-                # Replace with your channel ID
-                await channel.send(file=discord.File("gifs/memes/wednesday.jpg"))
-                not_sent = False
-            not_sent = True
+            logger.info("Not the right time to fetch the latest video")
 
 
 async def setup(bot):
+    """
+    Add the cog to the bot
+    """
     await bot.add_cog(Tasks(bot))

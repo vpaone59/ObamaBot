@@ -51,6 +51,12 @@ class Tasks(commands.Cog):
         self.task_channels[task_name] = (
             ctx.channel.id
         )  # Store the channel ID with the task
+        logger.info(
+            "Task %s started by %s in channel %s",
+            task_name,
+            ctx.author.id,
+            ctx.channel.id,
+        )
         await ctx.send(f"The task {task_name} has been started.")
 
     @commands.command(aliases=["stop task", "end task", "stop", "end"])
@@ -66,9 +72,10 @@ class Tasks(commands.Cog):
         try:
             task.cancel()
             del self.tasks[task_name]
+            logger.info("Task %s stopped by %s", task_name, ctx.author.id)
             await ctx.send(f"Task '{task_name}' stopped")
         except Exception as e:
-            print(f"ERROR {e}")
+            logger.error("Error stopping task %s: %s", task_name, e)
             await ctx.send(f"ERROR {e}")
 
     @commands.command(aliases=["tasks", "status"])

@@ -101,23 +101,24 @@ class Tasks(commands.Cog):
         """
         Task to fetch the latest video from Rate My Takeaway's channel
         """
-        # Get the channel ID associated with the task
-        channel_id = self.task_channels.get("ratemytakeaway_task")  # Get channel ID
-        if channel_id is None:
-            logger.error(
-                "No channel associated with ratemytakeaway_task, but task is running. I would stop the task to avoid errors."
-            )
-            return
-
-        channel = self.bot.get_channel(channel_id)
-
-        if channel is None:
-            logger.error("Could not find channel with ID - %s", channel_id)
-            return
-
         # Check if the current time is 6:05 PM to fetch the latest video
         now = datetime.now()
-        if now.hour == 18 and now.minute == 5:
+        if now.hour == 11 and now.minute == 5:
+            # Get the channel ID associated with the task
+            channel_id = self.task_channels.get("ratemytakeaway_task")  # Get channel ID
+            if channel_id is None:
+                logger.error(
+                    "No channel associated with ratemytakeaway_task, but task is running. I would stop the task to avoid errors."
+                )
+                return
+
+            channel = self.bot.get_channel(channel_id)
+
+            if channel is None:
+                logger.error("Could not find channel with ID - %s", channel_id)
+                return
+
+            # Check if the current time is 6:05 PM to fetch the latest video
             logger.info("Fetching latest video from Rate My Takeaway's channel")
             latest_video = query_latest_youtube_video_from_channel_id(
                 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
@@ -126,11 +127,7 @@ class Tasks(commands.Cog):
                 "Fetched the latest video from Rate My Takeaway's channel - %s",
                 latest_video,
             )
-            await channel.send(
-                f"Fetched the latest video from Rate My Takeaway's channel\nHere are the details: {latest_video['title']} - {latest_video['video_url']}"
-            )
-        else:
-            logger.info("Not the right time to fetch the latest video")
+            await channel.send(f"{latest_video['title']} - {latest_video['video_url']}")
 
 
 async def setup(bot):

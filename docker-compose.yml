@@ -9,11 +9,6 @@ services:
     environment:
       # When using docker you'll need to just define the environment variables here because the .env file is ignored by docker.
       # Docker compose will read the .env file and set the environment variables for you.
-      - DISCORD_TOKEN # DO NOT remove this line. It is required for the bot to run.
-      - PREFIX # DO NOT remove this line. It is required for the bot to run.
-      - LOG_FILE_PATH
-      - DATABASE_FILE_PATH
-      - GIPHY_KEY # Required for the gif command to work.
-      - YOUTUBE_API_KEY # Required for the youtube command to work.
-      - GOOGLE_MAPS_API_KEY # Required for the food commands to work.
+      - DISCORD_TOKEN
+      - PREFIX
     restart: unless-stopped

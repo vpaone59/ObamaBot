@@ -33,24 +33,34 @@ class Tasks(commands.Cog):
         print(f"{self} ready")
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
-    async def start_task(self, ctx, task_name: str):
+    async def start_task(self, ctx, task_name: str, channel_id: int = None):
         """
         Start a task with the given name.
         """
+        # Check if the task exists and is a Loop task
         task = getattr(self, task_name, None)
         if task is None or not isinstance(task, tasks.Loop):
             await ctx.send(f"No task found with the name {task_name}.")
             return
 
+        # Check if the task is already running
         if task.is_running():
             await ctx.send(f"The task {task_name} is already running.")
             return
 
+        if channel_id is not None:
+            channel = self.bot.get_channel(channel_id)
+            if channel is None:
+                await ctx.send(f"Could not find channel with ID {channel_id}.")
+                return
+        # Start the task
         task.start()
+        # Store the channel ID with the task
         self.tasks[task_name] = task
         self.task_channels[task_name] = (
-            ctx.channel.id
-        )  # Store the channel ID with the task
+            channel if channel_id is not None else ctx.channel.id
+        )
+
         logger.info(
             "Task %s started by %s in channel %s",
             task_name,

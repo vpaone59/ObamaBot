@@ -5,31 +5,33 @@ A general purpose Discord Bot with some fun interactions. Used as a base to lear
 Migrating to discordpy 2.0 --- https://discordpy.readthedocs.io/en/latest/migrating.html
 
 ## Running locally without Docker:
-Must have a Discord Bot Token ready. Place Token in the SAMPLE.env file. Rename SAMPLE.env file to ".env" (without quotes).
-requires Python3.8 >=
+Must have a Discord Bot Token https://discord.com/developers/applications.
+Requires Python3.8 >=
 
 ### If you're running Python >= 3.12 you might need to manually install setuptools.
 ```
 pip install setuptools 
 ```
 
-### Activate a virtual environment
+### Setup .env, install requirements and activate a virtual environment
 ```
+cp SAMPLE.env .env
+Place Discord Token in .env
+
 pip install -r requirements.txt
 python main.py
 ```
 
 ## Running with Docker:
 I recommend setting up the logging file map in the docker-compose.yml. You can update the left file path with the one on your host system. Optionally you can map the SQLite database from the container to your host machine.
-!!! These files must exist on the host system. They will not be created automatically.
+These files must exist on the host system. They will not be created automatically.
 
 ```
 volumes:
     ~\Documents\logs\ObamaBot\bot.log:/app/logs/bot.log
     ~\Documents\database\obamabot.db:/app/database/obamabot.db
 ```
-
-
+DISCORD_TOKEN and PREFIX are added to the docker-compose.yml as they are necessary for the bot to run. All other environment variables are unnecessary.
 
 ### To build the container and then run it
 ```

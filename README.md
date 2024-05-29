@@ -25,17 +25,17 @@ I recommend setting up the logging file map in the docker-compose.yml. You can u
 
 ```
 volumes:
-    ~\Documents\code\logs\ObamaBot\bot.log:/app/logs/bot.log
-    ~\Documents\code\database\obamabot.db:/app/database/obamabot.db
+    ~\Documents\logs\ObamaBot\bot.log:/app/logs/bot.log
+    ~\Documents\database\obamabot.db:/app/database/obamabot.db
 ```
 
-The .env file is ignored by Docker, so you need to simply define the environment variables you want to use in docker-compose.yml before running the container. Some of these are done for you like the necessary ones DISCORD_TOKEN and PREFIX.
+
 
 ### To build the container and then run it
 ```
-docker build . -t obama-bot
+docker build -t your_container_name .
 
-docker run -d obama-bot
+docker run -e DISCORD_TOKEN= -e PREFIX= -d your_container_name
 ```
 
 ### Run with docker-compose.yml

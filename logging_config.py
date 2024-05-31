@@ -1,3 +1,9 @@
+"""
+Vincent Paone
+
+This module configures a logger for the bot. The logger logs to a file and the console.
+"""
+
 import os
 import logging
 from datetime import datetime
@@ -15,7 +21,7 @@ if not os.path.exists(log_file_path):
         pass
 
 
-def setup_logging(logger_name=__name__, log_file="./logs/bot.log"):
+def create_new_logger(logger_name=__name__, log_file="./logs/bot.log"):
     """
     Configures a logger for the bot.
     """

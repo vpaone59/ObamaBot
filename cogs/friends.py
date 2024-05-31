@@ -8,9 +8,9 @@ import os
 import random
 import discord
 from discord.ext import commands
-from logging_config import setup_logging
+from logging_config import create_new_logger
 
-logger = setup_logging(__name__)
+logger = create_new_logger(__name__)
 
 FRIEND_GUILDS = os.getenv("FRIEND_GUILD_IDS")
 

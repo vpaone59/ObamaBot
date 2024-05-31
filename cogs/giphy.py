@@ -9,13 +9,13 @@ import os
 import json
 from urllib import parse, request
 from discord.ext import commands
-from logging_config import setup_logging
+from logging_config import create_new_logger
 
 # Grab Giphy key & assign url to variable
 GIPHY_KEY = os.getenv("GIPHY_KEY")
 URL = "http://api.giphy.com/v1/gifs/search"
 
-logger = setup_logging(__name__)
+logger = create_new_logger(__name__)
 
 
 class GifGenerator(commands.Cog):

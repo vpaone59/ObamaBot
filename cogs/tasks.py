@@ -10,9 +10,9 @@ from cogs.youtube import (
     RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID,
     query_latest_youtube_video_from_channel_id,
 )
-from logging_config import setup_logging
+from logging_config import create_new_logger
 
-logger = setup_logging()
+logger = create_new_logger()
 
 
 class Tasks(commands.Cog):

@@ -1,9 +1,9 @@
 from discord.ext import commands
 import sqlite3
 import os
-from logging_config import setup_logging
+from logging_config import create_new_logger
 
-logger = setup_logging(__name__)
+logger = create_new_logger(__name__)
 DB_PATH = os.getenv("DB_PATH")
 
 

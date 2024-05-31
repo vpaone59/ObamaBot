@@ -5,10 +5,10 @@ import discord
 from dotenv import load_dotenv
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
-from logging_config import setup_logging
+from logging_config import create_new_logger
 
 # Initialize main logger for the bot
-logger = setup_logging(__name__)
+logger = create_new_logger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()

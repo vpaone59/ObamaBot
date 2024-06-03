@@ -12,8 +12,9 @@ logger = create_new_logger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
+logger.info("Environment variables loaded")
 
-# Configure Discord bot intents and grab token
+# Configure Discord bot intents and grab token from environment variables
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
@@ -49,8 +50,7 @@ async def on_message(message):
     """
     This function is called whenever a message is sent in any channel of any guild.
 
-    Args:
-        message: The message object containing information about the sent message.
+    param: message - The message object that was sent in a channel
     """
     # Ignore messages from the bot itself and other bots to prevent infinite loops
     if message.author == bot.user or message.author.bot:
@@ -79,8 +79,8 @@ async def load_cog(ctx, cog_name):
     """
     Loads a specific Cog file.
 
-    param: ctx - The context object containing information about the command invocation.
-    param: cog_name - The name of the Cog file to load (without the .py extension).
+    param: ctx - The context in which the command is entered
+    param: cog_name - The name of the Cog file to load
     """
     try:
         await bot.load_extension(f"cogs.{cog_name}")
@@ -102,7 +102,7 @@ async def unload_cog(ctx, cog_name):
     Unload a Cog file
 
     param: ctx - The context of which the command is entered
-    param: extension - The name of the Cog file to unload
+    param: cog_name - The name of the Cog file to unload
     """
     try:
         await bot.unload_extension(f"cogs.{cog_name}")
@@ -117,11 +117,11 @@ async def unload_cog(ctx, cog_name):
         await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
 
 
-@bot.command(aliases=["rl"], help="Reloads all Cog files")
+@bot.command(aliases=["rl"], help="Reloads a specific Cog or all Cogs by default")
 @commands.has_permissions(administrator=True)
 async def reload_cog(ctx, cog_name=""):
     """
-    Reload a specific Cog file or all Cogs by default
+    Reloads a specific Cog file or all Cogs by default
 
     param: ctx - The context in which the command has been executed
     param: cog_name - The name of the Cog file to reload
@@ -155,8 +155,6 @@ async def reload_cog(ctx, cog_name=""):
 
 
 @bot.command()
-# @commands.guild_only()
-# @commands.is_owner()
 async def sync(
     ctx: Context,
     guilds: Greedy[discord.Object],
@@ -174,22 +172,30 @@ async def sync(
     If you change a global to a guild command, or vice versa.
     NOTE: If you do this, you will need to sync both global and to that guild to reflect the change.
     These are currently the only times you should re-sync.
+
+    param: ctx - The context in which the command is entered
+    param: guilds - The guilds to sync the commands to
+    param: spec - The specification for syncing the commands
     """
-    print("running")
+    logger.info("Syncing commands")
 
     if not guilds:
         if spec == "~":
+            # Sync to the current guild
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "*":
+            # Sync globally
             ctx.bot.tree.copy_global_to(guild=ctx.guild)
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "^":
+            # Clear the current guild's commands
             ctx.bot.tree.clear_commands(guild=ctx.guild)
             await ctx.bot.tree.sync(guild=ctx.guild)
             synced = []
         else:
             synced = await ctx.bot.tree.sync()
 
+        logger.info("Synced %s commands", len(synced))
         await ctx.send(
             f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
         )

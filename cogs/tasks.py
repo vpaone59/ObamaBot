@@ -120,7 +120,7 @@ class Tasks(commands.Cog):
         """
         # Check if the current time is 6:05 PM to fetch the latest video
         now = datetime.now()
-        if now.hour == 11 and now.minute == 5:
+        if now.hour == 14 and now.minute == 5:
             # Get the channel ID associated with the task
             channel_id = self.task_channels.get("ratemytakeaway_task")  # Get channel ID
             if channel_id is None:

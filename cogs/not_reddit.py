@@ -2,11 +2,11 @@
 https://github.com/vpaone59
 """
 
-from discord.ext import commands
 import os
 import datetime
-import asyncpraw
 import random
+from discord.ext import commands
+import asyncpraw
 
 CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")

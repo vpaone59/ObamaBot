@@ -10,8 +10,6 @@ import asyncpraw
 
 CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
-USERNAME = os.getenv("REDDIT_USERNAME")
-PASSWORD = os.getenv("REDDIT_PASSWORD")
 USER_AGENT = os.getenv("REDDIT_USER_AGENT")
 
 
@@ -25,8 +23,6 @@ class Not_Reddit(commands.Cog):
         self.reddit = asyncpraw.Reddit(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
-            password=PASSWORD,
-            username=USERNAME,
             user_agent=USER_AGENT,
         )
 

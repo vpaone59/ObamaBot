@@ -41,8 +41,8 @@ class Not_Reddit(commands.Cog):
         await subreddit.load()
         return subreddit.over18
 
-    @commands.command(aliases=["re"])
-    async def get_latest_post(self, ctx, subreddit):
+    @commands.command(aliases=["lp", "get_latest_post"])
+    async def get_latest_post_from_subreddit(self, ctx, subreddit):
         """
         Get the most recent post on a non-NSFW subreddit
         """
@@ -68,17 +68,17 @@ class Not_Reddit(commands.Cog):
                 # Display the time difference based on the condition
                 if hours_ago >= 1:
                     await ctx.send(
-                        f"```Latest post from r/{post.subreddit} {hours_ago} hours ago:\nUpvotes: {post.score}\nTitle: {post.title}\nOP: {post.author}\nURL:``` {post.url}"
+                        f"Latest post from r/{post.subreddit} {hours_ago} hours ago:\nUpvotes: {post.score}\nTitle: {post.title}\nOP: {post.author}\nURL: {post.url}"
                     )
                 else:
                     await ctx.send(
-                        f"```Latest post from r/{post.subreddit} {minutes_ago} minutes ago:\nUpvotes: {post.score}\nTitle: {post.title}\nOP: {post.author}\nURL:```{post.url}"
+                        f"Latest post from r/{post.subreddit} {minutes_ago} minutes ago:\nUpvotes: {post.score}\nTitle: {post.title}\nOP: {post.author}\nURL:{post.url}"
                     )
 
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
 
-    @commands.command(aliases=["rr"])
+    @commands.command(aliases=["rp", "get_random_post"])
     async def get_random_post_from_prev_day(self, ctx, subreddit):
         """
         Get a random Reddit post from a non-NSFW subreddit within the last 24 hours
@@ -127,11 +127,11 @@ class Not_Reddit(commands.Cog):
             # Display the time difference based on the condition
             if hours_ago >= 1:
                 await ctx.send(
-                    f"```Random post from r/{random_post.subreddit} {hours_ago} hours ago:\nUpvotes: {random_post.score}\nTitle: {random_post.title}\nOP: {random_post.author}\nURL:``` {random_post.url}"
+                    f"Random post from r/{random_post.subreddit} {hours_ago} hours ago:\nUpvotes: {random_post.score}\nTitle: {random_post.title}\nOP: {random_post.author}\nURL: {random_post.url}"
                 )
             else:
                 await ctx.send(
-                    f"```Random post from r/{random_post.subreddit} {minutes_ago} minutes ago:\nUpvotes: {random_post.score}\nTitle: {random_post.title}\nOP: {random_post.author}\nURL:``` {random_post.url}"
+                    f"Random post from r/{random_post.subreddit} {minutes_ago} minutes ago:\nUpvotes: {random_post.score}\nTitle: {random_post.title}\nOP: {random_post.author}\nURL: {random_post.url}"
                 )
 
         except Exception as e:

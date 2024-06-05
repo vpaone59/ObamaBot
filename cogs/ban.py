@@ -15,12 +15,12 @@ from discord.ext import commands
 if os.path.exists("./banned.json"):
     with open("./banned.json") as f:
         bannedWordsData = json.load(f)
+        # assign current banned words list to variable for use later
+        bannedWords = bannedWordsData["bannedWords"]
 else:
     bannedTemplate = {"bannedWords": []}
     with open("./banned.json", "w+") as f:
         json.dump(bannedTemplate, f)
-# assign current banned words list to variable for use later
-bannedWords = bannedWordsData["bannedWords"]
 
 
 class Ban(commands.Cog):

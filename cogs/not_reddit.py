@@ -13,7 +13,7 @@ CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
 USER_AGENT = os.getenv("REDDIT_USER_AGENT")
 
 
-class Not_Reddit(commands.Cog):
+class NotReddit(commands.Cog):
     """
     Reddit API thingy
     """
@@ -135,4 +135,4 @@ class Not_Reddit(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Not_Reddit(bot))
+    await bot.add_cog(NotReddit(bot))

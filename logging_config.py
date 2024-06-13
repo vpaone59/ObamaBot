@@ -4,6 +4,7 @@ Vincent Paone
 This module configures a logger for the bot. The logger logs to a file and the console.
 """
 
+import json
 import os
 import logging
 from datetime import datetime
@@ -21,9 +22,27 @@ if not os.path.exists(log_file_path):
         pass
 
 
+class JsonFormatter(logging.Formatter):
+    """
+    Custom formatter for logging in JSON format.
+    """
+
+    def format(self, record):
+        log_record = {
+            "asctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "name": record.name,
+            "levelname": record.levelname,
+            "message": record.getMessage(),
+        }
+        # Adjust time zone to EST for more accurate logging
+        est = pytz.timezone("US/Eastern")
+        log_record["asctime"] = datetime.now(est).strftime("%Y-%m-%d %H:%M:%S")
+        return json.dumps(log_record)
+
+
 def create_new_logger(logger_name=__name__, log_file="./logs/bot.log"):
     """
-    Configures a logger for the bot.
+    Create a new logger with the specified name and log file.
     """
     # Check if logger with specified name already exists
     if logger_name in logging.Logger.manager.loggerDict:
@@ -33,22 +52,17 @@ def create_new_logger(logger_name=__name__, log_file="./logs/bot.log"):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
 
-    # Create a file handler for logging to a file
+    # Create a handler for logging to a file
     file_handler = logging.FileHandler(log_file)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-
-    # Adjust time zone to EST for more accurate logging
-    est = pytz.timezone("US/Eastern")
-    formatter.converter = lambda *args: datetime.now(est).timetuple()
-
-    file_handler.setFormatter(formatter)
+    json_formatter = JsonFormatter()
+    file_handler.setFormatter(json_formatter)
     logger.addHandler(file_handler)
 
-    # Create a stream handler for logging to the console
+    # Create a handler for logging to stdout
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
+    stream_handler.setFormatter(json_formatter)
     logger.addHandler(stream_handler)
+
+    logger.info("Logger %s created", logger_name)
 
     return logger

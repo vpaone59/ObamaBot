@@ -5,8 +5,6 @@ This Cog is custom made for a specific server and will not work in normal server
 """
 
 import os
-import random
-import discord
 from discord.ext import commands
 from logging_config import create_new_logger
 

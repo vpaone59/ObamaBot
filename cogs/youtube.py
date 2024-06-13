@@ -7,10 +7,6 @@ from datetime import datetime
 import logging
 from discord.ext import commands
 import googleapiclient.discovery
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 # Rate My Takeaway's YouTube channel ID
 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"

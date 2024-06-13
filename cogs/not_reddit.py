@@ -28,6 +28,9 @@ class NotReddit(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        Prints a message when the bot is ready
+        """
         print(f"{self} ready")
 
     async def is_nsfw(self, subreddit):
@@ -135,4 +138,7 @@ class NotReddit(commands.Cog):
 
 
 async def setup(bot):
+    """
+    Adds the cog to the bot
+    """
     await bot.add_cog(NotReddit(bot))

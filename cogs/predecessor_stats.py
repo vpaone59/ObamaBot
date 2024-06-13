@@ -222,5 +222,7 @@ def format_date(date_string):
 
 
 async def setup(bot):
-    """ """
+    """
+    Adds the PredecessorStats cog to the bot
+    """
     await bot.add_cog(PredecessorStats(bot))

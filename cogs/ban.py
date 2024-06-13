@@ -13,13 +13,13 @@ from discord.ext import commands
 # find 'banned.json'
 # if it doesn't exist, auto create a new one from template
 if os.path.exists("./banned.json"):
-    with open("./banned.json") as f:
+    with open("./banned.json", encoding="utf-8") as f:
         bannedWordsData = json.load(f)
         # assign current banned words list to variable for use later
         bannedWords = bannedWordsData["bannedWords"]
 else:
     bannedTemplate = {"bannedWords": []}
-    with open("./banned.json", "w+") as f:
+    with open("./banned.json", "w+", encoding="utf-8") as f:
         json.dump(bannedTemplate, f)
 
 
@@ -126,4 +126,7 @@ def check_msg_contain_word(msg, word):
 
 
 async def setup(bot):
+    """
+    Add the Ban cog to the bot
+    """
     await bot.add_cog(Ban(bot))

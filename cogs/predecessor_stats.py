@@ -1,5 +1,5 @@
 """
-https://github.com/vpaone59
+Predecessor Game API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
 from datetime import datetime, timezone, timedelta

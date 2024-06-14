@@ -1,5 +1,5 @@
 """
-https://github.com/vpaone59
+YouTube API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
 import os

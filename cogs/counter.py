@@ -1,3 +1,7 @@
+"""
+Counter Cog for ObamaBot https://github.com/vpaone59
+"""
+
 from discord.ext import commands
 import sqlite3
 import os

@@ -1,5 +1,5 @@
 """
-https://github.com/vpaone59
+Stock Cog for ObamaBot https://github.com/vpaone59
 """
 
 import os

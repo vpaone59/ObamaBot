@@ -1,5 +1,5 @@
 """
-Vincent Paone
+https://github.com/vpaone59
 
 This module configures a logger for the bot. The logger logs to a file and the console.
 """

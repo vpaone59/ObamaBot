@@ -1,5 +1,5 @@
 """
-GIF Generator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+Giphy API integrator Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 
 Utilizes the Giphy API
 """

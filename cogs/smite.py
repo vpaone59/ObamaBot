@@ -1,3 +1,7 @@
+"""
+Custom Smite Cog commands for ObamaBot https://github.com/vpaone59
+"""
+
 import random
 import json
 import discord

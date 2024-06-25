@@ -11,11 +11,10 @@ from urllib import parse, request
 from discord.ext import commands
 from logging_config import create_new_logger
 
+logger = create_new_logger(__name__)
 # Grab Giphy key & assign url to variable
 GIPHY_KEY = os.getenv("GIPHY_KEY")
 URL = "http://api.giphy.com/v1/gifs/search"
-
-logger = create_new_logger(__name__)
 
 
 class GifGenerator(commands.Cog):
@@ -29,9 +28,9 @@ class GifGenerator(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command(aliases=["gq", "gif", "giphy"])
     @commands.cooldown(1, 5, commands.BucketType.user)

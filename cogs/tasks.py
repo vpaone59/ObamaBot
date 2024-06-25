@@ -28,9 +28,14 @@ class Tasks(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info(f"{self} ready")
+        try:
+            self.ratemytakeaway_task.start()
+            logger.info("ratemytakeaway_task started")
+        except Exception as e:
+            logger.error("Error starting ratemytakeaway_task : %s", e)
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
     async def start_task(self, ctx, task_name: str, channel_id: int = None):
@@ -53,8 +58,10 @@ class Tasks(commands.Cog):
             if channel is None:
                 await ctx.send(f"Could not find channel with ID {channel_id}.")
                 return
+
         # Start the task
         task.start()
+
         # Store the channel ID with the task
         self.tasks[task_name] = task
         self.task_channels[task_name] = (

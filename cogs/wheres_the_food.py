@@ -3,12 +3,13 @@ Google Maps API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
 import os
-import logging
 from discord.ext import commands
 import requests
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 GOOGLE_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-logger = logging.getLogger(__name__)
 
 
 class WheresTheFood(commands.Cog):
@@ -24,7 +25,7 @@ class WheresTheFood(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command()
     async def food_search(self, ctx, *keywords):

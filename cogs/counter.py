@@ -20,6 +20,13 @@ class Counter(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_ready(self):
+        """
+        Runs when the cog is loaded
+        """
+        logger.info("%s ready", self)
+
+    @commands.Cog.listener()
     async def on_message(self, message):
         """
         On every message we are going to check if it matches an entry in the database

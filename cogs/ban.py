@@ -9,18 +9,21 @@ import json
 import os
 import re
 from discord.ext import commands
+from logging_config import create_new_logger
 
-# find 'banned.json'
-# if it doesn't exist, auto create a new one from template
+logger = create_new_logger()
+# create banned.json if it doesn't exist
 if os.path.exists("./banned.json"):
     with open("./banned.json", encoding="utf-8") as f:
         bannedWordsData = json.load(f)
         # assign current banned words list to variable for use later
         bannedWords = bannedWordsData["bannedWords"]
+        logger.info("Banned words loaded")
 else:
     bannedTemplate = {"bannedWords": []}
     with open("./banned.json", "w+", encoding="utf-8") as f:
         json.dump(bannedTemplate, f)
+        logger.info("banned.json created")
 
 
 class Ban(commands.Cog):
@@ -34,9 +37,9 @@ class Ban(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.Cog.listener()
     async def on_message(self, message):

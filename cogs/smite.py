@@ -7,6 +7,9 @@ import json
 import discord
 from discord import app_commands
 from discord.ext import commands
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 with open("./dynamic/smite_gods.json", "r", encoding="utf-8") as file:
     god_list = json.load(file)
@@ -26,7 +29,10 @@ class SmiteShuffler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"{self} ready")
+        """
+        Runs when the cog is loaded
+        """
+        logger.info("%s ready", self)
 
     @commands.command(description="Syncs the Smite.py Cog to Discord")
     @commands.cooldown(1, 10, commands.BucketType.user)

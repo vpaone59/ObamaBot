@@ -5,6 +5,9 @@ Roles Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 import discord
 from discord.ext import commands
 from discord.utils import get
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 
 class Roles(commands.Cog, name="Roles"):
@@ -18,9 +21,9 @@ class Roles(commands.Cog, name="Roles"):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command(name="hasrole", aliases=["hr"])
     @commands.cooldown(1, 3, commands.BucketType.user)

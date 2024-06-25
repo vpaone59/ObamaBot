@@ -10,7 +10,9 @@ import discord
 from discord.ext import commands
 import cv2
 import os
+from logging_config import create_new_logger
 
+logger = create_new_logger()
 # number of cameras active and an index to identify each
 active_cam_nums = [1, 2, 3]
 
@@ -27,7 +29,7 @@ class Camcap(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
         print(f"{self} ready")
 

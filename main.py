@@ -25,6 +25,11 @@ async def main():
     """
     The main function that starts the Discord bot.
     """
+    try:
+        await load_all_cogs()
+    except Exception as e:
+        logger.error("Bot not ready: %s", e)
+
     async with bot:
         await bot.start(BOT_TOKEN)
         logger.info("TOKEN grabbed\n Starting bot")
@@ -39,10 +44,10 @@ async def on_ready():
     """
     logger.info("Logged in as %s", bot.user)
 
-    try:
-        await load_all_cogs()
-    except Exception as e:
-        logger.error("Bot not ready: %s", e)
+    # try:
+    #     await load_all_cogs()
+    # except Exception as e:
+    #     logger.error("Bot not ready: %s", e)
 
 
 @bot.event

@@ -7,6 +7,9 @@ import datetime
 import requests
 from discord.ext import commands
 from polygon import RESTClient
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 polygon_key = os.getenv("POLYGON_API_KEY")
 client = RESTClient(polygon_key)
@@ -23,7 +26,10 @@ class Insider_trading(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"{self} ready")
+        """
+        Runs when the cog is loaded
+        """
+        logger.info("%s ready", self)
 
     @commands.command(aliases=["tick"])
     async def get_ticker_aggregate(self, ctx, ticker):

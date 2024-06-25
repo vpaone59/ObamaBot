@@ -27,9 +27,9 @@ class Friends(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.Cog.listener()
     async def on_message(self, message):

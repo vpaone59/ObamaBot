@@ -4,6 +4,9 @@ Media Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 
 import discord
 from discord.ext import commands
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 
 class Media(commands.Cog):
@@ -17,9 +20,9 @@ class Media(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.Cog.listener("on_message")
     async def obama_message(self, message):

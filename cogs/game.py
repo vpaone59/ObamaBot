@@ -5,6 +5,9 @@ Game Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 import asyncio
 import random
 from discord.ext import commands
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 
 class Game(commands.Cog):
@@ -18,9 +21,9 @@ class Game(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.guild)

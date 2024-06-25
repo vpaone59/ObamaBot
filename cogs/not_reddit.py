@@ -7,6 +7,9 @@ import datetime
 import random
 from discord.ext import commands
 import asyncpraw
+from logging_config import create_new_logger
+
+logger = create_new_logger()
 
 CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
@@ -29,9 +32,9 @@ class NotReddit(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        Prints a message when the bot is ready
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     async def is_nsfw(self, subreddit):
         """

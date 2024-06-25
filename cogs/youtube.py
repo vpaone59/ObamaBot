@@ -4,13 +4,13 @@ YouTube API integrator Cog for ObamaBot https://github.com/vpaone59
 
 import os
 from datetime import datetime
-import logging
 from discord.ext import commands
 import googleapiclient.discovery
+from logging_config import create_new_logger
 
+logger = create_new_logger()
 # Rate My Takeaway's YouTube channel ID
 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"
-logger = logging.getLogger(__name__)
 
 
 class Youtube(commands.Cog):
@@ -20,6 +20,13 @@ class Youtube(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        """
+        Runs when the cog is loaded
+        """
+        logger.info("%s ready", self)
 
     @commands.command(aliases=["get latest video", "latest video", "latest"])
     async def get_latest_video_command(

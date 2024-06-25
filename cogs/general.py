@@ -4,11 +4,11 @@ General Commands Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 These are general use commands that any bot should have by default.
 """
 
-import logging
 import discord
 from discord.ext import commands
+from logging_config import create_new_logger
 
-logger = logging.getLogger(__name__)
+logger = create_new_logger()
 
 
 class General(commands.Cog):
@@ -22,9 +22,9 @@ class General(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        runs when Cog is loaded and ready to use
+        Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command(aliases=["hey", "hi"])
     @commands.cooldown(1, 2, commands.BucketType.user)

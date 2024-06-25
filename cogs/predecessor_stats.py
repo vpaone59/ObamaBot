@@ -21,7 +21,7 @@ class PredecessorStats(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        Runs once the Cog successfully loads
+        Runs when the cog is loaded
         """
         logger.info("%s ready", self)
 

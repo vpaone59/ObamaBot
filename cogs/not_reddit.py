@@ -9,7 +9,7 @@ from discord.ext import commands
 import asyncpraw
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 
 CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")

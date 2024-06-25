@@ -12,7 +12,7 @@ from cogs.youtube import (
 )
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 
 
 class Tasks(commands.Cog):

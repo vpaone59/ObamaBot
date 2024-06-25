@@ -11,7 +11,7 @@ import re
 from discord.ext import commands
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 # create banned.json if it doesn't exist
 if os.path.exists("./banned.json"):
     with open("./banned.json", encoding="utf-8") as f:

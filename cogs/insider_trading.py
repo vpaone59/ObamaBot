@@ -9,7 +9,7 @@ from discord.ext import commands
 from polygon import RESTClient
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 
 polygon_key = os.getenv("POLYGON_API_KEY")
 client = RESTClient(polygon_key)

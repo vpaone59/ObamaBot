@@ -12,7 +12,7 @@ import cv2
 import os
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 # number of cameras active and an index to identify each
 active_cam_nums = [1, 2, 3]
 
@@ -31,7 +31,7 @@ class Camcap(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        print(f"{self} ready")
+        logger.info("%s ready", self)
 
     @commands.command(aliases=["catcap", "catpic", "catsnap", "cat"])
     @commands.cooldown(1, 6, commands.BucketType.user)

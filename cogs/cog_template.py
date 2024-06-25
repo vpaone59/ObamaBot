@@ -3,9 +3,6 @@ https://github.com/vpaone59
 """
 
 from discord.ext import commands
-from logging_config import create_new_logger
-
-logger = create_new_logger()
 
 
 class COG_NAME(commands.Cog):
@@ -21,7 +18,7 @@ class COG_NAME(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        pass
 
 
 async def setup(bot):

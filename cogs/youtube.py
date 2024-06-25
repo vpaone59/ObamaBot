@@ -8,7 +8,7 @@ from discord.ext import commands
 import googleapiclient.discovery
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 # Rate My Takeaway's YouTube channel ID
 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID = "UCd03Ksc7VNypelv_TM3SjSg"
 

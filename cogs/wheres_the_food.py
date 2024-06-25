@@ -7,7 +7,7 @@ from discord.ext import commands
 import requests
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 
 GOOGLE_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 

@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.utils import get
 from logging_config import create_new_logger
 
-logger = create_new_logger()
+logger = create_new_logger(__name__)
 
 
 class Roles(commands.Cog, name="Roles"):

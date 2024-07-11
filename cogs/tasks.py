@@ -133,31 +133,36 @@ class Tasks(commands.Cog):
                 f"Task '{task_name}' is {status}{channel_info}{next_iteration_info}"
             )
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(hours=1)
     async def ratemytakeaway_task(self):
         """
         Task to fetch the latest video from Rate My Takeaway's channel
         """
+        # Check if the current time is 2 PM EST (6 PM UTC) to run the task
         now = datetime.now()
-        if now.hour == 22:
+        if now.hour == 14:
+            # Get the channel to send the message to
             rmt_channel_info = self.running_tasks.get("ratemytakeaway_task")
             rmt_channel = rmt_channel_info["channel"]
+
             if rmt_channel is None:
                 logger.error(
                     "No channel associated with ratemytakeaway_task, but task is running."
                 )
                 return
 
-            logger.info("Fetching latest video from Rate My Takeaway's channel")
+            # Fetch the latest video from Rate My Takeaway's channel
             latest_video = query_latest_youtube_video_from_channel_id(
                 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
             )
+
+            await rmt_channel.send(
+                f"{latest_video['title']} - {latest_video['video_url']}"
+            )
+
             logger.info(
                 "Fetched the latest video from Rate My Takeaway's channel - %s",
                 latest_video,
-            )
-            await rmt_channel.send(
-                f"{latest_video['title']} - {latest_video['video_url']}"
             )
 
 

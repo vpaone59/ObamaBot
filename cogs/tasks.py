@@ -5,7 +5,7 @@ Setup tasks to run periodically in your server.
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 from cogs.youtube import (
     RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID,
@@ -60,8 +60,15 @@ class Tasks(commands.Cog):
             logger.info("Could not find channel with ID %s", channel_id)
             return
 
-        # Store the task name and channel ID in the running_tasks dictionary
-        self.running_tasks[task_name] = {"channel": channel}
+        # Store the task and channel ID in the running_tasks dictionary
+        self.running_tasks[task_name] = {"task": task, "channel": channel}
+
+        # Start the task. This is the last thing done because it will also run the task, so we wait until the end to start it.
+        try:
+            task.start()
+        except Exception as e:
+            await ctx.send(f"ERROR {e}")
+            logger.error("Error starting task %s: %s", task_name, e)
 
         # Send a message to the channel where the start task command was ran from
         await ctx.send(f"The task {task_name} has been started.")
@@ -72,24 +79,18 @@ class Tasks(commands.Cog):
             channel,
         )
 
-        # Start the task. This is the last thing done because it will also run the task, so we wait until the end to start it.
-        try:
-            task.start()
-        except Exception as e:
-            await ctx.send(f"ERROR {e}")
-            logger.error("Error starting task %s: %s", task_name, e)
-
     @commands.command(aliases=["stop task", "end task", "stop", "end"])
     async def stop_task(self, ctx, task_name: str):
         """
         Stop a task with the given name.
         """
-        task = self.running_tasks.get(task_name)
-        if task is None:
-            await ctx.send(f"Task '{task_name}' is not running in this channel")
+        task_info = self.running_tasks.get(task_name)
+        if task_info is None:
+            await ctx.send(f"Task '{task_name}' is not running.")
             return
 
         try:
+            task = task_info["task"]
             task.cancel()
             del self.running_tasks[task_name]
             await ctx.send(f"Task '{task_name}' stopped")
@@ -103,22 +104,28 @@ class Tasks(commands.Cog):
         """
         Show the status and details of all tasks.
         """
-        print("ok")
         # Check if there are any tasks running
         if not self.running_tasks:
             await ctx.send("No tasks have been started yet.")
             return
 
         # Iterate through all the tasks and send a message with the status of each task
-        for task_name, task in self.running_tasks.items():
+        for task_name, task_info in self.running_tasks.items():
+            task = task_info["task"]
+            task_channel = task_info["channel"]
             status = "running" if task.is_running() else "stopped"
-            channel_id = self.running_tasks.get(task_name)
-            channel_info = f" (in channel <#{channel_id}>)" if channel_id else ""
 
-            next_iteration = task.next_iteration
+            channel_info = (
+                f" (in channel <#{task_channel.id}>)" if task_channel.id else ""
+            )
+
+            next_iteration = task_info.get("task").next_iteration
             if next_iteration is not None:
-                next_iteration_str = next_iteration.strftime("%m-%d-%y %H:%M:%S")
-                next_iteration_info = f", next run at {next_iteration_str}"
+                adjusted_next_iteration = next_iteration - timedelta(hours=4)
+                next_iteration_info = (
+                    ", next run at "
+                    + adjusted_next_iteration.strftime("%m-%d-%y %H:%M:%S")
+                )
             else:
                 next_iteration_info = ""
 
@@ -131,7 +138,6 @@ class Tasks(commands.Cog):
         """
         Task to fetch the latest video from Rate My Takeaway's channel
         """
-        # Check if the current time is 6:05 PM to fetch the latest video
         now = datetime.now()
         if now.hour == 22:
             rmt_channel_info = self.running_tasks.get("ratemytakeaway_task")
@@ -142,7 +148,6 @@ class Tasks(commands.Cog):
                 )
                 return
 
-            # Check if the current time is 6:05 PM to fetch the latest video
             logger.info("Fetching latest video from Rate My Takeaway's channel")
             latest_video = query_latest_youtube_video_from_channel_id(
                 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID

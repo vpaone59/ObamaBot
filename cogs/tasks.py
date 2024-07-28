@@ -140,7 +140,7 @@ class Tasks(commands.Cog):
         """
         # Check if the current time is 2 PM EST (6 PM UTC) to run the task
         now = datetime.now()
-        if now.hour == 14:
+        if now.hour == 13:
             # Get the channel to send the message to
             rmt_channel_info = self.running_tasks.get("ratemytakeaway_task")
             rmt_channel = rmt_channel_info["channel"]

@@ -56,8 +56,9 @@ class Friends(commands.Cog):
         ):
             await message.add_reaction("♿")
 
-    @commands.command()
+    @commands.command(aliases=["togr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.has_permissions(administrator=True)
     async def toggle_message_reactions(self, ctx, user: discord.Member = None):
         """
         Toggle reactions for a user's messages.
@@ -93,8 +94,9 @@ class Friends(commands.Cog):
         except Exception as e:
             logger.error("Error toggling message reactions: %s", e)
 
-    @commands.command(aliases=["lock", "lockguild"])
+    @commands.command(aliases=["lock", "lockguilds"])
     @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.has_permissions(administrator=True)
     async def toggle_friend_guilds_lock(self, ctx):
         """
         Toggle friend guilds lock. Prevents commands in this Cog from being used in non-friend guilds.

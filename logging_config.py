@@ -60,7 +60,6 @@ def create_new_logger(logger_name=__name__, log_file="./logs/bot.log"):
 
     # Create a handler for logging to stdout
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(json_formatter)
     logger.addHandler(stream_handler)
 
     logger.info("Logger %s created", logger_name)

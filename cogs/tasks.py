@@ -25,6 +25,7 @@ class Tasks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.running_tasks = {}
+        self.previous_video_url = None
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -156,14 +157,22 @@ class Tasks(commands.Cog):
                 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
             )
 
-            await rmt_channel.send(
-                f"{latest_video['title']} - {latest_video['video_url']}"
-            )
+            # Check if the latest video is different from the previous one
+            if latest_video["video_url"] != self.previous_video_url:
+                await rmt_channel.send(
+                    f"{latest_video['title']} - {latest_video['video_url']}"
+                )
+                self.previous_video_url = latest_video["video_url"]
 
-            logger.info(
-                "Fetched the latest video from Rate My Takeaway's channel - %s",
-                latest_video,
-            )
+                logger.info(
+                    "Fetched the latest video from Rate My Takeaway's channel - %s",
+                    latest_video["video_url"],
+                )
+            else:
+                logger.info(
+                    "Previous video url is the same as the latest video url - %s",
+                    latest_video["video_url"],
+                )
 
 
 async def setup(bot):

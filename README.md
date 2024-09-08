@@ -10,11 +10,13 @@ Must have a Discord Bot Token https://discord.com/developers/applications.
 Requires Python3.8 >=
 
 Setup your environment file with the required variables.
-```cp SAMPLE.env .env```
+```
+cp SAMPLE.env .env
+```
 
 ```DISCORD_TOKEN``` and ```PREFIX``` are the only non-optional environment variables that must be added in order for the bot to function. All other environment variables are optional depending on which Cog you want to use.
-- DISCORD_TOKEN will be your application's token from https://discord.com/developers/applications
-- PREFIX will be whatever character or string you want to signify the start of a command. The default is set to '!'. I.e, '!ping'
+- ```DISCORD_TOKEN``` will be your application's token from https://discord.com/developers/applications
+- ```PREFIX``` will be whatever character or string you want to signify the start of a command. The default is set to ```'!'```. I.e, ```'!ping'```
 
 ## Running locally without Docker
 ### If you're running Python >= 3.12 you might need to manually install setuptools.
@@ -28,7 +30,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-You can view logs for the bot in ObamaBot/logs/bot.log
+You can view logs for the bot in ```ObamaBot/logs/bot.log```
 
 ## Running with Docker
 I recommend setting up the logging file map in ```docker-compose.yml```. This will allow you to easily access the bot's log file from your host machine.

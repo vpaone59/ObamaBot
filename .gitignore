@@ -3,9 +3,6 @@
 /__pycache__
 /cogs/__pycache__
 .python-version
-seequal.py
-sql.py
-mariadb.py
 
 # specific json files
 banned.json
@@ -15,18 +12,14 @@ banned.json
 
 # environment files
 .env
-.env*
 
 # virtual environments
 /.venv
 
+# vs code
+.vscode
+
 # other
-/genius
-/Other
-gifs/catcam
-gifs/weird
-pixel_obama.png
-/CatBot
-bot_startup.bat
-bot.log
-try.py
+.bat
+*.log
+*.db

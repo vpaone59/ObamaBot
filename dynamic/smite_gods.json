@@ -101,6 +101,11 @@
             "type": "Assassin"
         },
         {
+            "name": "Bake Kujira",
+            "pantheon": "Japanese",
+            "type": "Guardian"
+        },
+        {
             "name": "Baron Samedi",
             "pantheon": "Voodoo",
             "type": "Mage"
@@ -302,7 +307,7 @@
         },
         {
             "name": "Ix Chel",
-            "pantheon": "Babylonian",
+            "pantheon": "Mayan",
             "type": "Mage"
         },
         {
@@ -366,6 +371,11 @@
             "type": "Assassin"
         },
         {
+            "name": "Maman Brigitte",
+            "pantheon": "Voodoo",
+            "type": "Mage"
+        },
+        {
             "name": "Martichoras",
             "pantheon": "Greek",
             "type": "Hunter"
@@ -424,6 +434,11 @@
             "name": "Nox",
             "pantheon": "Roman",
             "type": "Mage"
+        },
+        {
+            "name": "Nut",
+            "pantheon": "Egyptian",
+            "type": "Hunter"
         },
         {
             "name": "Nu Wa",

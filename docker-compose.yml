@@ -1,0 +1,13 @@
+services:
+  bot:
+    build: .
+    container_name: python3-obamabot
+    volumes:
+      # Map localhost machine files to the docker container. These files must exist prior to running the container.
+      - ${LOG_FILE_PATH}:/app/logs/bot.log
+      - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
+    environment:
+      # Environment variables that are necessary for the bot to run. These must be set in the .env file.
+      - DISCORD_TOKEN
+      - PREFIX
+    restart: unless-stopped

@@ -7,8 +7,7 @@ services:
       - ${LOG_FILE_PATH}:/app/logs/bot.log
       - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
     environment:
-      # When using docker you'll need to just define the environment variables here because the .env file is ignored by docker.
-      # Docker compose will read the .env file and set the environment variables for you. If you're running locally using python3 main.py you'll need to have a .env file.
+      # Environment variables that are necessary for the bot to run. These must be set in the .env file.
       - DISCORD_TOKEN
       - PREFIX
     restart: unless-stopped

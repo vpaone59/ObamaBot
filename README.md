@@ -6,7 +6,9 @@ Migrating to discordpy 2.0 --- https://discordpy.readthedocs.io/en/latest/migrat
 
 ## !Important Prerequisite Setup Before Running
 Must have a Discord Bot Token https://discord.com/developers/applications.
+
 Requires Python3.8 >=
+
 Setup your environment file with the required variables.
 ```cp SAMPLE.env .env```
 
@@ -20,7 +22,7 @@ Setup your environment file with the required variables.
 pip install setuptools 
 ```
 
-### Install requirements and run the bot
+Install requirements and run the bot
 ```
 pip install -r requirements.txt
 python main.py
@@ -30,7 +32,9 @@ You can view logs for the bot in ObamaBot/logs/bot.log
 
 ## Running with Docker
 I recommend setting up the logging file map in ```docker-compose.yml```. This will allow you to easily access the bot's log file from your host machine.
+
 You can update the file path on the lefthand side with the one on your host system. The file path on the right reflects the path to inside the container.
+
 Optionally, you can map the SQLite database from the container to your host machine for easier access to the database.
 
 ```
@@ -39,7 +43,7 @@ volumes:
     ~\Documents\database\obamabot.db:/app/database/obamabot.db
 ```
 
-### Build and then start the container
+Build and then start the container
 ```
 docker build -t your_container_name .
 
@@ -51,7 +55,7 @@ docker run -e DISCORD_TOKEN= -e PREFIX= -d your_container_name
 docker compose up --build -d
 ```
 
-### Troubleshooting Docker
+## Troubleshooting Docker
 entrypoint.sh:
     If Docker is complaining about entrypoint.sh like ```python3-obamabot  | exec ./entrypoint.sh: no such file or directory``` then you need to convert entrypoint.sh from CRLF to LF so the script is recognized on the linux system.
 

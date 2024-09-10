@@ -8,9 +8,14 @@ if [ -f "./database/obamabot.db" ]; then
     echo "Database file already exists at -> ./database/obamabot.db"
 else
     echo "Database file does not exist. Creating database..."
-    # Run the SQL script using SQLite
+
+    # Create the database file
+    touch ./database/obamabot.db
+    echo "Database file created at -> ./database/obamabot.db"
+    
+    # Create the tables
     sqlite3 ./database/obamabot.db < ./database/init_create.sql
-    echo "Database created at -> ./database/obamabot.db"
+    echo "Tables created in the database"
 fi
 
 # Run the bot

@@ -14,7 +14,7 @@ RUN chmod +x entrypoint.sh
 ENV LOG_FILE_PATH=/app/logs
 
 # Create the directory and set read/write permissions
-RUN mkdir -p $LOG_FILE_PATH && chmod 777 $LOG_FILE_PATH
+RUN mkdir -p $LOG_FILE_PATH $DATABASE_FILE_PATH && chmod 777 $LOG_FILE_PATH $DATABASE_FILE_PATH
 
 # Expose port 8080 for Cloud Run
 EXPOSE 8080

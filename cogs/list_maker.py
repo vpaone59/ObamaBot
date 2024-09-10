@@ -3,76 +3,78 @@ https://github.com/vpaone59
 """
 
 from discord.ext import commands
+from logging_config import create_new_logger
+from db_helper import get_db_connection
+
+logger = create_new_logger(__name__)
 
 
 class ListMaker(commands.Cog):
     """
-    Class for managing user lists
+    This Cog will allow users to create and manage custom lists
     """
 
     def __init__(self, bot):
         self.bot = bot
-        self.user_lists = {}  # Dictionary to store user lists
 
     @commands.Cog.listener()
     async def on_ready(self):
         """
         Runs when the cog is loaded
         """
-        print(f"{self.__class__.__name__} cog has been loaded")
+        logger.info("%s ready", self)
 
     @commands.command(name="create_list")
-    async def create_list(self, ctx, list_name: str):
+    async def create_list(self, ctx, *list_name: str):
         """
-        Create a new list for the user
+        Create a new list
         """
         user_id = ctx.author.id
-        if user_id not in self.user_lists:
-            self.user_lists[user_id] = {}
-        if list_name in self.user_lists[user_id]:
-            await ctx.send(f"You already have a list named '{list_name}'.")
-        else:
-            self.user_lists[user_id][list_name] = []
-            await ctx.send(f"List '{list_name}' created.")
+        print("user_id", user_id)
+        print("list_name", list_name)
 
-    @commands.command(name="add_to_list")
-    async def add_to_list(self, ctx, list_name: str, *, item: str):
-        """
-        Add an item to an existing list
-        """
-        user_id = ctx.author.id
-        if user_id in self.user_lists and list_name in self.user_lists[user_id]:
-            self.user_lists[user_id][list_name].append(item)
-            await ctx.send(f"Added '{item}' to list '{list_name}'.")
-        else:
-            await ctx.send(f"List '{list_name}' does not exist.")
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    @commands.command(name="view_list")
-    async def view_list(self, ctx, list_name: str):
-        """
-        View the items in a list
-        """
-        user_id = ctx.author.id
-        if user_id in self.user_lists and list_name in self.user_lists[user_id]:
-            items = self.user_lists[user_id][list_name]
-            if items:
-                await ctx.send(f"Items in '{list_name}':\n" + "\n".join(items))
-            else:
-                await ctx.send(f"List '{list_name}' is empty.")
-        else:
-            await ctx.send(f"List '{list_name}' does not exist.")
+        try:
+            cursor.execute(
+                "INSERT INTO lists (user_id, list_name) VALUES (?, ?)",
+                (user_id, list_name),
+            )
+            conn.commit()
+            await ctx.send(f'List "{list_name}" created.')
+        except Exception as e:
+            await ctx.send(f'Failed to create list "{list_name}": {e}')
+        finally:
+            conn.close()
 
-    @commands.command(name="delete_list")
-    async def delete_list(self, ctx, list_name: str):
+    @commands.command(name="add_item")
+    async def add_item(self, ctx, list_name: str, *, item: str):
         """
-        Delete an existing list
+        Add an item to a list
         """
-        user_id = ctx.author.id
-        if user_id in self.user_lists and list_name in self.user_lists[user_id]:
-            del self.user_lists[user_id][list_name]
-            await ctx.send(f"List '{list_name}' deleted.")
-        else:
-            await ctx.send(f"List '{list_name}' does not exist.")
+        pass
+
+    @commands.command(name="remove_item")
+    async def remove_item(self, ctx, list_name: str, *, item: str):
+        """
+        Remove an item from a list
+        """
+        pass
+
+    @commands.command(name="show_list")
+    async def show_list(self, ctx, list_name: str):
+        """
+        Display the list
+        """
+        pass
+
+    @commands.command(name="show_all_lists")
+    async def show_all_lists(self, ctx):
+        """
+        Display all lists for the user
+        """
+        pass
 
 
 async def setup(bot):

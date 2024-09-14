@@ -6,7 +6,7 @@ CREATE TABLE counters (
 
 CREATE TABLE users (
   user_id INTEGER PRIMARY KEY,
-  username VARCHAR(255) NULL,
+  username VARCHAR(255) NULL
 );
 
 CREATE TABLE lists (

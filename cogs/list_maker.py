@@ -49,14 +49,14 @@ class ListMaker(commands.Cog):
             conn.close()
 
     @commands.command(name="add_item")
-    async def add_item(self, ctx, list_name: str, *, item: str):
+    async def add_item_to_list(self, ctx, list_name: str, *, item: str):
         """
         Add an item to a list
         """
         pass
 
     @commands.command(name="remove_item")
-    async def remove_item(self, ctx, list_name: str, *, item: str):
+    async def remove_item_from_list(self, ctx, list_name: str, *, item: str):
         """
         Remove an item from a list
         """

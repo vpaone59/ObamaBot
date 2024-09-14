@@ -56,11 +56,6 @@ async def on_ready():
     """
     logger.info("Logged in as %s", bot.user)
 
-    # try:
-    #     await load_all_cogs()
-    # except Exception as e:
-    #     logger.error("Bot not ready: %s", e)
-
 
 @bot.event
 async def on_message(message):

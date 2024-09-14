@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
 from logging_config import create_new_logger
+from db_helper import initialize_db
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
@@ -25,14 +26,25 @@ async def main():
     """
     The main function that starts the Discord bot.
     """
+
+    # Initialize the database
+    try:
+        logger.info("Initializing database")
+        initialize_db()
+    except Exception as e:
+        logger.error("Failed to initialize database: %s", e)
+        raise e
+
+    # Load all Cog files
     try:
         await load_all_cogs()
     except Exception as e:
         logger.error("Bot not ready: %s", e)
 
+    # Start the bot
     async with bot:
-        await bot.start(BOT_TOKEN)
         logger.info("TOKEN grabbed\n Starting bot")
+        await bot.start(BOT_TOKEN)
 
 
 @bot.event

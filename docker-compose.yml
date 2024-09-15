@@ -3,11 +3,20 @@ services:
     build: .
     container_name: python3-obamabot
     volumes:
-      # Map localhost machine files to the docker container. These files must exist prior to running the container.
-      - ${LOG_FILE_PATH}:/app/logs/bot.log
-      - ${DATABASE_FILE_PATH}:/app/database/obamabot.db
+      # Mount the logs and database files to the host machine
+      - ${HOST_LOG_PATH}:/app/logs
+      - ${HOST_DB_PATH}:/app/database
     environment:
-      # Environment variables that are necessary for the bot to run. These must be set in the .env file.
-      - DISCORD_TOKEN
-      - PREFIX
+      - DISCORD_TOKEN # Discord bot token
+      - PREFIX # Command prefix
+      - HOST_LOG_PATH # Path to the logs directory on the host machine
+      - HOST_DB_PATH # Path to the database directory on the host machine
+      - GIPHY_KEY # Giphy API key
+      - POLYGON_API_KEY # Polygon.io API key
+      - REDDIT_CLIENT_ID # Reddit client ID
+      - REDDIT_CLIENT_SECRET # Reddit client secret
+      - REDDIT_USER_AGENT # Reddit user agent
+      - YOUTUBE_API_KEY # YouTube API key
+      - GOOGLE_MAPS_API_KEY # Google Maps API key
+      - FRIEND_GUILD_IDS # Comma-separated list of guild IDs that the bot will be active in
     restart: unless-stopped

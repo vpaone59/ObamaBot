@@ -8,7 +8,7 @@ import os
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
-DOCKER_DB_FILE_PATH = os.getenv("DOCKER_DB_FILE_PATH")
+HOST_DB_PATH = os.getenv("HOST_DB_PATH")
 
 
 class Counter(commands.Cog):
@@ -232,16 +232,16 @@ def get_counters():
 def connect_db():
     """
     Connect to the database and return a connection and cursor object.
-    Requires DOCKER_DB_FILE_PATH environment variable to be set
+    Requires HOST_DB_PATH environment variable to be set
     """
     try:
-        conn = sqlite3.connect(DOCKER_DB_FILE_PATH)  # type: ignore
+        conn = sqlite3.connect(HOST_DB_PATH)  # type: ignore
         cursor = conn.cursor()
-        logger.info("Cursor created for sqlite DB file at: %s", DOCKER_DB_FILE_PATH)
+        logger.info("Cursor created for sqlite DB file at: %s", HOST_DB_PATH)
     except Exception as err:
         logger.error(
             "Failed to connect to sqlite DB file at: %s --- %s",
-            DOCKER_DB_FILE_PATH,
+            HOST_DB_PATH,
             err,
         )
 

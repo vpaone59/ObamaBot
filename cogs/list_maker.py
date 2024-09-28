@@ -32,7 +32,9 @@ class ListMaker(commands.Cog):
     )
     async def create_user_list(self, interaction: discord.Interaction, list_name: str):
         """
-        Create a new list
+        User creates a new list
+
+        Save list to DB with user_id and list_name in the lists table
         """
         # Grab the user's ID from the interaction
         user_id = interaction.user.id
@@ -48,6 +50,7 @@ class ListMaker(commands.Cog):
             )
             return
 
+        # Create the list
         try:
             cursor.execute(
                 "INSERT INTO lists (user_id, list_name) VALUES (?, ?)",
@@ -64,10 +67,12 @@ class ListMaker(commands.Cog):
 
     @app_commands.command(name="add_item_to_list", description="Add an item to a list")
     async def add_item_to_list(
-        self, interaction: discord.Interaction, list_name: str, item: str
+        self, interaction: discord.Interaction, list_name: str, item_name: str
     ):
         """
         Add an item to a list
+
+        Save item to DB with user_id, list_name, and item_name in the items table
         """
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -90,11 +95,18 @@ class ListMaker(commands.Cog):
     async def remove_item_from_list(
         self, interaction: discord.Interaction, list_name: str, item: str
     ):
+        """
+        Remove an item from a list
+
+        Delete item from items table
+        """
         pass
 
     def get_user_list_items(self, user_id, list_name: str):
         """
         Get all list items for a user's list
+
+        Returns a list of tuples with the item names
         """
         conn = get_db_connection()
         cursor = conn.cursor()

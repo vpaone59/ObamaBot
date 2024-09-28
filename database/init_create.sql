@@ -11,13 +11,12 @@ CREATE TABLE users (
 
 CREATE TABLE lists (
   list_id INTEGER PRIMARY KEY,
-  list_name VARCHAR(255) NOT NULL,
-  list_items TEXT NOT NULL
+  user_id VARCHAR(255) NOT NULL,
+  list_name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE user_lists (
-  list_id INTEGER PRIMARY KEY,
-  user_id INTEGER NOT NULL,
-  list_name VARCHAR(255) NOT NULL,
-  list_items TEXT NOT NULL
+CREATE TABLE items (
+  item_id INTEGER PRIMARY KEY,
+  list_id INTEGER NOT NULL,
+  item_name VARCHAR(255) NOT NULL
 );

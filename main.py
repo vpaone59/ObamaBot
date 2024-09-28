@@ -167,6 +167,7 @@ async def reload_cog(ctx, cog_name=""):
 
 
 @bot.command()
+@commands.has_permissions(administrator=True)
 async def sync(
     ctx: Context,
     guilds: Greedy[discord.Object],
@@ -207,6 +208,19 @@ async def sync(
         else:
             synced = await ctx.bot.tree.sync()
 
+        # Get all available commands
+        commands = bot.tree.get_commands()
+        if not commands:
+            await ctx.send("No slash commands available.")
+            return
+
+        # Print out all available commands
+        command_list = "\n".join(
+            [f"/{cmd.name} - {cmd.description}" for cmd in commands]
+        )
+        await ctx.send(f"Available slash commands:\n{command_list}")
+
+        # Print out how many commands were synced
         logger.info("Synced %s commands", len(synced))
         await ctx.send(
             f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"

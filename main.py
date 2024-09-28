@@ -43,7 +43,7 @@ async def main():
 
     # Start the bot
     async with bot:
-        logger.info("TOKEN grabbed\n Starting bot")
+        logger.info("TOKEN grabbed from .env file. Starting bot")
         await bot.start(BOT_TOKEN)
 
 

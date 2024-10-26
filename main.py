@@ -8,7 +8,7 @@ from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
 
 from logging_config import create_new_logger
-from db_helper import initialize_db
+from db_helper import initialize_database
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
@@ -28,7 +28,7 @@ async def main():
     # Initialize the database
     try:
         logger.info("Initializing database")
-        initialize_db()
+        initialize_database()
     except Exception as e:
         logger.error("Failed to initialize database: %s", e)
         raise e

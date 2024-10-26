@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from logging_config import create_new_logger
-from db_helper import get_db_connection
+from db_helper import get_database_connection
 
 logger = create_new_logger(__name__)
 
@@ -40,7 +40,7 @@ class ListMaker(commands.Cog):
         user_id = interaction.user.id
 
         # Get a connection to the database
-        conn = get_db_connection()
+        conn = get_database_connection()
         cursor = conn.cursor()
 
         # Check if the list already exists
@@ -74,19 +74,29 @@ class ListMaker(commands.Cog):
 
         Save item to DB with user_id, list_name, and item_name in the items table
         """
-        conn = get_db_connection()
+        conn = get_database_connection()
         cursor = conn.cursor()
 
+        # Find the list ID
+        cursor.execute("SELECT list_id FROM lists WHERE list_name = ?", (list_name,))
+        list_id = cursor.fetchone()[0]
+        if not list_id:
+            await interaction.response.send_message(f'List "{list_name}" not found.')
+            return
+
+        # Add the item to the list
         try:
             cursor.execute(
-                "INSERT INTO list_items (user_id, list_name, item_name) VALUES (?, ?, ?)",
-                (interaction.author.id, list_name, item),
+                "INSERT INTO items (list_id, item_name) VALUES (?, ?)",
+                (list_id, item_name),
             )
             conn.commit()
-            await interaction.send(f'Item "{item}" added to list "{list_name}"')
+            await interaction.response.send_message(
+                f'Item "{item_name}" added to list "{list_name}"'
+            )
         except Exception as e:
-            await interaction.send(
-                f'Failed to add item "{item}" to list "{list_name}": {e}'
+            await interaction.response.send_message(
+                f'Failed to add item "{item_name}" to list "{list_name}": {e}'
             )
 
     @app_commands.command(
@@ -100,7 +110,30 @@ class ListMaker(commands.Cog):
 
         Delete item from items table
         """
-        pass
+        conn = get_database_connection()
+        cursor = conn.cursor()
+
+        # Find the list ID
+        cursor.execute("SELECT list_id FROM lists WHERE list_name = ?", (list_name,))
+        list_id = cursor.fetchone()[0]
+        if not list_id:
+            await interaction.response.send_message(f'List "{list_name}" not found.')
+            return
+
+        # Remove the item from the list
+        try:
+            cursor.execute(
+                "DELETE FROM items WHERE list_id = ? AND item_name = ?",
+                (list_id, item),
+            )
+            conn.commit()
+            await interaction.response.send_message(
+                f'Item "{item}" removed from list "{list_name}"'
+            )
+        except Exception as e:
+            await interaction.response.send_message(
+                f'Failed to remove item "{item}" from list "{list_name}": {e}'
+            )
 
     def get_user_list_items(self, user_id, list_name: str):
         """
@@ -108,7 +141,7 @@ class ListMaker(commands.Cog):
 
         Returns a list of tuples with the item names
         """
-        conn = get_db_connection()
+        conn = get_database_connection()
         cursor = conn.cursor()
 
         try:
@@ -127,7 +160,7 @@ class ListMaker(commands.Cog):
         """
         Check if a list already exists in the database
         """
-        conn = get_db_connection()
+        conn = get_database_connection()
         cursor = conn.cursor()
 
         try:

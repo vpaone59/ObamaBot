@@ -30,7 +30,7 @@ class GifGenerator(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(aliases=["gq", "gif", "giphy"])
     @commands.cooldown(1, 5, commands.BucketType.user)

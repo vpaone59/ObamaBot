@@ -31,7 +31,7 @@ class Tasks(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info(f"{self} ready")
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
     async def start_task(self, ctx, task_name: str, channel_id: int = None):

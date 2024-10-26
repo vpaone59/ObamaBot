@@ -24,7 +24,7 @@ class ListMaker(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @app_commands.command(
         name="create_list",

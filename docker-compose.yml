@@ -3,7 +3,7 @@ services:
     build: .
     container_name: python3-obamabot
     volumes:
-      # Mount the logs and database files to the host machine
+      # Mount the logs and database folders to the host machine
       - ${HOST_LOG_PATH}:/app/logs
       - ${HOST_DB_PATH}:/app/database
     environment:

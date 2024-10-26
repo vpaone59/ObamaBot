@@ -1,18 +1,15 @@
-import os
 import sqlite3
-from logging_config import create_new_logger
-from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 
-HOST_DB_PATH = os.getenv("HOST_DB_PATH")
-DATABASE_PATH = f"{HOST_DB_PATH}/obamabot.db"
+DATABASE_PATH = Path("./database/obamabot.db").resolve()
 SQL_INIT_FILE = "./database/init_create.sql"
 
 
-def get_db_connection():
+def get_database_connection():
     """
     Connect to the SQLite database using the path from environment variables.
     Returns a connection object.
@@ -27,13 +24,12 @@ def get_db_connection():
         raise e
 
 
-def initialize_db():
+def initialize_database():
     """
     Initialize the database with the required tables using the init_create.sql file.
     """
-    # Check if the database file exists
     try:
-        if not os.path.exists(DATABASE_PATH):
+        if not Path(DATABASE_PATH).exists():
             logger.info("Database file does not exist. Creating now...")
 
             # Create the database file
@@ -50,12 +46,12 @@ def initialize_db():
         raise e
 
     # Read the SQL initialization file
-    with open(SQL_INIT_FILE, "r") as sql_file:
+    with open(SQL_INIT_FILE, "r", encoding="UTF-8") as sql_file:
         sql_script = sql_file.read()
 
     # Execute the SQL script
     try:
-        conn = get_db_connection()
+        conn = get_database_connection()
         cursor = conn.cursor()
         cursor.executescript(sql_script)
         conn.commit()

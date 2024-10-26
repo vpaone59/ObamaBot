@@ -1,25 +1,23 @@
 import os
 import asyncio
 from typing import Literal, Optional
+from pathlib import Path
+
 import discord
-from dotenv import load_dotenv
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
+
 from logging_config import create_new_logger
 from db_helper import initialize_db
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
 
-# Load environment variables from .env file
-load_dotenv()
-logger.info("Environment variables loaded")
-
 # Configure Discord bot intents and grab token from environment variables
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
-BOT_TOKEN = os.getenv("DISCORD_TOKEN")
+bot = commands.Bot(command_prefix=os.environ.get("PREFIX"), intents=intents)
+BOT_TOKEN = os.environ.get("DISCORD_TOKEN")
 
 
 async def main():
@@ -39,11 +37,14 @@ async def main():
     try:
         await load_all_cogs()
     except Exception as e:
-        logger.error("Bot not ready: %s", e)
+        logger.error(
+            "There was an error loading Cog files, the bot has been stopped: %s", e
+        )
+        return
 
     # Start the bot
     async with bot:
-        logger.info("TOKEN grabbed from .env file. Starting bot")
+        logger.info("Starting bot...")
         await bot.start(BOT_TOKEN)
 
 
@@ -76,13 +77,13 @@ async def load_all_cogs():
     """
     Loads all Cog files from the /cogs directory.
     """
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            try:
-                await bot.load_extension(f"cogs.{filename[:-3]}")
-                logger.info("%s loaded", filename)
-            except Exception as e:
-                logger.error("%s - %s not loaded", e, filename)
+    for cog_file in Path("cogs").rglob("*.py"):
+        try:
+            await bot.load_extension(f"cogs.{cog_file.stem}")
+        except Exception as e:
+            logger.error("%s - %s not loaded", e, cog_file.stem)
+
+    logger.info("Loaded *%s* cogs", len(bot.cogs))
 
 
 @bot.command(aliases=["load"], help="Loads a Cog file")
@@ -166,7 +167,7 @@ async def reload_cog(ctx, cog_name=""):
             await ctx.send(f"```{cog_name}.py could not be reloaded \n{e}```")
 
 
-@bot.command()
+@bot.command(help="Syncs the bot's slash commands to Discord")
 @commands.has_permissions(administrator=True)
 async def sync(
     ctx: Context,

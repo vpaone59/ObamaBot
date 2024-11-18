@@ -19,4 +19,5 @@ services:
       - YOUTUBE_API_KEY # YouTube API key
       - GOOGLE_MAPS_API_KEY # Google Maps API key
       - FRIEND_GUILD_IDS # Comma-separated list of guild IDs that the bot will be active in
+      - GENIUS_API_KEY # Genius.com API key
     restart: unless-stopped

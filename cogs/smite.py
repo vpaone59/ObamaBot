@@ -32,7 +32,7 @@ class SmiteShuffler(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(description="Syncs the Smite.py Cog to Discord")
     @commands.cooldown(1, 10, commands.BucketType.user)

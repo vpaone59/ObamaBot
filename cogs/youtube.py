@@ -26,7 +26,7 @@ class Youtube(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(aliases=["get latest video", "latest video", "latest"])
     async def get_latest_video_command(

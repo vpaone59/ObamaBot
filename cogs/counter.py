@@ -6,9 +6,10 @@ from discord.ext import commands
 import sqlite3
 import os
 from logging_config import create_new_logger
+from pathlib import Path
 
 logger = create_new_logger(__name__)
-DB_PATH = os.getenv("DB_PATH")
+DATABASE_PATH = Path("./database/obamabot.db").resolve()
 
 
 class Counter(commands.Cog):
@@ -24,7 +25,7 @@ class Counter(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -232,14 +233,18 @@ def get_counters():
 def connect_db():
     """
     Connect to the database and return a connection and cursor object.
-    Requires DB_PATH environment variable to be set
+    Requires HOST_DB_PATH environment variable to be set
     """
     try:
-        conn = sqlite3.connect(DB_PATH)  # type: ignore
+        conn = sqlite3.connect(DATABASE_PATH)  # type: ignore
         cursor = conn.cursor()
-        logger.info("Cursor created for sqlite DB file at: %s", DB_PATH)
+        logger.info("Cursor created for sqlite DB file at: %s", DATABASE_PATH)
     except Exception as err:
-        logger.error("Failed to connect to sqlite DB file at: %s --- %s", DB_PATH, err)
+        logger.error(
+            "Failed to connect to sqlite DB file at: %s --- %s",
+            DATABASE_PATH,
+            err,
+        )
 
     return conn, cursor
 

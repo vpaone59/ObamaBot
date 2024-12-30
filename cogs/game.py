@@ -23,7 +23,7 @@ class Game(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command()
     @commands.cooldown(1, 2, commands.BucketType.guild)

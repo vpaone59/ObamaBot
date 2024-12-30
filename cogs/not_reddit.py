@@ -34,7 +34,7 @@ class NotReddit(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     async def is_nsfw(self, subreddit):
         """

@@ -61,7 +61,7 @@ class Genius(commands.Cog):
             random_bar = random.choice(lyrics_lines)
             random_bar2 = random.choice(lyrics_lines)
 
-            await ctx.send(f"{random_bar}, {random_bar2}")
+            await ctx.send(f"{random_bar}, {random_bar2}\n**({song.title})**")
 
         except Exception as e:
             logger.error("Error getting lyrics: %s", e)

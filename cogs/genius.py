@@ -34,29 +34,22 @@ class Genius(commands.Cog):
         """
         logger.info("%s ready", self.__cog_name__)
 
-    # @commands.command(description="Syncs the Genius.py Cog to Discord")
-    # @commands.cooldown(1, 10, commands.BucketType.user)
-    # @commands.has_permissions(administrator=True)
-    # async def sync_genius_commands(self, ctx) -> None:
-    #     """
-    #     Specifically sync the slash commands from this Cog
-    #     """
-    #     number_of_synced_commands = await ctx.bot.tree.sync(guild=ctx.guild)
-    #     await ctx.send(f"Synced {len(number_of_synced_commands)} commands.")
-
     @app_commands.command(
         name="bar",
         description="Get a random bar from a random song in the input artist's discography",
     )
-    async def get_random_bar(self, interaction: discord.Interaction, artist_name: str):
+    async def get_random_bar_from_artist(
+        self, interaction: discord.Interaction, artist_name: str
+    ):
         """
-        Get a random bar from a random song in the input artist's discography
+        Get a random bar from a random song in an input artist_name's discography
         """
+        # Defer the response to avoid timeout
         await interaction.response.defer()
         try:
-            # Search for artist
+            # Search for artist, get top 5 songs
             artist = self.genius.search_artist(
-                artist_name, max_songs=1, sort="popularity"
+                artist_name, max_songs=5, sort="popularity"
             )
             if not artist:
                 await interaction.response.send_message(
@@ -64,9 +57,8 @@ class Genius(commands.Cog):
                 )
                 return
 
-            # Get a random song from artist's songs
+            # Choose 1 of 5 random songs
             song = random.choice(artist.songs)
-
             if not song.lyrics:
                 await interaction.response.send_message(
                     f"No lyrics found for song: {song.title}"
@@ -80,7 +72,6 @@ class Genius(commands.Cog):
             random_bar = random.choice(lyrics_lines)
             random_bar2 = random.choice(lyrics_lines)
 
-            print(f"{random_bar}, {random_bar2}\n**({song.title})**")
             await interaction.followup.send(
                 f"{random_bar}, {random_bar2}\n**({song.title})**"
             )

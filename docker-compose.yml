@@ -7,17 +7,17 @@ services:
       - ${HOST_LOG_PATH}:/app/logs
       - ${HOST_DB_PATH}:/app/database
     environment:
-      - DISCORD_TOKEN # Discord bot token
-      - PREFIX # Command prefix
-      - HOST_LOG_PATH # Path to the logs directory on the host machine
-      - HOST_DB_PATH # Path to the database directory on the host machine
-      - GIPHY_KEY # Giphy API key
-      - POLYGON_API_KEY # Polygon.io API key
-      - REDDIT_CLIENT_ID # Reddit client ID
-      - REDDIT_CLIENT_SECRET # Reddit client secret
-      - REDDIT_USER_AGENT # Reddit user agent
-      - YOUTUBE_API_KEY # YouTube API key
-      - GOOGLE_MAPS_API_KEY # Google Maps API key
-      - FRIEND_GUILD_IDS # Comma-separated list of guild IDs that the bot will be active in
-      - GENIUS_API_KEY # Genius.com API key
+      - DISCORD_TOKEN=${DISCORD_TOKEN} # Discord bot token
+      - PREFIX=${PREFIX} # Command prefix
+      - HOST_LOG_PATH=${HOST_LOG_PATH} # Path to the logs directory on the host machine
+      - HOST_DB_PATH=${HOST_DB_PATH} # Path to the database directory on the host machine
+      - GIPHY_KEY=${GIPHY_KEY} # Giphy API key
+      - POLYGON_API_KEY=${POLYGON_API_KEY} # Polygon.io API key
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID} # Reddit client ID
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET} # Reddit client secret
+      - REDDIT_USER_AGENT=${REDDIT_USER_AGENT} # Reddit user agent
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY} # YouTube API key
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY} # Google Maps API key
+      - FRIEND_GUILD_IDS=${FRIEND_GUILD_IDS} # Comma-separated list of guild IDs that the bot will be active in
+      - GENIUS_API_KEY=${GENIUS_API_KEY} # Genius.com API key
     restart: unless-stopped

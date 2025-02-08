@@ -56,7 +56,7 @@ class GifGenerator(commands.Cog):
                 selection = random.choice(data["data"])
                 link = selection.get("embed_url")
                 if link:
-                    await interaction.response.send_message(link)
+                    await interaction.response.send_message(f"{query}\n{link}")
                 else:
                     raise Exception("No embed URL found for the selected GIF")
 

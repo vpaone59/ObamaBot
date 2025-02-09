@@ -1,23 +1,38 @@
+"""
+This is the main file for the Discord bot.
+It initializes the bot, loads all Cog files, and starts the bot.
+
+Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN.
+"""
+
 import os
 import asyncio
 from typing import Literal, Optional
 from pathlib import Path
-
 import discord
 from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
-
 from logging_config import create_new_logger
 from db_helper import initialize_database
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+PREFIX = os.getenv("PREFIX")
 
-# Configure Discord bot intents and grab token from environment variables
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix=os.environ.get("PREFIX"), intents=intents)
-BOT_TOKEN = os.environ.get("DISCORD_TOKEN")
+# Check if the bot token and prefix are set as environment variables
+if not DISCORD_TOKEN:
+    logger.error("DISCORD_TOKEN environment variable not set")
+    exit(1)
+elif not PREFIX:
+    logger.error("PREFIX environment variable not set")
+    exit(1)
+else:
+    # Configure Discord bot intents and grab token from environment variables
+    intents = discord.Intents.default()
+    intents.message_content = True
+    bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+    BOT_TOKEN = DISCORD_TOKEN
 
 
 async def main():
@@ -100,8 +115,8 @@ async def load_cog(ctx, cog_name):
         await ctx.send(f"```{cog_name}.py loaded```")
 
     except commands.ExtensionAlreadyLoaded as e:
-        await ctx.send(f"```{cog_name}.py is already loaded\n{e}```")
         logger.error("%s - %s already loaded", e, cog_name)
+        await ctx.send(f"```{cog_name}.py is already loaded\n{e}```")
 
     except commands.ExtensionNotFound as e:
         logger.error("%s - %s does not exist", e, cog_name)
@@ -195,18 +210,23 @@ async def sync(
 
     if not guilds:
         if spec == "~":
+            # Clear the current guild's commands
+            ctx.bot.tree.clear_commands(guild=ctx.guild)
             # Sync to the current guild
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "*":
+            # Clear global commands
+            ctx.bot.tree.clear_commands()
             # Sync globally
-            ctx.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            synced = await ctx.bot.tree.sync()
         elif spec == "^":
             # Clear the current guild's commands
             ctx.bot.tree.clear_commands(guild=ctx.guild)
             await ctx.bot.tree.sync(guild=ctx.guild)
             synced = []
         else:
+            # Clear global commands
+            ctx.bot.tree.clear_commands()
             synced = await ctx.bot.tree.sync()
 
         # Get all available commands
@@ -231,6 +251,8 @@ async def sync(
     ret = 0
     for guild in guilds:
         try:
+            # Clear the guild's commands
+            ctx.bot.tree.clear_commands(guild=guild)
             await ctx.bot.tree.sync(guild=guild)
         except discord.HTTPException:
             pass

@@ -4,9 +4,7 @@ from pathlib import Path
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
-
-DATABASE_PATH = Path("./database/obamabot.db").resolve()
-SQL_INIT_FILE = "./database/init_create.sql"
+DATABASE_PATH = Path("./database/bot.db").resolve()
 
 
 def get_database_connection():
@@ -46,7 +44,7 @@ def initialize_database():
         raise e
 
     # Read the SQL initialization file
-    with open(SQL_INIT_FILE, "r", encoding="UTF-8") as sql_file:
+    with open("./database/init_create.sql", "r", encoding="UTF-8") as sql_file:
         sql_script = sql_file.read()
 
     # Execute the SQL script

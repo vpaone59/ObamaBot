@@ -73,7 +73,7 @@ class Genius(commands.Cog):
             random_bar2 = random.choice(lyrics_lines)
 
             await interaction.followup.send(
-                f"{random_bar}, {random_bar2}\n**({song.title})**"
+                f"{random_bar}, {random_bar2}\n**({song.artist} - {song.title})**"
             )
 
         except Exception as e:

@@ -33,7 +33,7 @@ class Friends(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.Cog.listener()
     async def on_message(self, message):

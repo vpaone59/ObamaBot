@@ -14,7 +14,6 @@ from cogs.youtube import (
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
-RMT_CHANNEL_ID = os.getenv("RMT_CHANNEL_ID")
 
 
 class Tasks(commands.Cog):
@@ -32,7 +31,7 @@ class Tasks(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info(f"{self} ready")
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
     async def start_task(self, ctx, task_name: str, channel_id: int = None):

@@ -18,7 +18,6 @@ if os.path.exists("./banned.json"):
         bannedWordsData = json.load(f)
         # assign current banned words list to variable for use later
         bannedWords = bannedWordsData["bannedWords"]
-        logger.info("Banned words loaded")
 else:
     bannedTemplate = {"bannedWords": []}
     with open("./banned.json", "w+", encoding="utf-8") as f:
@@ -39,7 +38,7 @@ class Ban(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.Cog.listener()
     async def on_message(self, message):

@@ -10,6 +10,8 @@ import json
 from urllib import parse, request
 from discord.ext import commands
 from logging_config import create_new_logger
+import discord
+from discord import app_commands
 
 logger = create_new_logger(__name__)
 # Grab Giphy key & assign url to variable
@@ -30,14 +32,13 @@ class GifGenerator(commands.Cog):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
-    @commands.command(aliases=["gq", "gif", "giphy"])
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def giphyquery(self, ctx, *query):
+    @app_commands.command(name="gq", description="Search for GIFs using Giphy API")
+    @app_commands.describe(query="The search query for the GIFs")
+    async def get_random_gif(self, interaction: discord.Interaction, query: str):
         """
-        Uses giphy api to search for gifs using user input query strings
-        Picks 10 gifs and then randomly chooses 1 to send
+        Search for GIFs using the Giphy API and return a random GIF from the results
         """
         params = parse.urlencode({"q": query, "api_key": GIPHY_KEY, "limit": "10"})
 
@@ -48,22 +49,22 @@ class GifGenerator(commands.Cog):
                 # Check if no GIFs were found
                 if not data.get("data"):
                     raise Exception(
-                        f"No GIFs found for {' '.join(query)}, try again with a different search query"
+                        f"No GIFs found for {query}, try again with a different search query"
                     )
 
                 # Choose a random GIF from the list returned
                 selection = random.choice(data["data"])
                 link = selection.get("embed_url")
                 if link:
-                    await ctx.send(link)
+                    await interaction.response.send_message(f"{query}\n{link}")
                 else:
                     raise Exception("No embed URL found for the selected GIF")
 
         except Exception as e:
             logger.error(
-                f"\n\t USER: {ctx.message.author}\n\t INPUT: {query}\n\t ERROR: {e}"
+                f"\n\t USER: {interaction.user}\n\t INPUT: {query}\n\t ERROR: {e}"
             )
-            await ctx.send(f"```{e}```")
+            await interaction.response.send_message(f"```{e}```")
 
 
 async def setup(bot):

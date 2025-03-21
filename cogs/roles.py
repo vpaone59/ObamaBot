@@ -23,7 +23,7 @@ class Roles(commands.Cog, name="Roles"):
         """
         Runs when the cog is loaded
         """
-        logger.info("%s ready", self)
+        logger.info("%s ready", self.__cog_name__)
 
     @commands.command(name="hasrole", aliases=["hr"])
     @commands.cooldown(1, 3, commands.BucketType.user)

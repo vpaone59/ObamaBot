@@ -182,84 +182,54 @@ async def reload_cog(ctx, cog_name=""):
             await ctx.send(f"```{cog_name}.py could not be reloaded \n{e}```")
 
 
-@bot.command(help="Syncs the bot's slash commands to Discord")
+@bot.command(name="sync")
+@commands.guild_only()
 @commands.has_permissions(administrator=True)
-async def sync(
-    ctx: Context,
-    guilds: Greedy[discord.Object],
-    spec: Optional[Literal["~", "*", "^"]] = None,
-) -> None:
+async def sync_command(ctx, spec: Optional[str] = None):
     """
-    Sync Slash Commands Globally to the bot
-    When to sync
-    When you add a new command.
-    When you remove a command.
-    When a command's name or description changes.
-    When the callback's parameters change.
-    This includes parameter names, types or descriptions.
-    Also when you add or remove a parameter.
-    If you change a global to a guild command, or vice versa.
-    NOTE: If you do this, you will need to sync both global and to that guild to reflect the change.
-    These are currently the only times you should re-sync.
+    Syncs slash commands with Discord.
 
-    param: ctx - The context in which the command is entered
-    param: guilds - The guilds to sync the commands to
-    param: spec - The specification for syncing the commands
+    Without arguments, syncs current guild commands
+    `!sync global` - sync global commands (can take up to 1 hour to appear)
+    `!sync clear` - clear all commands from the current guild
+    `!sync clear global` - clear all global commands (dangerous!)
     """
-    logger.info("Syncing commands")
-
-    if not guilds:
-        if spec == "~":
-            # Clear the current guild's commands
-            ctx.bot.tree.clear_commands(guild=ctx.guild)
-            # Sync to the current guild
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
-        elif spec == "*":
-            # Clear global commands
-            ctx.bot.tree.clear_commands()
-            # Sync globally
-            synced = await ctx.bot.tree.sync()
-        elif spec == "^":
-            # Clear the current guild's commands
-            ctx.bot.tree.clear_commands(guild=ctx.guild)
-            await ctx.bot.tree.sync(guild=ctx.guild)
-            synced = []
-        else:
-            # Clear global commands
-            ctx.bot.tree.clear_commands()
-            synced = await ctx.bot.tree.sync()
-
-        # Get all available commands
-        commands = bot.tree.get_commands()
-        if not commands:
-            await ctx.send("No slash commands available.")
-            return
-
-        # Print out all available commands
-        command_list = "\n".join(
-            [f"/{cmd.name} - {cmd.description}" for cmd in commands]
-        )
-        await ctx.send(f"Available slash commands:\n{command_list}")
-
-        # Print out how many commands were synced
-        logger.info("Synced %s commands", len(synced))
+    if spec not in [None, "global", "clear", "clear global"]:
         await ctx.send(
-            f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            "Invalid option. Use `!sync`, `!sync global`, `!sync clear`, or `!sync clear global`"
         )
         return
 
-    ret = 0
-    for guild in guilds:
-        try:
-            # Clear the guild's commands
-            ctx.bot.tree.clear_commands(guild=guild)
-            await ctx.bot.tree.sync(guild=guild)
-        except discord.HTTPException:
-            pass
-        else:
-            ret += 1
+    if spec is None:
+        # Sync to current guild
+        synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        await ctx.send(f"Synced {len(synced)} commands to the current guild.")
+        return
 
-    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+    elif spec == "global":
+        # Sync globally (takes up to 1 hour to propagate)
+        ctx.bot.tree.copy_global_to(guild=ctx.guild)
+        await ctx.bot.tree.sync(guild=None)
+        await ctx.send(
+            "Synced commands globally. This can take up to 1 hour to take effect."
+        )
+        return
+
+    elif spec == "clear":
+        # Clear commands from current guild
+        ctx.bot.tree.clear_commands(guild=ctx.guild)
+        await ctx.bot.tree.sync(guild=ctx.guild)
+        await ctx.send("Cleared all commands from the current guild.")
+        return
+
+    elif spec == "clear global":
+        # Clear global commands
+        ctx.bot.tree.clear_commands(guild=None)
+        await ctx.bot.tree.sync(guild=None)
+        await ctx.send(
+            "Cleared all global commands. This can take up to 1 hour to take effect."
+        )
+        return
 
 
 asyncio.run(main())

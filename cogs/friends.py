@@ -11,8 +11,6 @@ from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 
-FRIEND_GUILDS = os.getenv("FRIEND_GUILD_IDS")
-
 
 class Friends(commands.Cog):
     """
@@ -43,10 +41,10 @@ class Friends(commands.Cog):
         string_message = str(message.content)
 
         # return whenever a prefix is detected without a command attached
-        if string_message.startswith(f'{os.getenv("PREFIX")}'):
+        if string_message.startswith(f"{os.getenv('PREFIX')}"):
             return
 
-        if str(message.guild.id) not in FRIEND_GUILDS and self.friend_guilds_locked:
+        if self.friend_guilds_locked:
             return
 
         # Message reactions for a user

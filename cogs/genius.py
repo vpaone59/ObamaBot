@@ -42,14 +42,21 @@ class Genius(commands.Cog):
         self, interaction: discord.Interaction, artist_name: str
     ):
         """
-        Get a random bar from a random song in an input artist_name's discography
+        Returns a random lyric bar from a random song by the specific artist_name
         """
+        sort_type = ["popularity"] * 8 + ["title"] * 2
+        sort_type_choice = random.choice(sort_type)
+
         # Defer the response to avoid timeout
         await interaction.response.defer()
         try:
             # Search for artist, get top 5 songs
             artist = self.genius.search_artist(
-                artist_name, max_songs=5, sort="popularity"
+                artist_name,
+                max_songs=5,
+                sort=sort_type_choice,
+                per_page=5,
+                get_full_info=False,
             )
             if not artist:
                 await interaction.response.send_message(

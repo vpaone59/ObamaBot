@@ -2,18 +2,16 @@
 This is the main file for the Discord bot.
 It initializes the bot, loads all Cog files, and starts the bot.
 
-Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN.
+Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN or else the bot will not work.
 """
 
 import os
 import asyncio
-from typing import Literal, Optional
+from typing import Optional
 from pathlib import Path
 import discord
-from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
 from logging_config import create_new_logger
-from db_helper import initialize_database
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
@@ -28,7 +26,7 @@ elif not PREFIX:
     logger.error("PREFIX environment variable not set")
     exit(1)
 else:
-    # Configure Discord bot intents and grab token from environment variables
+    # Configure Discord bot intents and initialize the bot
     intents = discord.Intents.default()
     intents.message_content = True
     bot = commands.Bot(command_prefix=PREFIX, intents=intents)

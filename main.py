@@ -39,15 +39,6 @@ async def main():
     """
     The main function that starts the Discord bot.
     """
-
-    # Initialize the database
-    try:
-        logger.info("Initializing database")
-        initialize_database()
-    except Exception as e:
-        logger.error("Failed to initialize database: %s", e)
-        raise e
-
     # Load all Cog files
     try:
         await load_all_cogs()

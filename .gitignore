@@ -21,5 +21,6 @@ banned.json
 
 # other
 .bat
+/logs
 *.log
 *.db

@@ -56,8 +56,6 @@ async def main():
 async def on_ready():
     """
     Runs once the bot establishes a connection with Discord.
-
-    Load all cogs into the bot
     """
     logger.info("Logged in as %s", bot.user)
 

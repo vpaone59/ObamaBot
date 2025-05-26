@@ -35,7 +35,7 @@ class General(commands.Cog):
         try:
             await ctx.channel.send(f"Hello {ctx.author.mention}!")
         except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
             await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="hiall")
@@ -47,7 +47,7 @@ class General(commands.Cog):
         try:
             await ctx.send(f"Hello {ctx.message.guild.default_role}!")
         except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
             await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(name="ping", aliases=["p"])
@@ -60,7 +60,7 @@ class General(commands.Cog):
             bot_latency = round(self.bot.latency * 1000, 2)
             await ctx.send(f"pong {bot_latency}ms")
         except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
             await ctx.channel.send(f"Error {__name__}: {e}")
 
     @commands.command(aliases=["gm"])
@@ -74,33 +74,6 @@ class General(commands.Cog):
             file=discord.File("gifs/obama/obama-smile.jpg"),
         )
 
-    @commands.command(aliases=["gn"])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def goodnight(self, ctx):
-        """
-        Reply with media
-        """
-        await ctx.send(
-            "Goodnight and God Bless!",
-            file=discord.File("gifs/obama/obama-sleep.jpeg"),
-        )
-
-    @commands.command(name="fibonacci", aliases=["fib"])
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def fib(self, ctx, num):
-        """
-        Calculate fibonacci of the parameter input
-        paramter num: number in the fibonacci sequence to calculate
-        """
-        try:
-            n = int(num)
-            result = fibonacci(n)
-            await ctx.send(f"```Result:\nFibonnaci of {num} = {result}```")
-
-        except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
-            await ctx.channel.send(f"Error {__name__}: {e}")
-
     @commands.command(name="current_guilds", aliases=["guilds", "servers"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def current_guilds(self, ctx):
@@ -110,23 +83,8 @@ class General(commands.Cog):
         try:
             await ctx.channel.send("I'm in " + str(len(self.bot.guilds)) + " servers!")
         except Exception as e:
-            logger.error(f"USER: {ctx.message.author} ERROR: {e}")
+            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
             await ctx.channel.send(f"Error {__name__}: {e}")
-
-
-def fibonacci(n):
-    """
-    calculate fibonacci sequence for a given n
-    """
-    if n < 0:
-        return "Invalid input"
-    elif n == 0:
-        return 0
-    elif n == 1 or n == 2:
-        return 1
-    else:
-        fib = fibonacci(n - 1) + fibonacci(n - 2)
-        return fib
 
 
 async def setup(bot):

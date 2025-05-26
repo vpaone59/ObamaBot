@@ -4,9 +4,6 @@
 /cogs/__pycache__
 .python-version
 
-# specific json files
-banned.json
-
 # OS files
 .DS_Store
 

@@ -1,7 +1,7 @@
 """
-General Commands Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
+Obama AI Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 
-These are general use commands that any bot should have by default.
+This cog allows users to interact with an AI that generates responses in the style of Barack Obama.
 """
 
 import os
@@ -11,13 +11,7 @@ import requests
 from discord.ext import commands
 from logging_config import create_new_logger
 
-OBAMA_SYSTEM_PROMPT = """
-You are Barack Obama, the 44th President of the United States. Respond in your distinct speaking style, 
-using phrases like "Let me be clear" and "folks." Maintain a thoughtful, measured tone while being. 
-Avoid policy specifics from after your presidency ended in January 2017.
-Ensure each response is less than 2000 characters, and if the response exceeds this limit, 
-truncate it to fit within the limit while preserving the essence of the message.
-"""
+OBAMA_SYSTEM_PROMPT = os.getenv("OBAMA_SYSTEM_PROMPT")
 OBAMA_AI_API_URL = os.getenv("OBAMA_AI_API_URL")
 logger = create_new_logger(__name__)
 
@@ -38,7 +32,6 @@ class ObamaAI(commands.Cog):
         """
         Generate a response in the style of Barack Obama.
         """
-        print(f"Received prompt: {prompt}")
         try:
             # await ctx.response.defer(thinking=True)
             response_text = await asyncio.get_event_loop().run_in_executor(
@@ -85,4 +78,17 @@ class ObamaAI(commands.Cog):
 
 
 async def setup(bot):
+    # Check if required environment variables are set
+    if not OBAMA_SYSTEM_PROMPT:
+        logger.error(
+            "OBAMA_SYSTEM_PROMPT environment variable not set. ObamaAI cog not loaded."
+        )
+        return
+
+    if not OBAMA_AI_API_URL:
+        logger.error(
+            "OBAMA_AI_API_URL environment variable not set. ObamaAI cog not loaded."
+        )
+        return
+
     await bot.add_cog(ObamaAI(bot))

@@ -17,6 +17,11 @@ logger = create_new_logger(__name__)
 
 
 class ObamaAI(commands.Cog):
+    """
+    A cog that allows users to interact with an AI that generates responses in the style of Barack Obama.
+    This cog uses the Ollama API to generate responses based on user prompts.
+    """
+
     def __init__(self, bot):
         self.bot = bot
 

@@ -11,12 +11,12 @@ import requests
 from discord.ext import commands
 from logging_config import create_new_logger
 
-OBAMA_SYSTEM_PROMPT = os.getenv("OBAMA_SYSTEM_PROMPT")
-OBAMA_AI_API_URL = os.getenv("OBAMA_AI_API_URL")
+AI_SYSTEM_PROMPT = os.getenv("AI_SYSTEM_PROMPT")
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
 logger = create_new_logger(__name__)
 
 
-class ObamaAI(commands.Cog):
+class AIChat(commands.Cog):
     """
     A cog that allows users to interact with an AI that generates responses in the style of Barack Obama.
     This cog uses the Ollama API to generate responses based on user prompts.
@@ -32,27 +32,27 @@ class ObamaAI(commands.Cog):
         """
         logger.info("%s ready", self.__cog_name__)
 
-    @commands.command(name="askobama")
-    async def obama_ai(self, ctx, *, prompt: str):
+    @commands.command(aliases=["askobama", "obama"])
+    async def ai_chat(self, ctx, *, prompt: str):
         """
-        Generate a response in the style of Barack Obama.
+        Generate a response to the user's input prompt when they run this command.
         """
         try:
             # await ctx.response.defer(thinking=True)
             response_text = await asyncio.get_event_loop().run_in_executor(
-                None, self.generate_obama_response, prompt
+                None, self.generate_ai_response, prompt
             )
 
             # Send the complete response
             await ctx.send(response_text)
 
         except Exception as e:
-            logger.error("Error in obama_ai command: %s", e)
+            logger.error("Error in ai_chat command: %s", e)
             await ctx.send(
                 "I'm sorry, but I couldn't generate a response at this time."
             )
 
-    def generate_obama_response(self, prompt):
+    def generate_ai_response(self, prompt):
         """
         Generate a response from the Ollama API and return the complete text.
         This runs in a separate thread via run_in_executor.
@@ -60,11 +60,11 @@ class ObamaAI(commands.Cog):
         response_text = ""
 
         response = requests.post(
-            OBAMA_AI_API_URL,
+            OLLAMA_API_URL,
             json={
                 "model": "gemma3:1b",
                 "prompt": prompt,
-                "system": OBAMA_SYSTEM_PROMPT,
+                "system": AI_SYSTEM_PROMPT,
             },
             stream=True,
             timeout=10,
@@ -84,16 +84,16 @@ class ObamaAI(commands.Cog):
 
 async def setup(bot):
     # Check if required environment variables are set
-    if not OBAMA_SYSTEM_PROMPT:
+    if not AI_SYSTEM_PROMPT:
         logger.error(
-            "OBAMA_SYSTEM_PROMPT environment variable not set. ObamaAI cog not loaded."
+            "AI_SYSTEM_PROMPT environment variable not set. ObamaAI cog not loaded."
         )
         return
 
-    if not OBAMA_AI_API_URL:
+    if not OLLAMA_API_URL:
         logger.error(
-            "OBAMA_AI_API_URL environment variable not set. ObamaAI cog not loaded."
+            "OLLAMA_API_URL environment variable not set. ObamaAI cog not loaded."
         )
         return
 
-    await bot.add_cog(ObamaAI(bot))
+    await bot.add_cog(AIChat(bot))

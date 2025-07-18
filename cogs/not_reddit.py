@@ -2,11 +2,14 @@
 Reddit API Cog for ObamaBot https://github.com/vpaone59
 """
 
-import os
 import datetime
+import os
 import random
-from discord.ext import commands
+
 import asyncpraw
+import discord
+from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -139,9 +142,72 @@ class NotReddit(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
 
+    @commands.command(aliases=["fp", "foodpoll"])
+    async def food_poll(self, ctx):
+        """
+        Creates a poll with 2 random posts from r/shittyfoodporn
+        """
+        try:
+            # Create a Reddit subreddit object for r/shittyfoodporn
+            subreddit = await self.reddit.subreddit("shittyfoodporn")
+
+            # Get 50 hot posts to have a good selection
+            posts = [post async for post in subreddit.hot(limit=50)]
+
+            # Filter for posts with images
+            image_posts = [
+                post
+                for post in posts
+                if post.url.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+                or "i.redd.it" in post.url
+                or "imgur.com" in post.url
+            ]
+
+            if len(image_posts) < 2:
+                await ctx.send("Not enough image posts found in r/shittyfoodporn")
+                return
+
+            # Select 2 random posts
+            selected_posts = random.sample(image_posts, 2)
+
+            # Create embed
+            embed = discord.Embed(
+                title="Which is better?",
+                description="Use reactions to vote",
+                color=0xFF6B35,
+            )
+
+            # Add fields for each post
+            for i, post in enumerate(selected_posts, 1):
+                embed.add_field(
+                    name=f"Option {i}: {post.title[:100]}{'...' if len(post.title) > 100 else ''}",
+                    value=f"👤 u/{post.author} | ⬆️ {post.score}\nLink({post.url})",
+                    inline=True,
+                )
+
+            # Set the first image as the main image
+            embed.set_image(url=selected_posts[0].url)
+
+            # Add a second embed for the second image
+            embed2 = discord.Embed(color=0xFF6B35)
+            embed2.set_image(url=selected_posts[1].url)
+
+            # Send both embeds
+            message = await ctx.send(embeds=[embed, embed2])
+
+            # Add reactions for voting
+            await message.add_reaction("1️⃣")
+            await message.add_reaction("2️⃣")
+
+        except Exception as e:
+            await ctx.send(f"An error occurred: {e}")
+
 
 async def setup(bot):
     """
     Adds the cog to the bot
     """
+    if not all([CLIENT_ID, CLIENT_SECRET, USER_AGENT]):
+        logger.error("Reddit API credentials not set. NotReddit cog not loaded.")
+        return
     await bot.add_cog(NotReddit(bot))

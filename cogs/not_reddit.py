@@ -145,7 +145,7 @@ class NotReddit(commands.Cog):
     @commands.command(aliases=["fp", "foodpoll"])
     async def food_poll(self, ctx):
         """
-        Creates a poll with 2 random posts from r/shittyfoodporn
+        Creates a poll with a random post from r/shittyfoodporn
         """
         try:
             # Create a Reddit subreddit object for r/shittyfoodporn
@@ -163,43 +163,36 @@ class NotReddit(commands.Cog):
                 or "imgur.com" in post.url
             ]
 
-            if len(image_posts) < 2:
+            if len(image_posts) < 1:
                 await ctx.send("Not enough image posts found in r/shittyfoodporn")
                 return
 
-            # Select 2 random posts
-            selected_posts = random.sample(image_posts, 2)
+            # Select 1 random post
+            selected_post = random.choice(image_posts)
 
             # Create embed
             embed = discord.Embed(
-                title="Which is better?",
-                description="Use reactions to vote",
                 color=0xFF6B35,
             )
 
-            # Add fields for each post
-            for i, post in enumerate(selected_posts, 1):
-                embed.add_field(
-                    name=f"Option {i}: {post.title[:100]}{'...' if len(post.title) > 100 else ''}",
-                    value=f"👤 u/{post.author} | ⬆️ {post.score}\nLink({post.url})",
-                    inline=True,
-                )
+            embed.add_field(
+                name=f"{selected_post.title[:150]}{'...' if len(selected_post.title) > 150 else ''}",
+                value=f"👤 u/{selected_post.author} | ⬆️ {selected_post.score}\n[View Post]({selected_post.url})",
+                inline=False,
+            )
 
-            # Set the first image as the main image
-            embed.set_image(url=selected_posts[0].url)
+            # Set the image
+            embed.set_image(url=selected_post.url)
 
-            # Add a second embed for the second image
-            embed2 = discord.Embed(color=0xFF6B35)
-            embed2.set_image(url=selected_posts[1].url)
+            # Send the embed
+            message = await ctx.send(embed=embed)
 
-            # Send both embeds
-            message = await ctx.send(embeds=[embed, embed2])
-
-            # Add reactions for voting
-            await message.add_reaction("1️⃣")
-            await message.add_reaction("2️⃣")
+            # Add voting reactions
+            await message.add_reaction("⬆️")
+            await message.add_reaction("⬇️")
 
         except Exception as e:
+            logger.error("Error in food_poll command: %s", e)
             await ctx.send(f"An error occurred: {e}")
 
 

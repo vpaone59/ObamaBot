@@ -34,12 +34,12 @@ class PredecessorStats(commands.Cog):
         player_info = await get_player(await get_player_id(player_name))
 
         response_message = f"""```
-Player ID: {player_info['id']}
-Display Name: {player_info['display_name']}
-Region: {player_info['region']}
-Leaderboard: #{player_info['rank_active']}
-Rank: {player_info['rank_title']}
-MMR: {player_info['mmr']}```"""
+Player ID: {player_info["id"]}
+Display Name: {player_info["display_name"]}
+Region: {player_info["region"]}
+Leaderboard: #{player_info["rank_active"]}
+Rank: {player_info["rank_title"]}
+MMR: {player_info["mmr"]}```"""
 
         await ctx.channel.send(response_message)
 
@@ -72,19 +72,19 @@ MMR: {player_info['mmr']}```"""
             )
 
             response_message = f"""```
-Player ID: {player_match_history['id']}
+Player ID: {player_match_history["id"]}
 Game Time: {start_time.strftime("%B %d, %Y")} {start_time.strftime("%I:%M:%S %p")} - {end_time.strftime("%I:%M:%S %p")}
-Name: {player_match_history['display_name']}
-MMR: {player_match_history['mmr']}
-MMR Change: {player_match_history['mmr_change']}
-Minions Killed: {player_match_history['minions_killed']}
-Level: {player_match_history['level']}
-Kills: {player_match_history['kills']}
-Deaths: {player_match_history['deaths']}
-Assists: {player_match_history['assists']}
-Total Damage Dealt to Heroes: {player_match_history['total_damage_dealt_to_heroes']}
-Total Damage Taken from Heroes: {player_match_history['total_damage_taken_from_heroes']}
-Gold Earned: {player_match_history['gold_earned']}```"""
+Name: {player_match_history["display_name"]}
+MMR: {player_match_history["mmr"]}
+MMR Change: {player_match_history["mmr_change"]}
+Minions Killed: {player_match_history["minions_killed"]}
+Level: {player_match_history["level"]}
+Kills: {player_match_history["kills"]}
+Deaths: {player_match_history["deaths"]}
+Assists: {player_match_history["assists"]}
+Total Damage Dealt to Heroes: {player_match_history["total_damage_dealt_to_heroes"]}
+Total Damage Taken from Heroes: {player_match_history["total_damage_taken_from_heroes"]}
+Gold Earned: {player_match_history["gold_earned"]}```"""
             await ctx.channel.send(response_message)
         else:
             await ctx.channel.send(f"Player '{player_name}' not found.")

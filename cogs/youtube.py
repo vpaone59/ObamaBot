@@ -81,8 +81,7 @@ def query_latest_youtube_video_from_channel_id(
         return latest_video
 
     except Exception as e:
-        # Log any errors that occur during the process
-        print(f"Error fetching latest video: {e}")
+        logger.info("Error fetching latest video: %s", e)
 
 
 async def setup(bot):

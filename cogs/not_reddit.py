@@ -2,11 +2,14 @@
 Reddit API Cog for ObamaBot https://github.com/vpaone59
 """
 
-import os
 import datetime
+import os
 import random
-from discord.ext import commands
+
 import asyncpraw
+import discord
+from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -139,9 +142,65 @@ class NotReddit(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {e}")
 
+    @commands.command(aliases=["fp", "foodpoll"])
+    async def food_poll(self, ctx):
+        """
+        Creates a poll with a random post from r/shittyfoodporn
+        """
+        try:
+            # Create a Reddit subreddit object for r/shittyfoodporn
+            subreddit = await self.reddit.subreddit("shittyfoodporn")
+
+            # Get 50 hot posts to have a good selection
+            posts = [post async for post in subreddit.hot(limit=50)]
+
+            # Filter for posts with images
+            image_posts = [
+                post
+                for post in posts
+                if post.url.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+                or "i.redd.it" in post.url
+                or "imgur.com" in post.url
+            ]
+
+            if len(image_posts) < 1:
+                await ctx.send("Not enough image posts found in r/shittyfoodporn")
+                return
+
+            # Select 1 random post
+            selected_post = random.choice(image_posts)
+
+            # Create embed
+            embed = discord.Embed(
+                color=0xFF6B35,
+            )
+
+            embed.add_field(
+                name=f"{selected_post.title[:150]}{'...' if len(selected_post.title) > 150 else ''}",
+                value=f"👤 u/{selected_post.author} | ⬆️ {selected_post.score}\n[View Post]({selected_post.url})",
+                inline=False,
+            )
+
+            # Set the image
+            embed.set_image(url=selected_post.url)
+
+            # Send the embed
+            message = await ctx.send(embed=embed)
+
+            # Add voting reactions
+            await message.add_reaction("⬆️")
+            await message.add_reaction("⬇️")
+
+        except Exception as e:
+            logger.error("Error in food_poll command: %s", e)
+            await ctx.send(f"An error occurred: {e}")
+
 
 async def setup(bot):
     """
     Adds the cog to the bot
     """
+    if not all([CLIENT_ID, CLIENT_SECRET, USER_AGENT]):
+        logger.error("Reddit API credentials not set. NotReddit cog not loaded.")
+        return
     await bot.add_cog(NotReddit(bot))

@@ -2,18 +2,18 @@
 This is the main file for the Discord bot.
 It initializes the bot, loads all Cog files, and starts the bot.
 
-Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN.
+Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN or else the bot will not work.
 """
 
-import os
 import asyncio
-from typing import Literal, Optional
+import os
 from pathlib import Path
+from typing import Optional
+
 import discord
-from discord.ext.commands import Greedy, Context  # or a subclass of yours
 from discord.ext import commands
+
 from logging_config import create_new_logger
-from db_helper import initialize_database
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)
@@ -28,7 +28,7 @@ elif not PREFIX:
     logger.error("PREFIX environment variable not set")
     exit(1)
 else:
-    # Configure Discord bot intents and grab token from environment variables
+    # Configure Discord bot intents and initialize the bot
     intents = discord.Intents.default()
     intents.message_content = True
     bot = commands.Bot(command_prefix=PREFIX, intents=intents)
@@ -39,15 +39,6 @@ async def main():
     """
     The main function that starts the Discord bot.
     """
-
-    # Initialize the database
-    try:
-        logger.info("Initializing database")
-        initialize_database()
-    except Exception as e:
-        logger.error("Failed to initialize database: %s", e)
-        raise e
-
     # Load all Cog files
     try:
         await load_all_cogs()
@@ -67,8 +58,6 @@ async def main():
 async def on_ready():
     """
     Runs once the bot establishes a connection with Discord.
-
-    Load all cogs into the bot
     """
     logger.info("Logged in as %s", bot.user)
 

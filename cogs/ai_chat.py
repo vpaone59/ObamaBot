@@ -13,6 +13,7 @@ from logging_config import create_new_logger
 
 AI_SYSTEM_PROMPT = os.getenv("AI_SYSTEM_PROMPT")
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 logger = create_new_logger(__name__)
 
 
@@ -62,7 +63,7 @@ class AIChat(commands.Cog):
         response = requests.post(
             OLLAMA_API_URL,
             json={
-                "model": "gemma3:1b",
+                "model": OLLAMA_MODEL,
                 "prompt": prompt,
                 "system": AI_SYSTEM_PROMPT,
             },

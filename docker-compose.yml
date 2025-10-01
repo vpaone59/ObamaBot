@@ -2,6 +2,8 @@ services:
   bot:
     build: .
     container_name: python3-obamabot
+    env_file:
+      - .env
     volumes:
       # Mount the logs and database folders to the host machine
       - ${HOST_LOG_PATH}:/app/logs

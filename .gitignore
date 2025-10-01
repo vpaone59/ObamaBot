@@ -13,9 +13,6 @@
 # virtual environments
 /.venv
 
-# vs code
-.vscode
-
 # other
 .bat
 /logs

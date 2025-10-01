@@ -4,11 +4,15 @@ Obama AI Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 This cog allows users to interact with an AI that generates responses in the style of Barack Obama.
 """
 
-import os
-import json
 import asyncio
+import json
+import os
+
 import requests
+from discord import app_commands
+from discord import Interaction
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 AI_SYSTEM_PROMPT = os.getenv("AI_SYSTEM_PROMPT")
@@ -33,23 +37,23 @@ class AIChat(commands.Cog):
         """
         logger.info("%s ready", self.__cog_name__)
 
-    @commands.command(aliases=["askobama", "obama"])
-    async def ai_chat(self, ctx, *, prompt: str):
+    @app_commands.command(name="askobama", description="Ask ObamaBot a question")
+    async def ai_chat(self, interaction: Interaction, query: str):
         """
         Generate a response to the user's input prompt when they run this command.
         """
         try:
             # await ctx.response.defer(thinking=True)
             response_text = await asyncio.get_event_loop().run_in_executor(
-                None, self.generate_ai_response, prompt
+                None, self.generate_ai_response, query
             )
 
             # Send the complete response
-            await ctx.send(response_text)
+            await interaction.response.send_message(response_text)
 
         except Exception as e:
             logger.error("Error in ai_chat command: %s", e)
-            await ctx.send(
+            await interaction.response.send_message(
                 "I'm sorry, but I couldn't generate a response at this time."
             )
 

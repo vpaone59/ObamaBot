@@ -9,16 +9,15 @@ import json
 import os
 
 import requests
-from discord import app_commands
-from discord import Interaction
+from discord import Interaction, app_commands
 from discord.ext import commands
-
 from logging_config import create_new_logger
+
+logger = create_new_logger(__name__)
 
 AI_SYSTEM_PROMPT = os.getenv("AI_SYSTEM_PROMPT")
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
-logger = create_new_logger(__name__)
 
 
 class AIChat(commands.Cog):
@@ -38,7 +37,7 @@ class AIChat(commands.Cog):
         logger.info("%s ready", self.__cog_name__)
 
     @app_commands.command(name="askobama", description="Ask ObamaBot a question")
-    async def ai_chat(self, interaction: Interaction, query: str):
+    async def ai_chat_slash_command(self, interaction: Interaction, query: str):
         """
         Generate a response to the user's input prompt when they run this command.
         """
@@ -54,6 +53,33 @@ class AIChat(commands.Cog):
         except Exception as e:
             logger.error("Error in ai_chat command: %s", e)
             await interaction.response.send_message(
+                "I'm sorry, but I couldn't generate a response at this time."
+            )
+
+    @commands.command(aliases=["obama", "askobama"])
+    async def chat(self, ctx, *, query: str = None):
+        """
+        Prefix activated AI chat command. Does the same thing as ai_chat_slash_command
+        """
+        try:
+            if not query:
+                await ctx.send(
+                    "Please provide a question after the command. Example: `!obama What do you think about climate change?`"
+                )
+                return
+
+            # Defer typing to show the bot is working
+            async with ctx.typing():
+                response_text = await asyncio.get_event_loop().run_in_executor(
+                    None, self.generate_ai_response, query
+                )
+
+            # Send the complete response
+            await ctx.send(response_text)
+
+        except Exception as e:
+            logger.error("Error in chat command: %s", e)
+            await ctx.send(
                 "I'm sorry, but I couldn't generate a response at this time."
             )
 

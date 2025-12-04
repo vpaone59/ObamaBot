@@ -9,7 +9,6 @@ import random
 import asyncpraw
 import discord
 from discord.ext import commands
-
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)

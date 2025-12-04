@@ -12,7 +12,6 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-
 from logging_config import create_new_logger
 
 # Initialize main logger for the bot
@@ -81,7 +80,7 @@ async def load_all_cogs():
     """
     Loads all Cog files from the /cogs directory.
     """
-    for cog_file in Path("cogs").rglob("*.py"):
+    for cog_file in Path("./app/cogs").rglob("*.py"):
         try:
             await bot.load_extension(f"cogs.{cog_file.stem}")
         except Exception as e:
@@ -192,6 +191,9 @@ async def sync_command(ctx, spec: Optional[str] = None):
     if spec is None:
         # Sync to current guild
         synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        logger.info(
+            "Synced %d commands to guild %s (%d)", len(synced), ctx.guild, ctx.guild.id
+        )
         await ctx.send(f"Synced {len(synced)} commands to the current guild.")
         return
 
@@ -199,6 +201,7 @@ async def sync_command(ctx, spec: Optional[str] = None):
         # Sync globally (takes up to 1 hour to propagate)
         ctx.bot.tree.copy_global_to(guild=ctx.guild)
         await ctx.bot.tree.sync(guild=None)
+        logger.info("Synced commands globally (requested by %s)", ctx.message.author)
         await ctx.send(
             "Synced commands globally. This can take up to 1 hour to take effect."
         )
@@ -208,6 +211,7 @@ async def sync_command(ctx, spec: Optional[str] = None):
         # Clear commands from current guild
         ctx.bot.tree.clear_commands(guild=ctx.guild)
         await ctx.bot.tree.sync(guild=ctx.guild)
+        logger.info("Cleared all commands from guild %s (%d)", ctx.guild, ctx.guild.id)
         await ctx.send("Cleared all commands from the current guild.")
         return
 
@@ -215,6 +219,7 @@ async def sync_command(ctx, spec: Optional[str] = None):
         # Clear global commands
         ctx.bot.tree.clear_commands(guild=None)
         await ctx.bot.tree.sync(guild=None)
+        logger.info("Cleared all global commands (requested by %s)", ctx.message.author)
         await ctx.send(
             "Cleared all global commands. This can take up to 1 hour to take effect."
         )

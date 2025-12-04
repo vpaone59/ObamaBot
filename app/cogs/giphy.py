@@ -4,14 +4,16 @@ Giphy API integrator Cog for ObamaBot by Vincent Paone https://github.com/vpaone
 Utilizes the Giphy API
 """
 
-import random
-import os
 import json
+import os
+import random
 from urllib import parse, request
-from discord.ext import commands
-from logging_config import create_new_logger
+
 import discord
 from discord import app_commands
+from discord.ext import commands
+
+from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 # Grab Giphy key & assign url to variable

@@ -1,14 +1,10 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y sqlite3
 
-WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-COPY . .
+COPY app/ ./app/
 
-RUN pip3 install --upgrade pip setuptools==70.0.0
-RUN pip3 install -r requirements.txt
-
-EXPOSE 8080
-
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "/app/main.py"]

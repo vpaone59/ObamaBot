@@ -5,9 +5,10 @@ This module configures a logger for the bot. The logger logs to a file and the c
 """
 
 import json
-import os
 import logging
+import os
 from datetime import datetime
+
 import pytz
 
 # Create the log file and directory if it doesn't already exist

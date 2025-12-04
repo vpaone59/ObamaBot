@@ -12,7 +12,6 @@ from urllib import parse, request
 import discord
 from discord import app_commands
 from discord.ext import commands
-
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -40,33 +39,107 @@ class GifGenerator(commands.Cog):
     @app_commands.describe(query="The search query for the GIFs")
     async def get_random_gif(self, interaction: discord.Interaction, query: str):
         """
-        Search for GIFs using the Giphy API and return a random GIF from the results
+        Search for GIFs using the Giphy API and return a random GIF from the results.
+
+        Args:
+            query: The search term for finding GIFs
         """
-        params = parse.urlencode({"q": query, "api_key": GIPHY_KEY, "limit": "10"})
+        logger.info("User %s requested GIF for query: %s", interaction.user, query)
+
+        # Validate inputs
+        if not GIPHY_KEY:
+            logger.error("GIPHY_KEY not configured")
+            await interaction.response.send_message(
+                "Giphy API is not configured. Please contact an administrator."
+            )
+            return
+
+        if not query.strip():
+            await interaction.response.send_message(
+                "Please provide a search term for the GIF."
+            )
+            return
+
+        # Sanitize query
+        query = query.strip()[:100]  # Limit query length
 
         try:
-            with request.urlopen("".join((URL, "?", params))) as response:
+            params = parse.urlencode(
+                {
+                    "q": query,
+                    "api_key": GIPHY_KEY,
+                    "limit": "10",
+                    "rating": "pg-13",  # Keep content appropriate
+                }
+            )
+
+            logger.info("Making Giphy API request for query: %s", query)
+
+            with request.urlopen("".join((URL, "?", params)), timeout=10) as response:
+                if response.status != 200:
+                    logger.error("Giphy API returned status code: %s", response.status)
+                    raise Exception(f"Giphy API error (status {response.status})")
+
                 data = json.loads(response.read())
 
-                # Check if no GIFs were found
-                if not data.get("data"):
-                    raise Exception(
-                        f"No GIFs found for {query}, try again with a different search query"
-                    )
+                # Validate API response
+                if "data" not in data:
+                    logger.error("Invalid API response structure: %s", data)
+                    raise Exception("Invalid response from Giphy API")
 
-                # Choose a random GIF from the list returned
+                # Check if no GIFs were found
+                if not data["data"]:
+                    logger.info("No GIFs found for query: %s", query)
+                    await interaction.response.send_message(
+                        f"No GIFs found for **{query}**\nTry a different search term!"
+                    )
+                    return
+
+                # Choose a random GIF from the results
                 selection = random.choice(data["data"])
-                link = selection.get("embed_url")
-                if link:
-                    await interaction.response.send_message(f"{query}\n{link}")
-                else:
-                    raise Exception("No embed URL found for the selected GIF")
+
+                # Get the best available URL (prefer embed_url, fallback to url)
+                gif_url = selection.get("embed_url") or selection.get("url")
+
+                if not gif_url:
+                    logger.error("No valid URL found in GIF data: %s", selection)
+                    raise Exception("No valid URL found for the selected GIF")
+
+                title = selection.get("title", "GIF")[:100]  # Limit title length
+
+                logger.info("Successfully found GIF for query '%s': %s", query, title)
+
+                embed = discord.Embed(
+                    title=f"{query}",
+                    description=f"[{title}]({gif_url})",
+                    color=0xFF6F91,  # Giphy pink
+                )
+                embed.set_image(url=gif_url)
+
+                await interaction.response.send_message(embed=embed)
 
         except Exception as e:
             logger.error(
-                f"\n\t USER: {interaction.user}\n\t INPUT: {query}\n\t ERROR: {e}"
+                "Error in GIF search - User: %s, Query: %s, Error: %s",
+                interaction.user,
+                query,
+                e,
+                exc_info=True,
             )
-            await interaction.response.send_message(f"```{e}```")
+
+            # Provide user-friendly error messages
+            if "timeout" in str(e).lower():
+                error_msg = "The request timed out. Please try again."
+            elif "no gifs found" in str(e).lower():
+                error_msg = (
+                    f"No GIFs found for **{query}**. Try a different search term!"
+                )
+            else:
+                error_msg = (
+                    "Sorry, I couldn't fetch a GIF right now. Please try again later."
+                )
+
+            await interaction.response.send_message(error_msg)
 
 
 async def setup(bot):

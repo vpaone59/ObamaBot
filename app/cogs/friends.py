@@ -18,13 +18,18 @@ class Friends(commands.Cog):
     For friends :)
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.user_reactions = {
             "toggle": False,
             "discord_user_id": None,
-        }  # Flag for enabling reactions for a user
-        self.friend_guilds_locked = False  # Flag for locking the cog to specific guilds
+        }
+        self.friend_guilds_locked = False
+        logger.info(
+            "Friends cog initialized with reactions: %s, guild_lock: %s",
+            self.user_reactions["toggle"],
+            self.friend_guilds_locked,
+        )
 
     @commands.Cog.listener()
     async def on_ready(self):

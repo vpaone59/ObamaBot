@@ -28,15 +28,23 @@ class General(commands.Cog):
 
     @commands.command(aliases=["hey", "hi"])
     @commands.cooldown(1, 2, commands.BucketType.user)
-    async def hello(self, ctx):
+    async def hello(self, ctx: commands.Context):
         """
         Reply mention to the user
         """
         try:
-            await ctx.channel.send(f"Hello {ctx.author.mention}!")
+            logger.info(
+                "User %s (%s) used hello command in %s",
+                ctx.author,
+                ctx.author.id,
+                ctx.guild,
+            )
+            await ctx.send(f"Hello {ctx.author.mention}!")
         except Exception as e:
-            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
-            await ctx.channel.send(f"Error {__name__}: {e}")
+            logger.error(
+                "Error in hello command for user %s: %s", ctx.author, e, exc_info=True
+            )
+            await ctx.send("Sorry, I couldn't send a greeting right now.")
 
     @commands.command(name="hiall")
     @commands.cooldown(1, 2, commands.BucketType.user)

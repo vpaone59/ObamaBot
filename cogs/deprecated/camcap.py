@@ -12,7 +12,7 @@ import cv2
 import discord
 from discord.ext import commands
 
-from logging_config import create_new_logger
+from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 # number of cameras active and an index to identify each

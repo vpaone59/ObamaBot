@@ -13,7 +13,7 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from logging_config import create_new_logger
+from utils.logging_config import create_new_logger
 
 # Initialize main logger for the bot
 logger = create_new_logger(__name__)

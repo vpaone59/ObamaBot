@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-from logging_config import create_new_logger
+from .logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 DATABASE_PATH = Path("./database/bot.db").resolve()

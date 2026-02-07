@@ -2,9 +2,11 @@
 Predecessor Game API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+
 import requests
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)

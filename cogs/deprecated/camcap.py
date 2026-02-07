@@ -4,12 +4,14 @@ Camcap Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 This Cog is custom made for a specific server and will not work in normal servers.
 """
 
-import time
+import os
 import random
+import time
+
+import cv2
 import discord
 from discord.ext import commands
-import cv2
-import os
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -21,6 +23,8 @@ class Camcap(commands.Cog):
     """
     camera capture commands that uses webcams to take pictures,
     record videos, etc
+
+    DEPRECATED: This cog is no longer maintained and will be removed in a future version.
     """
 
     def __init__(self, bot):
@@ -140,4 +144,8 @@ def check_for_cat(image):
 
 
 async def setup(bot):
-    await bot.add_cog(Camcap(bot))
+    # await bot.add_cog(Camcap(bot))
+
+    # Don't add the cog
+    logger.warning("Camcap cog is deprecated and no longer loaded.")
+    return

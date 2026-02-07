@@ -12,6 +12,7 @@ from urllib import parse, request
 import discord
 from discord import app_commands
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -143,5 +144,4 @@ class GifGenerator(commands.Cog):
 
 
 async def setup(bot):
-    """ """
     await bot.add_cog(GifGenerator(bot))

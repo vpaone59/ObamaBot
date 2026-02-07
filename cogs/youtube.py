@@ -4,8 +4,10 @@ YouTube API integrator Cog for ObamaBot https://github.com/vpaone59
 
 import os
 from datetime import datetime
-from discord.ext import commands
+
 import googleapiclient.discovery
+from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)

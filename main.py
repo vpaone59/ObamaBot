@@ -12,6 +12,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 # Initialize main logger for the bot
@@ -80,7 +81,7 @@ async def load_all_cogs():
     """
     Loads all Cog files from the /cogs directory.
     """
-    for cog_file in Path("./app/cogs").rglob("*.py"):
+    for cog_file in Path("./cogs").rglob("*.py"):
         try:
             await bot.load_extension(f"cogs.{cog_file.stem}")
         except Exception as e:

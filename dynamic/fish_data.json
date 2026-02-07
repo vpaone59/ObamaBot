@@ -1,0 +1,48 @@
+{
+    "fish": [
+        {
+            "name": "Clownfish",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Amphiprion_ocellaris_%28Clown_anemonefish%29_by_Nick_Hobgood.jpg/1280px-Amphiprion_ocellaris_%28Clown_anemonefish%29_by_Nick_Hobgood.jpg"
+        },
+        {
+            "name": "Blue Tang",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Atlantic_blue_tang_surgeonfish_%28%22Acanthurus_coeruleus%22%29_-13092009a.jpg/640px-Atlantic_blue_tang_surgeonfish_%28%22Acanthurus_coeruleus%22%29_-13092009a.jpg"
+        },
+        {
+            "name": "Oscar",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Astronotus_ocellatus.jpg"
+        },
+        {
+            "name": "Whale Shark",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Whale_shark%2C_Rhincodon_typus%2C_at_Daedalus_in_the_Egyptian_Red_Sea._%2835827412321%29.jpg/640px-Whale_shark%2C_Rhincodon_typus%2C_at_Daedalus_in_the_Egyptian_Red_Sea._%2835827412321%29.jpg"
+        },
+        {
+            "name": "Salmon",
+            "image_url": ""
+        },
+        {
+            "name": "Red saddleback anemonefish",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Amphiprion_ephippium_341445534.jpg/640px-Amphiprion_ephippium_341445534.jpg"
+        },
+        {
+            "name": "Green terror",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Andinoacara_rivulatus_-_Karlsruhe_Zoo_01.jpg/640px-Andinoacara_rivulatus_-_Karlsruhe_Zoo_01.jpg"
+        },
+        {
+            "name": "Shortnose Sturgeon",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Acipenser_brevirostrum_223786222.jpg/640px-Acipenser_brevirostrum_223786222.jpg"
+        },
+        {
+            "name": "Old World knifefish",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Chitala_ornata.jpg/640px-Chitala_ornata.jpg"
+        },
+        {
+            "name": "Colorado squawfish",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Colorado_Pikeminnow_%2851647957658%29.jpg/640px-Colorado_Pikeminnow_%2851647957658%29.jpg"
+        },
+        {
+            "name": "Mustache triggerfish",
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Pez_ballesta_tit%C3%A1n_%28Balistoides_viridescens%29%2C_mar_Rojo%2C_Egipto%2C_2023-04-15%2C_DD_66.jpg/640px-Pez_ballesta_tit%C3%A1n_%28Balistoides_viridescens%29%2C_mar_Rojo%2C_Egipto%2C_2023-04-15%2C_DD_66.jpg"
+        }
+    ]
+}

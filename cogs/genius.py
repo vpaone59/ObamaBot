@@ -4,10 +4,12 @@ Genius API integrator Cog for ObamaBot https://github.com/vpaone59
 
 import os
 import random
+
 import discord
+import lyricsgenius
 from discord import app_commands
 from discord.ext import commands
-import lyricsgenius
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -148,7 +150,7 @@ class Genius(commands.Cog):
                 "Error getting lyrics for %s: %s", artist_name, e, exc_info=True
             )
             await interaction.followup.send(
-                f"An error occurred while searching for lyrics.\nPlease try again or contact an administrator if the issue persists."
+                "An error occurred while searching for lyrics.\nPlease try again or contact an administrator if the issue persists."
             )
 
 

@@ -1,0 +1,24 @@
+{
+  "users": {
+    "149356710455279617": {
+      "username": "vinnnyy",
+      "games_played": 1,
+      "correct_answers": 1,
+      "wrong_answers": 0,
+      "image_games": 0,
+      "name_games": 1,
+      "image_correct": 0,
+      "name_correct": 1,
+      "last_played": "2025-12-26T21:05:51.744486"
+    }
+  },
+  "global": {
+    "total_games": 1,
+    "total_correct": 1,
+    "total_wrong": 0,
+    "image_games": 0,
+    "name_games": 1,
+    "image_correct": 0,
+    "name_correct": 1
+  }
+}

@@ -2,11 +2,13 @@
 Custom Smite Cog commands for ObamaBot https://github.com/vpaone59
 """
 
-import random
 import json
+import random
+
 import discord
 from discord import app_commands
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)

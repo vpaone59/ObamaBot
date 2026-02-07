@@ -11,6 +11,7 @@ import os
 import requests
 from discord import Interaction, app_commands
 from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)

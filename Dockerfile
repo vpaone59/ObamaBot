@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y sqlite3
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY app/ ./app/
+COPY . .
+COPY dynamic/ ./dynamic/
 
-ENTRYPOINT ["python", "/app/main.py"]
+ENTRYPOINT ["python", "/main.py"]

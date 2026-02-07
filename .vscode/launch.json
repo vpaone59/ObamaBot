@@ -5,7 +5,7 @@
             "name": "Python Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/app/main.py",
+            "program": "${workspaceFolder}/main.py",
             "autoReload": {
                 "enable": true
             },

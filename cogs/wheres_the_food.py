@@ -3,8 +3,10 @@ Google Maps API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
 import os
-from discord.ext import commands
+
 import requests
+from discord.ext import commands
+
 from logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -74,7 +76,7 @@ def find_restaurant(keyword, ctx):
 
     # Get restaurant open status in a String
     restaurant_status = ""
-    if {restaurant["opening_hours"]["open_now"]} is True:
+    if {restaurant["opening_hours"]["open_now"]} == True:
         restaurant_status = "open"
     else:
         restaurant_status = "closed"

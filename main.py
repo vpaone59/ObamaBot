@@ -90,85 +90,72 @@ async def load_all_cogs():
     logger.info("Loaded *%s* cogs", len(bot.cogs))
 
 
-@bot.command(aliases=["load"], help="Loads a Cog file")
-@commands.has_permissions(administrator=True)
-async def load_cog(ctx, cog_name):
+async def manage_cog(action: str, cog_name: str) -> tuple[bool, str]:
     """
-    Loads a specific Cog file.
+    Helper function to manage cog operations (load, unload, reload).
 
-    param: ctx - The context in which the command is entered
-    param: cog_name - The name of the Cog file to load
+    Returns: (success: bool, message: str)
     """
     try:
-        await bot.load_extension(f"cogs.{cog_name}")
-        await ctx.send(f"```{cog_name}.py loaded```")
+        if action == "load":
+            await bot.load_extension(f"cogs.{cog_name}")
+        elif action == "unload":
+            await bot.unload_extension(f"cogs.{cog_name}")
+        elif action == "reload":
+            await bot.reload_extension(f"cogs.{cog_name}")
+        return True, f"{cog_name}.py {action}ed"
 
     except commands.ExtensionAlreadyLoaded as e:
         logger.error("%s - %s already loaded", e, cog_name)
-        await ctx.send(f"```{cog_name}.py is already loaded\n{e}```")
-
-    except commands.ExtensionNotFound as e:
-        logger.error("%s - %s does not exist", e, cog_name)
-        await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
-
-
-@bot.command(aliases=["unload"], help="Unload a Cog file")
-@commands.has_permissions(administrator=True)
-async def unload_cog(ctx, cog_name):
-    """
-    Unload a Cog file
-
-    param: ctx - The context of which the command is entered
-    param: cog_name - The name of the Cog file to unload
-    """
-    try:
-        await bot.unload_extension(f"cogs.{cog_name}")
-        await ctx.send(f"```{cog_name}.py unloaded```")
-
+        return False, f"{cog_name}.py is already loaded\n{e}"
     except commands.ExtensionNotLoaded as e:
         logger.error("%s - %s is not loaded", e, cog_name)
-        await ctx.send(f"```{cog_name}.py is not loaded\n{e}```")
-
+        return False, f"{cog_name}.py is not loaded\n{e}"
     except commands.ExtensionNotFound as e:
         logger.error("%s - %s does not exist", e, cog_name)
-        await ctx.send(f"```{cog_name}.py does not exist\n{e}```")
+        return False, f"{cog_name}.py does not exist\n{e}"
+    except Exception as e:
+        logger.error("%s", e)
+        return False, f"{cog_name}.py could not be {action}ed\n{e}"
 
 
-@bot.command(aliases=["rl"], help="Reloads a specific Cog or all Cogs by default")
+@bot.command(help="Load, unload, or reload cogs")
 @commands.has_permissions(administrator=True)
-async def reload_cog(ctx, cog_name=""):
+async def cog(ctx, action: str, cog_name: str = ""):
     """
-    Reloads a specific Cog file or all Cogs by default
+    Unified cog management command.
 
-    param: ctx - The context in which the command has been executed
-    param: cog_name - The name of the Cog file to reload
+    Usage:
+    !cog load <cog_name>
+    !cog unload <cog_name>
+    !cog reload <cog_name> (or just !cog reload to reload all)
     """
-    if cog_name == "":
-        reloaded_cogs = ""
-        failed = ""
+    valid_actions = {"load", "unload", "reload"}
+
+    if action not in valid_actions:
+        await ctx.send(f"```Invalid action. Use: {', '.join(valid_actions)}```")
+        return
+
+    if action == "reload" and cog_name == "":
+        # Reload all cogs
+        reloaded, failed = [], []
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
-                try:
-                    await bot.reload_extension(f"cogs.{filename[:-3]}")
-                    reloaded_cogs += " - " + filename
-                except Exception as e:
-                    logger.error("%s", e)
-                    failed += " - " + filename
+                success, _ = await manage_cog("reload", filename[:-3])
+                (reloaded if success else failed).append(filename)
+
         await ctx.send(
-            f"```These Cogs were reloaded: {reloaded_cogs}\n\nThese Cogs failed to reload: {failed}```"
+            f"```Reloaded: {', '.join(reloaded) or 'None'}\n"
+            f"Failed: {', '.join(failed) or 'None'}```"
         )
-    else:
-        try:
-            await bot.reload_extension(f"cogs.{cog_name}")
-            await ctx.send(f"```{cog_name}.py reloaded```")
+        return
 
-        except commands.ExtensionNotFound as e:
-            logger.error("%s", e)
-            await ctx.send(f"```{cog_name}.py not in directory\n{e}```")
+    if not cog_name:
+        await ctx.send(f"```Cog name required for {action} action```")
+        return
 
-        except Exception as e:
-            logger.error("%s", e)
-            await ctx.send(f"```{cog_name}.py could not be reloaded \n{e}```")
+    success, message = await manage_cog(action, cog_name)
+    await ctx.send(f"```{message}```")
 
 
 @bot.command(name="sync")

@@ -17,7 +17,7 @@ All bot features live in `cogs/` as individual Cog classes. Each cog file:
 
 **Example structure:**
 ```python
-from logging_config import create_new_logger
+from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 

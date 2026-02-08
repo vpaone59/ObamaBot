@@ -5,10 +5,10 @@ This cog allows users to interact with an AI that generates responses in the sty
 """
 
 import asyncio
-import json
 import os
+import time
 
-import requests
+import ollama
 from discord import Interaction, app_commands
 from discord.ext import commands
 
@@ -16,8 +16,10 @@ from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 
-AI_SYSTEM_PROMPT = os.getenv("AI_SYSTEM_PROMPT")
-OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
+AI_SYSTEM_PROMPT = os.getenv(
+    "AI_SYSTEM_PROMPT", "You are Barack Obama, the 44th President of the United States."
+)
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 
 
@@ -29,44 +31,95 @@ class AIChat(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.client = ollama.Client(host=OLLAMA_API_URL)
+        self.api_available = False
 
         # Validate environment variables
         if not AI_SYSTEM_PROMPT:
             logger.error("AI_SYSTEM_PROMPT environment variable not set.")
-        if not OLLAMA_API_URL:
-            logger.error("OLLAMA_API_URL environment variable not set.")
-        if not OLLAMA_MODEL:
-            logger.warning("OLLAMA_MODEL not set. Using default model: gemma3:1b")
+
+        logger.info(
+            "AIChat initialized | Ollama URL: %s | Model: %s",
+            OLLAMA_API_URL,
+            OLLAMA_MODEL,
+        )
 
     @commands.Cog.listener()
     async def on_ready(self):
         """
-        Runs when the cog is loaded
+        Runs when the cog is loaded. Checks Ollama API health.
         """
         logger.info("%s ready", self.__cog_name__)
+        await self._check_ollama_health()
+
+    async def _check_ollama_health(self):
+        """
+        Check if Ollama API is reachable and model is available.
+        Runs asynchronously without blocking bot startup.
+        """
+        try:
+            models = await asyncio.get_event_loop().run_in_executor(
+                None, self.client.list
+            )
+            available_models = [m.get("name", "") for m in models.get("models", [])]
+
+            if OLLAMA_MODEL in available_models:
+                logger.info(
+                    "Ollama API health check passed | Available models: %s",
+                    ", ".join(available_models),
+                )
+                self.api_available = True
+            else:
+                logger.warning(
+                    "Model %s not available | Available: %s",
+                    OLLAMA_MODEL,
+                    ", ".join(available_models),
+                )
+                self.api_available = False
+        except Exception as e:
+            logger.error(
+                "Ollama API health check failed | URL: %s | Error: %s",
+                OLLAMA_API_URL,
+                e,
+            )
+            self.api_available = False
 
     @app_commands.command(name="askobama", description="Ask ObamaBot a question")
     async def ai_chat_slash_command(self, interaction: Interaction, query: str):
         """
         Generate a response to the user's input prompt when they run this command.
         """
-        logger.info("Slash command 'askobama' invoked with query: %s", query)
+        logger.info("Slash command 'askobama' invoked | Query: %s", query[:100])
+        await interaction.response.defer()
+
         try:
             response_text = await asyncio.get_event_loop().run_in_executor(
                 None, self.generate_ai_response, query
             )
 
-            if not response_text:
+            if not response_text or response_text.isspace():
+                logger.warning(
+                    "Empty response from AI | Query: %s | API available: %s",
+                    query[:100],
+                    self.api_available,
+                )
                 response_text = (
-                    "I'm sorry, but I couldn't generate a response at this time."
+                    "I'm unable to generate a response right now. Please try again."
                 )
 
-            await interaction.response.send_message(response_text)
+            await interaction.followup.send(response_text)
+            logger.info(
+                "Response sent successfully | Length: %d chars", len(response_text)
+            )
 
         except Exception as e:
-            logger.error("Error in ai_chat_slash_command: %s", e)
-            await interaction.response.send_message(
-                "I'm sorry, but I couldn't generate a response at this time."
+            logger.error(
+                "Error in ai_chat_slash_command: %s | Query: %s",
+                e,
+                query[:100],
+            )
+            await interaction.followup.send(
+                "An error occurred while processing your request."
             )
 
     @commands.command(aliases=["obama", "askobama"])
@@ -74,12 +127,17 @@ class AIChat(commands.Cog):
         """
         Prefix activated AI chat command. Does the same thing as ai_chat_slash_command
         """
-        logger.info("Prefix command 'chat' invoked with query: %s", query)
+        logger.info(
+            "Prefix command 'chat' invoked | Query: %s",
+            query[:100] if query else "None",
+        )
+
         try:
-            if not query:
+            if not query or query.isspace():
                 await ctx.send(
                     "Please provide a question after the command. Example: `!obama What do you think about climate change?`"
                 )
+                logger.warning("Chat command invoked without query")
                 return
 
             # Defer typing to show the bot is working
@@ -88,76 +146,91 @@ class AIChat(commands.Cog):
                     None, self.generate_ai_response, query
                 )
 
-            if not response_text:
+            if not response_text or response_text.isspace():
+                logger.warning(
+                    "Empty response from AI | Query: %s | API available: %s",
+                    query[:100],
+                    self.api_available,
+                )
                 response_text = (
-                    "I'm sorry, but I couldn't generate a response at this time."
+                    "I'm unable to generate a response right now. Please try again."
                 )
 
             await ctx.send(response_text)
+            logger.info(
+                "Response sent successfully | Length: %d chars", len(response_text)
+            )
 
         except Exception as e:
-            logger.error("Error in chat command: %s", e)
-            await ctx.send(
-                "I'm sorry, but I couldn't generate a response at this time."
+            logger.error(
+                "Error in chat command: %s | Query: %s",
+                e,
+                query[:100] if query else "None",
             )
+            await ctx.send("An error occurred while processing your request.")
 
     def generate_ai_response(self, prompt: str) -> str:
         """
-        Generate a response from the Ollama API and return the complete text.
+        Generate a response from the Ollama API using the official Python library.
         This runs in a separate thread via run_in_executor.
+
+        Returns: Generated response text, or empty string on failure
         """
-        logger.info("Generating AI response for prompt: %s", prompt)
+        logger.info(
+            "Generating AI response | Model: %s | Prompt: %s",
+            OLLAMA_MODEL,
+            prompt[:100],
+        )
         response_text = ""
+        start_time = time.time()
 
         try:
-            response = requests.post(
-                OLLAMA_API_URL,
-                json={
-                    "model": OLLAMA_MODEL,
-                    "prompt": prompt,
-                    "system": AI_SYSTEM_PROMPT,
-                },
-                stream=True,
-                timeout=30,  # Increased timeout
+            # Call Ollama API
+            response = self.client.generate(
+                model=OLLAMA_MODEL,
+                prompt=prompt,
+                system=AI_SYSTEM_PROMPT,
+                stream=False,
             )
 
-            logger.info("API request sent. Status code: %d", response.status_code)
+            response_text = response.get("response", "").strip()
+            elapsed_time = time.time() - start_time
 
-            # Check if the request was successful
-            response.raise_for_status()
+            if response_text:
+                logger.info(
+                    "AI response generated | Length: %d chars | Time: %.2fs",
+                    len(response_text),
+                    elapsed_time,
+                )
+            else:
+                logger.warning(
+                    "Empty response from Ollama | Model: %s | Time: %.2fs",
+                    OLLAMA_MODEL,
+                    elapsed_time,
+                )
 
-            for line in response.iter_lines():
-                if line:
-                    try:
-                        chunk = json.loads(line.decode("utf-8"))
-                        if "response" in chunk:
-                            response_text += chunk["response"]
-                    except json.JSONDecodeError:
-                        logger.error("Failed to parse JSON from line: %s", line)
-
-            if not response_text:
-                logger.warning("No response text generated from the API.")
-
-        except requests.exceptions.RequestException as e:
-            logger.error("Request error: %s", e)
+        except ollama.ResponseError as e:
+            logger.error(
+                "Ollama API response error | Status: %s | Error: %s",
+                getattr(e, "status_code", "unknown"),
+                e.error if hasattr(e, "error") else str(e),
+            )
+        except ollama.RequestError as e:
+            logger.error("Ollama API request error | Error: %s", e)
         except Exception as e:
-            logger.error("Unexpected error in generate_ai_response: %s", e)
+            logger.error(
+                "Unexpected error in generate_ai_response | Type: %s | Error: %s",
+                type(e).__name__,
+                e,
+            )
 
         return response_text
 
 
 async def setup(bot: commands.Bot):
-    # Check if required environment variables are set
+    """Setup function for the AIChat cog"""
     if not AI_SYSTEM_PROMPT:
-        logger.error(
-            "AI_SYSTEM_PROMPT environment variable not set. ObamaAI cog not loaded."
-        )
-        return
-
-    if not OLLAMA_API_URL:
-        logger.error(
-            "OLLAMA_API_URL environment variable not set. ObamaAI cog not loaded."
-        )
+        logger.error("AI_SYSTEM_PROMPT not set. AIChat cog not loaded.")
         return
 
     await bot.add_cog(AIChat(bot))

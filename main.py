@@ -31,7 +31,7 @@ else:
     # Configure Discord bot intents and initialize the bot
     intents = discord.Intents.default()
     intents.message_content = True
-    bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+    bot = commands.Bot(command_prefix=PREFIX, intents=intents, case_insensitive=True)
     BOT_TOKEN = DISCORD_TOKEN
 
 

@@ -45,6 +45,13 @@ logger = create_new_logger(__name__)
 
 Logs output to `./logs/bot.log` in JSON format with EST timezone. No print statements—always use `logger.*()`.
 
+Important: Always use lazy formatting when calling logger methods. Pass interpolation values as separate arguments instead of using f-strings or `str.format()` inside the logger call. This preserves performance and defers string interpolation until the message will actually be emitted.
+
+Examples:
+
+- Good: `logger.info("Connected to %s", destination)`
+- Bad: `logger.info(f"Connected to {destination}")`
+
 ### Import Conventions (CRITICAL)
 
 **After creating `cogs/__init__.py`**, use relative imports in cog files:

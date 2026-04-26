@@ -435,7 +435,7 @@ class Fish(commands.Cog):
                     if fake_name:
                         return fake_name
         except Exception as e:
-            logger.error(f"AI fish name generation failed: {e}")
+            logger.error("AI fish name generation failed: %s", e)
 
         return self._generate_fake_fish_name_fallback()
 

@@ -16,8 +16,9 @@ from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 
-AI_SYSTEM_PROMPT = os.getenv(
-    "AI_SYSTEM_PROMPT", "You are Barack Obama, the 44th President of the United States."
+# Fallback system prompt if none provided by prompt loader
+FALLBACK_SYSTEM_PROMPT = (
+    "You are Barack Obama, the 44th President of the United States."
 )
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
@@ -34,9 +35,8 @@ class AIChat(commands.Cog):
         self.client = ollama.Client(host=OLLAMA_API_URL)
         self.api_available = False
 
-        # Validate environment variables
-        if not AI_SYSTEM_PROMPT:
-            logger.error("AI_SYSTEM_PROMPT environment variable not set.")
+        # system prompt will be read dynamically from bot.prompt_manager when generating
+        self.system_prompt = None
 
         logger.info(
             "AIChat initialized | Ollama URL: %s | Model: %s",
@@ -186,10 +186,18 @@ class AIChat(commands.Cog):
 
         try:
             # Call Ollama API
+            # Prefer prompt from PromptManager if available
+            mgr = getattr(self.bot, "prompt_manager", None)
+            system_prompt = None
+            if mgr and mgr.prompt:
+                system_prompt = mgr.prompt
+            else:
+                system_prompt = FALLBACK_SYSTEM_PROMPT
+
             response = self.client.generate(
                 model=OLLAMA_MODEL,
                 prompt=prompt,
-                system=AI_SYSTEM_PROMPT,
+                system=system_prompt,
                 stream=False,
             )
 
@@ -229,8 +237,4 @@ class AIChat(commands.Cog):
 
 async def setup(bot: commands.Bot):
     """Setup function for the AIChat cog"""
-    if not AI_SYSTEM_PROMPT:
-        logger.error("AI_SYSTEM_PROMPT not set. AIChat cog not loaded.")
-        return
-
     await bot.add_cog(AIChat(bot))

@@ -2,7 +2,8 @@
 This is the main file for the Discord bot.
 It initializes the bot, loads all Cog files, and starts the bot.
 
-Before running this file, make sure to set the environment variables PREFIX and DISCORD_TOKEN or else the bot will not work.
+Install dependencies:
+    pip install fastapi uvicorn httpx discord.py
 """
 
 import asyncio
@@ -13,6 +14,7 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
+from api import ping_backend, run_api_server, set_bot_reference
 from utils.logging_config import create_new_logger
 
 # Initialize main logger for the bot
@@ -37,7 +39,7 @@ else:
 
 async def main():
     """
-    The main function that starts the Discord bot.
+    The main function that starts the Discord bot and API server.
     """
     # Load all Cog files
     try:
@@ -48,10 +50,15 @@ async def main():
         )
         return
 
-    # Start the bot
-    async with bot:
-        logger.info("Starting bot...")
-        await bot.start(BOT_TOKEN)
+    # Set bot reference for API server
+    set_bot_reference(bot)
+
+    # Create tasks for bot and API server
+    bot_task = asyncio.create_task(bot.start(BOT_TOKEN))
+    api_task = asyncio.create_task(run_api_server(host="0.0.0.0", port=5000))
+
+    # Wait for both to run
+    await asyncio.gather(bot_task, api_task)
 
 
 @bot.event
@@ -60,6 +67,14 @@ async def on_ready():
     Runs once the bot establishes a connection with Discord.
     """
     logger.info("Logged in as %s", bot.user)
+    logger.info("Connected to %d servers", len(bot.guilds))
+
+    # Ping the backend to sync stats (first time)
+    success = await ping_backend()
+    if success:
+        logger.info("Initial backend sync successful")
+    else:
+        logger.warning("Could not reach backend on startup")
 
 
 @bot.event
@@ -214,4 +229,5 @@ async def sync_command(ctx, spec: Optional[str] = None):
         return
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

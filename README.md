@@ -28,6 +28,14 @@ python main.py
 
 You can view logs for the bot in ```ObamaBot/logs/bot.log```
 
+### Running locally with uv (recommended)
+This project is also managed with [uv](https://docs.astral.sh/uv/). Dependencies live in `pyproject.toml`/`uv.lock`.
+```
+uv sync
+uv run python main.py
+```
+`uv add <package>` / `uv remove <package>` keep `pyproject.toml` and `uv.lock` up to date; `requirements.txt` is kept for Docker builds.
+
 ## Running with Docker
 I recommend setting up the logging file map in ```docker-compose.yml```. This will bind ```/logs``` in the container to the location you choose so you can access the container logs from your host machine.
 

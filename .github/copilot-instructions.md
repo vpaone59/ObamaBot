@@ -52,19 +52,24 @@ Examples:
 - Good: `logger.info("Connected to %s", destination)`
 - Bad: `logger.info(f"Connected to {destination}")`
 
-### Import Conventions (CRITICAL)
+### Import Conventions
 
-**After creating `cogs/__init__.py`**, use relative imports in cog files:
+Cog files use absolute imports rooted at the project directory (the project root is on `sys.path`, cogs are not a package):
 ```python
-from ..logging_config import create_new_logger  # From root level
+from utils.logging_config import create_new_logger
 ```
 
-Do NOT use `from .logging_config` (that tries to import from cogs directory).
-
-Root-level scripts like `main.py` and `db_helper.py` use absolute imports:
+Root-level scripts like `main.py` use the same absolute import style:
 ```python
-from logging_config import create_new_logger
+from utils.logging_config import create_new_logger
 ```
+
+Modules inside `utils/` (e.g. `db_helper.py`) use relative imports since `utils` is a package:
+```python
+from .logging_config import create_new_logger
+```
+
+
 
 ### Environment Variables & Configuration
 

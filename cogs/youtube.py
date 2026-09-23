@@ -4,9 +4,11 @@ YouTube API integrator Cog for ObamaBot https://github.com/vpaone59
 
 import os
 from datetime import datetime
-from discord.ext import commands
+
 import googleapiclient.discovery
-from logging_config import create_new_logger
+from discord.ext import commands
+
+from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 # Rate My Takeaway's YouTube channel ID

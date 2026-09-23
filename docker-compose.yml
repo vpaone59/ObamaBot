@@ -6,6 +6,6 @@ services:
       - .env
     volumes:
       # Mount the logs and database folders to the host machine
-      - ${HOST_LOG_PATH}:/app/logs
-      - ${HOST_DB_PATH}:/app/database
+      - ${HOST_LOG_PATH}:/logs
+      - ${HOST_DB_PATH}:/database
     restart: unless-stopped

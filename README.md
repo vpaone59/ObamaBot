@@ -28,16 +28,24 @@ python main.py
 
 You can view logs for the bot in ```ObamaBot/logs/bot.log```
 
+### Running locally with uv (recommended)
+This project is also managed with [uv](https://docs.astral.sh/uv/). Dependencies live in `pyproject.toml`/`uv.lock`.
+```
+uv sync
+uv run python main.py
+```
+`uv add <package>` / `uv remove <package>` keep `pyproject.toml` and `uv.lock` up to date; `requirements.txt` is kept for Docker builds.
+
 ## Running with Docker
-I recommend setting up the logging file map in ```docker-compose.yml```. This will bind ```/app/logs``` in the container to the location you choose so you can access the container logs from your host machine.
+I recommend setting up the logging file map in ```docker-compose.yml```. This will bind ```/logs``` in the container to the location you choose so you can access the container logs from your host machine.
 
 Optionally, you can map the SQLite database from the container to your host machine for easier access to the database.
 
 In ```docker-compose.yml```:
 ```
 volumes:
-    ~\Documents\logs\ObamaBot\bot.log:/app/logs/bot.log
-    ~\Documents\database\obamabot.db:/app/database/obamabot.db
+    ~\Documents\logs\ObamaBot\bot.log:/logs/bot.log
+    ~\Documents\database\obamabot.db:/database/obamabot.db
 ```
 
 Build and run the container with docker compose:

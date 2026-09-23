@@ -5,12 +5,14 @@ Setup tasks to run periodically in your server.
 """
 
 from datetime import datetime, timedelta
+
 from discord.ext import commands, tasks
+
 from cogs.youtube import (
     RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID,
     query_latest_youtube_video_from_channel_id,
 )
-from logging_config import create_new_logger
+from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 

@@ -1,0 +1,16 @@
+[project]
+name = "obamabot"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "asyncpraw==7.8.1",
+    "discord-py==2.6.4",
+    "fastapi==0.136.0",
+    "google-api-python-client==2.187.0",
+    "lyricsgenius==3.7.5",
+    "ollama==0.6.1",
+    "pytz==2025.2",
+    "requests==2.33.1",
+    "uvicorn==0.44.0",
+]

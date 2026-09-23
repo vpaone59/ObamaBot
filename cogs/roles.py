@@ -5,7 +5,8 @@ Roles Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 import discord
 from discord.ext import commands
 from discord.utils import get
-from logging_config import create_new_logger
+
+from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 

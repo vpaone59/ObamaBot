@@ -1,5 +1,7 @@
 # ObamaBot - AI Coding Agent Instructions
 
+> **Note:** This file references [claude.md](../claude.md) for shared guidelines on commit styling, logging, exception handling, and code quality. See that file for details.
+
 ## Project Overview
 
 ObamaBot is a Discord.py bot with a modular Cog-based architecture. It's a general-purpose entertainment bot with features ranging from games to API integrations (Google Maps, Genius lyrics, Reddit, Giphy, etc.).
@@ -37,20 +39,11 @@ async def setup(bot):
 
 ### Logging Pattern
 
-All modules use the centralized logger:
-```python
-from logging_config import create_new_logger
-logger = create_new_logger(__name__)
-```
-
-Logs output to `./logs/bot.log` in JSON format with EST timezone. No print statements—always use `logger.*()`.
-
-Important: Always use lazy formatting when calling logger methods. Pass interpolation values as separate arguments instead of using f-strings or `str.format()` inside the logger call. This preserves performance and defers string interpolation until the message will actually be emitted.
-
-Examples:
-
-- Good: `logger.info("Connected to %s", destination)`
-- Bad: `logger.info(f"Connected to {destination}")`
+See [claude.md](../claude.md#logging) for logging guidelines. Key points:
+- All modules use centralized logger: `from utils.logging_config import create_new_logger`
+- Logs output to `./logs/bot.log` in JSON format with EST timezone
+- Use **lazy formatting**: `logger.info("User %s logged in", user)` not `logger.info(f"User {user} logged in")`
+- Use `logger.exception()` in except blocks, never `logger.error(..., exc_info=True)`
 
 ### Import Conventions
 
@@ -148,16 +141,32 @@ async def setup(bot):
     await bot.add_cog(MyCog(bot))
 ```
 
-### Message Filtering
+### Message Filtering & Exception Handling
+
 In `on_message` listeners, always check:
 - `if message.author == bot.user or message.author.bot: return` (in main.py)
 - `if string.startswith(PREFIX): return` (to skip command prefixes in listeners)
 
+For exception handling, see [claude.md](../claude.md#exception-handling):
+- Never use bare `except Exception:`
+- Catch specific exception types (discord.DiscordException, httpx.RequestError, etc.)
+- Use `logger.exception()` not `logger.error(..., exc_info=True)`
+
 ### Async/Await Discipline
-All Discord interactions are async. Use `await` for:
-- `ctx.send()`, `ctx.reply()`
-- `bot.load_extension()`, `bot.add_cog()`
-- API calls (requests, aiohttp)
+
+See [claude.md](../claude.md#asyncawait) for async best practices. Key points:
+- All Discord interactions are async — use `await` for:
+  - Message sends: `await ctx.send()`, `await interaction.response.send_message()`
+  - Cog operations: `await bot.add_cog()`, `await bot.load_extension()`
+  - Blocking I/O: wrap in `asyncio.to_thread()` or `loop.run_in_executor()`
+- Never block the event loop with `time.sleep()` — use `await asyncio.sleep()`
+
+## Code Quality Standards
+
+See [claude.md](../claude.md#code-quality-standards) for detailed standards on:
+- **Type Hints**: Add to all public methods for IDE support
+- **Imports**: Absolute imports in cogs, relative imports in utils package
+- **Review Checklist**: Pre-commit quality verification
 
 ## File Organization Reference
 
@@ -177,5 +186,5 @@ Deprecated cogs are marked with `⚠️ DEPRECATED` in docstrings and moved to `
 
 ---
 
-**Last Updated:** February 2026
+**Last Updated:** September 2026
 **Python Version:** 3.11+

@@ -148,4 +148,3 @@ async def setup(bot):
 
     # Don't add the cog
     logger.warning("Camcap cog is deprecated and no longer loaded.")
-    return

@@ -119,13 +119,11 @@ class GifGenerator(commands.Cog):
 
                 await interaction.response.send_message(embed=embed)
 
-        except Exception as e:
-            logger.error(
-                "Error in GIF search - User: %s, Query: %s, Error: %s",
+        except Exception:
+            logger.exception(
+                "Error in GIF search - User: %s, Query: %s",
                 interaction.user,
                 query,
-                e,
-                exc_info=True,
             )
 
             # Provide user-friendly error messages

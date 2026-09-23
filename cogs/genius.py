@@ -145,10 +145,8 @@ class Genius(commands.Cog):
 
             await interaction.followup.send(embed=embed)
 
-        except Exception as e:
-            logger.error(
-                "Error getting lyrics for %s: %s", artist_name, e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error getting lyrics for %s", artist_name)
             await interaction.followup.send(
                 "An error occurred while searching for lyrics.\nPlease try again or contact an administrator if the issue persists."
             )

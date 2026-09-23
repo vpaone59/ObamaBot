@@ -2,7 +2,7 @@
 Predecessor Game API integrator Cog for ObamaBot https://github.com/vpaone59
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import requests
 from discord.ext import commands
@@ -60,7 +60,7 @@ MMR: {player_info["mmr"]}```"""
                 datetime.strptime(
                     player_match_history["start_time"], "%B %d, %Y %I:%M:%S %p"
                 )
-                .replace(tzinfo=timezone.utc)
+                .replace(tzinfo=UTC)
                 .astimezone(timezone(timedelta(hours=-5)))
             )
 
@@ -69,7 +69,7 @@ MMR: {player_info["mmr"]}```"""
                 datetime.strptime(
                     player_match_history["end_time"], "%B %d, %Y %I:%M:%S %p"
                 )
-                .replace(tzinfo=timezone.utc)
+                .replace(tzinfo=UTC)
                 .astimezone(timezone(timedelta(hours=-5)))
             )
 

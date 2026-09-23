@@ -41,10 +41,8 @@ class General(commands.Cog):
                 ctx.guild,
             )
             await ctx.send(f"Hello {ctx.author.mention}!")
-        except Exception as e:
-            logger.error(
-                "Error in hello command for user %s: %s", ctx.author, e, exc_info=True
-            )
+        except discord.DiscordException:
+            logger.exception("Error in hello command for user %s", ctx.author)
             await ctx.send("Sorry, I couldn't send a greeting right now.")
 
     @commands.command(name="hiall")
@@ -55,9 +53,11 @@ class General(commands.Cog):
         """
         try:
             await ctx.send(f"Hello {ctx.message.guild.default_role}!")
-        except Exception as e:
-            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
-            await ctx.channel.send(f"Error {__name__}: {e}")
+        except discord.DiscordException:
+            logger.exception(
+                "Failed to send greeting to all users for %s", ctx.message.author
+            )
+            await ctx.send("Sorry, I couldn't send that message.")
 
     @commands.command(name="ping", aliases=["p"])
     @commands.cooldown(1, 2, commands.BucketType.user)
@@ -68,9 +68,11 @@ class General(commands.Cog):
         try:
             bot_latency = round(self.bot.latency * 1000, 2)
             await ctx.send(f"pong {bot_latency}ms")
-        except Exception as e:
-            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
-            await ctx.channel.send(f"Error {__name__}: {e}")
+        except discord.DiscordException:
+            logger.exception(
+                "Failed to send ping response for user %s", ctx.message.author
+            )
+            await ctx.send("Sorry, I couldn't send that message.")
 
     @commands.command(aliases=["gm"])
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -90,10 +92,12 @@ class General(commands.Cog):
         Return the number of guilds(servers) this bot is currently in
         """
         try:
-            await ctx.channel.send("I'm in " + str(len(self.bot.guilds)) + " servers!")
-        except Exception as e:
-            logger.error("USER: %s ERROR: %s", ctx.message.author, e)
-            await ctx.channel.send(f"Error {__name__}: {e}")
+            await ctx.send(f"I'm in {len(self.bot.guilds)} servers!")
+        except discord.DiscordException:
+            logger.exception(
+                "Failed to send guild count for user %s", ctx.message.author
+            )
+            await ctx.send("Sorry, I couldn't send that message.")
 
 
 async def setup(bot):

@@ -9,7 +9,6 @@ import os
 import random
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
 import aiohttp
 import discord
@@ -37,7 +36,7 @@ class FishGame:
     game_type: str
     correct_answer: str
     correct_fish_name: str
-    options: List[str]
+    options: list[str]
     answered_users: set = field(default_factory=set)
     game_stats: dict = field(
         default_factory=lambda: {
@@ -102,7 +101,7 @@ class Fish(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         # expose module-level env values on the cog instance as well
         self.ollama_api_url = OLLAMA_API_URL
         self.ollama_model = OLLAMA_MODEL
@@ -135,7 +134,7 @@ class Fish(commands.Cog):
     @app_commands.describe(
         game_type="Choose a specific game, or leave blank for random."
     )
-    async def fishgame(self, ctx: commands.Context, game_type: Optional[str] = None):
+    async def fishgame(self, ctx: commands.Context, game_type: str | None = None):
         """Starts a fish-related guessing game. Can be image or name based."""
         if game_type:
             choice = game_type.lower()
@@ -187,8 +186,8 @@ class Fish(commands.Cog):
             view = FishGameView(self, game)
             await ctx.send(embed=embed, view=view)
 
-        except Exception as e:
-            logger.error("Error starting image fish game: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error starting image fish game")
             await ctx.send("Sorry, I couldn't start the fish game. Please try again.")
 
     async def _start_name_game(self, ctx: commands.Context):
@@ -221,8 +220,8 @@ class Fish(commands.Cog):
             view = FishGameView(self, game)
             await ctx.send(embed=embed, view=view)
 
-        except Exception as e:
-            logger.error("Error starting name fish game: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error starting name fish game")
             await ctx.send(
                 "Sorry, I couldn't start the fish name game. Please try again."
             )
@@ -335,7 +334,7 @@ class Fish(commands.Cog):
         name="fishstats", description="View your fish game statistics."
     )
     async def fish_stats_slash(
-        self, interaction: discord.Interaction, user: Optional[discord.User] = None
+        self, interaction: discord.Interaction, user: discord.User | None = None
     ):
         """Slash command to view fish game statistics."""
         target_user = user or interaction.user
@@ -345,7 +344,7 @@ class Fish(commands.Cog):
 
     @commands.command(name="fishstats", help="View your fish game statistics.")
     async def fish_stats_prefix(
-        self, ctx: commands.Context, user: Optional[discord.User] = None
+        self, ctx: commands.Context, user: discord.User | None = None
     ):
         """Prefix command to view fish game statistics."""
         target_user = user or ctx.author

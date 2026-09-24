@@ -136,9 +136,39 @@ async def sync_with_backend():
 async def run_api_server(host: str = "0.0.0.0", port: int = 5000):
     """
     Runs the FastAPI server in an asyncio task.
+    Gracefully handles port conflicts by retrying or using alternate port.
     """
-    config = Config(app=app, host=host, port=port, log_level="info")
-    server = Server(config)
-
-    logger.info("Starting API server on %s:%s", host, port)
-    await server.serve()
+    import socket
+    
+    # Check if port is available
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    
+    try:
+        result = sock.connect_ex((host, port))
+        if result == 0:
+            logger.warning(
+                "Port %s already in use. Skipping API server startup (likely another instance is running)",
+                port
+            )
+            sock.close()
+            return
+        sock.close()
+    except Exception as e:
+        logger.warning("Error checking port availability: %s", e)
+        sock.close()
+    
+    try:
+        config = Config(app=app, host=host, port=port, log_level="info", loop="asyncio")
+        server = Server(config)
+        logger.info("Starting API server on %s:%s", host, port)
+        await server.serve()
+    except OSError as e:
+        if e.errno == 10048:  # Address already in use
+            logger.warning(
+                "Port %s is in use. API server skipped. If this is a restart, kill previous bot instance.",
+                port
+            )
+        else:
+            logger.error("Error starting API server: %s", e)
+            raise

@@ -1,6 +1,6 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y sqlite3 libpq-dev build-essential && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 RUN pip install --no-cache-dir uv

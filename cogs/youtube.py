@@ -53,7 +53,7 @@ def query_latest_youtube_video_from_channel_id(
     )
 
     # Setup for the first request to get the most recent video from the channel
-    youtube_video_request = getattr(youtube_client, "search")().list(
+    youtube_video_request = youtube_client.search().list(
         part="snippet",
         channelId=youtube_channel_id,
         order="date",  # Order by date so we know it is the most recent

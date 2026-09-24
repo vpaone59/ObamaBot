@@ -2,46 +2,86 @@
 Obama AI Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 
 This cog allows users to interact with an AI that generates responses in the style of Barack Obama.
+Includes conversation memory and user customization support.
 """
 
 import asyncio
 import os
 import time
+from pathlib import Path
 
+import discord
 import ollama
 from discord import Interaction, app_commands
 from discord.ext import commands
 
+from utils.conversation_manager import ConversationManager
 from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
 
-# Fallback system prompt if none provided by prompt loader
+# Configuration
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+PAUL_DISCORD_ID = os.getenv("PAUL_DISCORD_ID")
+
+# Load system prompt from file or fallback
+SYSTEM_PROMPT_FILE = Path("./system_prompt.txt")
 FALLBACK_SYSTEM_PROMPT = (
     "You are Barack Obama, the 44th President of the United States."
 )
-OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+
+
+def load_system_prompt() -> str:
+    """Load system prompt from file or return fallback."""
+    if SYSTEM_PROMPT_FILE.exists():
+        try:
+            prompt = SYSTEM_PROMPT_FILE.read_text(encoding="utf-8")
+            logger.info("Loaded system prompt from %s", SYSTEM_PROMPT_FILE)
+            return prompt
+        except (OSError, UnicodeDecodeError):
+            logger.warning("Failed to load system prompt file")
+            return FALLBACK_SYSTEM_PROMPT
+    else:
+        logger.debug("System prompt file not found, using fallback")
+        return FALLBACK_SYSTEM_PROMPT
+
+
+def generate_special_user_rules() -> str:
+    """Generate special user rules (e.g., for Paul)."""
+    rules = []
+
+    if PAUL_DISCORD_ID:
+        try:
+            paul_id = int(PAUL_DISCORD_ID)
+            rules.append(
+                f"- If the message author's ID is {paul_id} (Paul), refer to him as **Daddy Paul** in your response."
+            )
+        except ValueError:
+            logger.warning("Invalid PAUL_DISCORD_ID format: %s", PAUL_DISCORD_ID)
+
+    return "\n".join(rules) if rules else "No special user rules configured."
 
 
 class AIChat(commands.Cog):
     """
     A cog that allows users to interact with an AI that generates responses in the style of Barack Obama.
     This cog uses the Ollama API to generate responses based on user prompts.
+    Includes conversation memory for context and user customization support.
     """
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.client = ollama.Client(host=OLLAMA_API_URL)
         self.api_available = False
-
-        # system prompt will be read dynamically from bot.prompt_manager when generating
-        self.system_prompt = None
+        self.system_prompt = load_system_prompt()
+        self.special_user_rules = generate_special_user_rules()
 
         logger.info(
-            "AIChat initialized | Ollama URL: %s | Model: %s",
+            "AIChat initialized | Ollama URL: %s | Model: %s | Special rules configured: %s",
             OLLAMA_API_URL,
             OLLAMA_MODEL,
+            "yes" if PAUL_DISCORD_ID else "no",
         )
 
     @commands.Cog.listener()
@@ -76,11 +116,10 @@ class AIChat(commands.Cog):
                     ", ".join(available_models),
                 )
                 self.api_available = False
-        except Exception as e:
+        except (ollama.RequestError, ollama.ResponseError):
             logger.error(
-                "Ollama API health check failed | URL: %s | Error: %s",
+                "Ollama API health check failed | URL: %s",
                 OLLAMA_API_URL,
-                e,
             )
             self.api_available = False
 
@@ -88,13 +127,44 @@ class AIChat(commands.Cog):
     async def ai_chat_slash_command(self, interaction: Interaction, query: str):
         """
         Generate a response to the user's input prompt when they run this command.
+        Includes conversation history for context.
         """
-        logger.info("Slash command 'askobama' invoked | Query: %s", query[:100])
+        logger.info(
+            "Slash command 'askobama' invoked by %s | Query: %s",
+            interaction.user,
+            query[:100],
+        )
         await interaction.response.defer()
 
         try:
+            # Get or create user record
+            user = ConversationManager.get_or_create_user(
+                interaction.user.id, interaction.user.name
+            )
+            logger.debug(
+                "User record | ID: %s | Name: %s",
+                user["discord_id"],
+                user["display_name"],
+            )
+
+            # Get conversation history
+            history = ConversationManager.get_conversation_history(interaction.user.id)
+            logger.info(
+                "Retrieved conversation history | User: %s | Messages: %d | IDs: %s",
+                interaction.user.name,
+                len(history),
+                [msg.get("content", "")[:30] for msg in history],
+            )
+
+            # Generate response with conversation context
             response_text = await asyncio.get_event_loop().run_in_executor(
-                None, self.generate_ai_response, query
+                None,
+                self.generate_ai_response,
+                query,
+                interaction.user.id,
+                interaction.user.name,
+                user,
+                history,
             )
 
             if not response_text or response_text.isspace():
@@ -107,28 +177,37 @@ class AIChat(commands.Cog):
                     "I'm unable to generate a response right now. Please try again."
                 )
 
-            await interaction.followup.send(response_text)
-            logger.info(
-                "Response sent successfully | Length: %d chars", len(response_text)
+            # Store the exchange in conversation history
+            ConversationManager.add_message_to_history(
+                interaction.user.id, "user", query
+            )
+            ConversationManager.add_message_to_history(
+                interaction.user.id, "assistant", response_text
             )
 
-        except Exception as e:
-            logger.error(
-                "Error in ai_chat_slash_command: %s | Query: %s",
-                e,
-                query[:100],
+            await interaction.followup.send(response_text)
+            logger.info(
+                "Response sent successfully | User: %s | Length: %d chars",
+                interaction.user,
+                len(response_text),
+            )
+
+        except discord.DiscordException:
+            logger.exception(
+                "Discord error in ai_chat_slash_command for user %s", interaction.user
             )
             await interaction.followup.send(
                 "An error occurred while processing your request."
             )
 
     @commands.command(aliases=["obama", "askobama"])
-    async def chat(self, ctx: commands.Context, *, query: str = None):
+    async def chat(self, ctx: commands.Context, *, query: str | None = None):
         """
-        Prefix activated AI chat command. Does the same thing as ai_chat_slash_command
+        Prefix activated AI chat command. Includes conversation history for context.
         """
         logger.info(
-            "Prefix command 'chat' invoked | Query: %s",
+            "Prefix command 'chat' invoked by %s | Query: %s",
+            ctx.author,
             query[:100] if query else "None",
         )
 
@@ -137,13 +216,38 @@ class AIChat(commands.Cog):
                 await ctx.send(
                     "Please provide a question after the command. Example: `!obama What do you think about climate change?`"
                 )
-                logger.warning("Chat command invoked without query")
+                logger.warning("Chat command invoked without query by %s", ctx.author)
                 return
+
+            # Get or create user record
+            user = ConversationManager.get_or_create_user(
+                ctx.author.id, ctx.author.name
+            )
+            logger.debug(
+                "User record | ID: %s | Name: %s",
+                user["discord_id"],
+                user["display_name"],
+            )
+
+            # Get conversation history
+            history = ConversationManager.get_conversation_history(ctx.author.id)
+            logger.info(
+                "Retrieved conversation history | User: %s | Messages: %d | IDs: %s",
+                ctx.author.name,
+                len(history),
+                [msg.get("content", "")[:30] for msg in history],
+            )
 
             # Defer typing to show the bot is working
             async with ctx.typing():
                 response_text = await asyncio.get_event_loop().run_in_executor(
-                    None, self.generate_ai_response, query
+                    None,
+                    self.generate_ai_response,
+                    query,
+                    ctx.author.id,
+                    ctx.author.name,
+                    user,
+                    history,
                 )
 
             if not response_text or response_text.isspace():
@@ -156,44 +260,74 @@ class AIChat(commands.Cog):
                     "I'm unable to generate a response right now. Please try again."
                 )
 
+            # Store the exchange in conversation history
+            ConversationManager.add_message_to_history(ctx.author.id, "user", query)
+            ConversationManager.add_message_to_history(
+                ctx.author.id, "assistant", response_text
+            )
+
             await ctx.send(response_text)
             logger.info(
-                "Response sent successfully | Length: %d chars", len(response_text)
+                "Response sent successfully | User: %s | Length: %d chars",
+                ctx.author,
+                len(response_text),
             )
 
-        except Exception as e:
-            logger.error(
-                "Error in chat command: %s | Query: %s",
-                e,
-                query[:100] if query else "None",
-            )
+        except discord.DiscordException:
+            logger.exception("Discord error in chat command for user %s", ctx.author)
             await ctx.send("An error occurred while processing your request.")
 
-    def generate_ai_response(self, prompt: str) -> str:
+    def generate_ai_response(
+        self,
+        prompt: str,
+        discord_id: int,
+        user_name: str,
+        user: dict,
+        conversation_history: list,
+    ) -> str:
         """
-        Generate a response from the Ollama API using the official Python library.
+        Generate a response from the Ollama API using conversation context and user data.
         This runs in a separate thread via run_in_executor.
 
-        Returns: Generated response text, or empty string on failure
+        Args:
+            prompt: User's current message
+            discord_id: User's Discord ID
+            user_name: User's Discord display name
+            user: User record from database
+            conversation_history: List of previous messages in conversation
+
+        Returns:
+            Generated response text, or empty string on failure
         """
         logger.info(
-            "Generating AI response | Model: %s | Prompt: %s",
+            "Generating AI response | User: %s | Discord ID: %s | Model: %s",
+            user_name,
+            discord_id,
             OLLAMA_MODEL,
-            prompt[:100],
         )
         response_text = ""
         start_time = time.time()
 
         try:
-            # Call Ollama API
-            # Prefer prompt from PromptManager if available
-            mgr = getattr(self.bot, "prompt_manager", None)
-            system_prompt = None
-            if mgr and mgr.prompt:
-                system_prompt = mgr.prompt
-            else:
-                system_prompt = FALLBACK_SYSTEM_PROMPT
+            # Build system prompt with special user rules and user name
+            system_prompt = self.system_prompt.replace(
+                "{SPECIAL_USER_RULES}", self.special_user_rules
+            ).replace("{USER_NAME}", user_name)
 
+            # Add conversation history (may be empty string if no history)
+            history_context = ConversationManager.format_history_for_context(
+                conversation_history, user_name
+            )
+            if history_context:
+                system_prompt = f"{system_prompt}\n{history_context}\n"
+
+            logger.info(
+                "Sending to Ollama | User: %s | History messages: %d",
+                user_name,
+                len(conversation_history),
+            )
+
+            # Call Ollama API with context
             response = self.client.generate(
                 model=OLLAMA_MODEL,
                 prompt=prompt,
@@ -206,30 +340,33 @@ class AIChat(commands.Cog):
 
             if response_text:
                 logger.info(
-                    "AI response generated | Length: %d chars | Time: %.2fs",
+                    "AI response generated | User: %s | Length: %d chars | Time: %.2fs",
+                    user_name,
                     len(response_text),
                     elapsed_time,
                 )
             else:
                 logger.warning(
-                    "Empty response from Ollama | Model: %s | Time: %.2fs",
+                    "Empty response from Ollama | User: %s | Model: %s | Time: %.2fs",
+                    user_name,
                     OLLAMA_MODEL,
                     elapsed_time,
                 )
 
         except ollama.ResponseError as e:
             logger.error(
-                "Ollama API response error | Status: %s | Error: %s",
+                "Ollama API response error | User: %s | Status: %s | Error: %s",
+                user_name,
                 getattr(e, "status_code", "unknown"),
                 e.error if hasattr(e, "error") else str(e),
             )
-        except ollama.RequestError as e:
-            logger.error("Ollama API request error | Error: %s", e)
-        except Exception as e:
+        except ollama.RequestError:
+            logger.error("Ollama API request error | User: %s", user_name)
+        except (OSError, TimeoutError, ValueError) as e:
             logger.error(
-                "Unexpected error in generate_ai_response | Type: %s | Error: %s",
+                "Error in generate_ai_response | User: %s | Type: %s",
+                user_name,
                 type(e).__name__,
-                e,
             )
 
         return response_text

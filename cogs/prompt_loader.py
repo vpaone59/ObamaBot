@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import discord
 import httpx
@@ -12,12 +11,12 @@ logger = create_new_logger(__name__)
 
 
 class PromptManager:
-    def __init__(self, api_url: Optional[str], timeout: int = 10):
+    def __init__(self, api_url: str | None, timeout: int = 10):
         self.api_url = api_url
         self.timeout = timeout
-        self.prompt: Optional[str] = None
-        self.updated_at: Optional[str] = None
-        self._client: Optional[httpx.AsyncClient] = None
+        self.prompt: str | None = None
+        self.updated_at: str | None = None
+        self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
         if not self._client:
@@ -52,8 +51,8 @@ class PromptManager:
             self.updated_at = data.get("updated_at")
             logger.info("Loaded bot prompt (updated: %s)", self.updated_at)
             return True
-        except Exception as e:
-            logger.warning("Failed to load bot prompt: %s", e)
+        except (httpx.RequestError, httpx.HTTPStatusError, ValueError):
+            logger.warning("Failed to load bot prompt")
             return False
 
     async def close(self):
@@ -80,7 +79,7 @@ class PromptLoader(commands.Cog):
 
     async def cog_load(self):
         """Initialize background task and attach manager to bot when cog loads."""
-        setattr(self.bot, "prompt_manager", self.manager)
+        self.bot.prompt_manager = self.manager
         try:
             self.refresh_prompt.start()
         except RuntimeError:
@@ -102,10 +101,8 @@ class PromptLoader(commands.Cog):
                         self.bot.tree.add_command(
                             show_cmd, guild=discord.Object(id=g.id)
                         )
-                    except Exception as e:
-                        logger.debug(
-                            "Failed to add show_prompt to guild %s: %s", g.id, e
-                        )
+                    except discord.app_commands.AppCommandError:
+                        logger.debug("Failed to add show_prompt to guild %s", g.id)
                 logger.debug(
                     "Registered show_prompt app command for %d guild(s)",
                     len(self.bot.guilds),
@@ -114,19 +111,19 @@ class PromptLoader(commands.Cog):
                 # fallback: add without guild (global) and rely on manual global sync
                 self.bot.tree.add_command(show_cmd)
                 logger.debug("Registered show_prompt app command globally (not synced)")
-        except Exception as e:
-            logger.warning("Failed to register app command show_prompt: %s", e)
+        except discord.app_commands.AppCommandError:
+            logger.warning("Failed to register app command show_prompt")
 
     async def cog_unload(self):
         """Cancel background task and close HTTP client when cog unloads."""
         try:
             self.refresh_prompt.cancel()
-        except Exception:
+        except RuntimeError:
             pass
 
         try:
             await self.manager.close()
-        except Exception:
+        except (RuntimeError, httpx.RequestError):
             logger.debug("Failed to close PromptManager client on unload")
 
     async def _show_prompt_app(self, interaction: discord.Interaction):
@@ -155,8 +152,8 @@ class PromptLoader(commands.Cog):
             try:
                 fetched = await mgr.fetch_prompt()
                 logger.info("fetch_prompt result: %s", fetched)
-            except Exception as e:
-                logger.warning("Error while fetching prompt on-demand: %s", e)
+            except (httpx.RequestError, httpx.HTTPStatusError, ValueError):
+                logger.warning("Error while fetching prompt on-demand")
 
         # truncate if too long
         prompt_text = mgr.prompt

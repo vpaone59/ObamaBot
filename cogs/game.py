@@ -2,7 +2,6 @@
 Game Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 """
 
-import asyncio
 import random
 
 import discord
@@ -128,8 +127,8 @@ class Game(commands.Cog):
             await ctx.send(
                 "🎲 **Number Duel**: Please mention a user to duel with!\nUsage: `!numberduel @user`"
             )
-        except Exception as e:
-            logger.error("Error in numberduel command: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error in numberduel command")
             await ctx.send("❌ An error occurred during the duel. Please try again.")
 
     @commands.command(aliases=["r"])
@@ -150,7 +149,7 @@ class Game(commands.Cog):
             reaction, user = await self.bot.wait_for(
                 "reaction_add", timeout=5.0, check=check
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await ctx.channel.send("ERROR: Timeout Exception")
         else:
             await ctx.channel.send("Obama approves")

@@ -117,8 +117,8 @@ class ConversationManager:
             conn.commit()
             cursor.close()
             return_database_connection(conn)
-            logger.debug(
-                "Message added to history | User: %s | Role: %s | Length: %d",
+            logger.info(
+                "✓ Message saved to DB | User: %s | Role: %s | Length: %d bytes",
                 discord_id,
                 role,
                 len(content),
@@ -167,10 +167,11 @@ class ConversationManager:
                 for row in reversed(rows)
             ]
 
-            logger.debug(
-                "Retrieved conversation history | User: %s | Messages: %d",
-                discord_id,
+            logger.info(
+                "✓ Retrieved %d messages from DB | User: %s | Cutoff: %s",
                 len(history),
+                discord_id,
+                cutoff_time,
             )
             return history
 
@@ -193,18 +194,15 @@ class ConversationManager:
         if not history:
             return ""
 
-        context_lines = ["## Recent Conversation Context", ""]
-
+        context_lines = []
         for msg in history:
-            role = "You" if msg["role"] == "assistant" else user_name
-            # Truncate long messages for context
+            role = "ObamaBot" if msg["role"] == "assistant" else user_name
             content = msg["content"]
-            if len(content) > 300:
-                content = content[:300] + "..."
+            if len(content) > 500:
+                content = content[:500] + "..."
 
-            context_lines.append(f"**{role}**: {content}")
+            context_lines.append(f"{role}: {content}")
 
-        context_lines.append("")
         return "\n".join(context_lines)
 
     @staticmethod

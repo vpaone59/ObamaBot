@@ -149,6 +149,12 @@ class AIChat(commands.Cog):
 
             # Get conversation history
             history = ConversationManager.get_conversation_history(interaction.user.id)
+            logger.info(
+                "Retrieved conversation history | User: %s | Messages: %d | IDs: %s",
+                interaction.user.name,
+                len(history),
+                [msg.get("content", "")[:30] for msg in history],
+            )
 
             # Generate response with conversation context
             response_text = await asyncio.get_event_loop().run_in_executor(
@@ -225,6 +231,12 @@ class AIChat(commands.Cog):
 
             # Get conversation history
             history = ConversationManager.get_conversation_history(ctx.author.id)
+            logger.info(
+                "Retrieved conversation history | User: %s | Messages: %d | IDs: %s",
+                ctx.author.name,
+                len(history),
+                [msg.get("content", "")[:30] for msg in history],
+            )
 
             # Defer typing to show the bot is working
             async with ctx.typing():
@@ -297,26 +309,21 @@ class AIChat(commands.Cog):
         start_time = time.time()
 
         try:
-            # Build system prompt with special user rules and conversation context
+            # Build system prompt with special user rules and user name
             system_prompt = self.system_prompt.replace(
                 "{SPECIAL_USER_RULES}", self.special_user_rules
+            ).replace("{USER_NAME}", user_name)
+
+            # Add conversation history (may be empty string if no history)
+            history_context = ConversationManager.format_history_for_context(
+                conversation_history, user_name
             )
+            if history_context:
+                system_prompt = f"{system_prompt}\n{history_context}\n"
 
-            # Add conversation context if available
-            if conversation_history:
-                history_context = ConversationManager.format_history_for_context(
-                    conversation_history, user_name
-                )
-                system_prompt = f"{system_prompt}\n\n{history_context}"
-
-            # Add current user info
-            system_prompt += (
-                f"\n\n## Current Request\n**User**: {user_name} (ID: {discord_id})"
-            )
-
-            logger.debug(
-                "System prompt size: %d chars | History messages: %d",
-                len(system_prompt),
+            logger.info(
+                "Sending to Ollama | User: %s | History messages: %d",
+                user_name,
                 len(conversation_history),
             )
 

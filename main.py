@@ -8,13 +8,19 @@ Install dependencies:
 
 import asyncio
 import os
+import sys
 from pathlib import Path
-from typing import Optional
 
 import discord
+import psycopg2
 from discord.ext import commands
 
 from api import ping_backend, run_api_server, set_bot_reference
+from utils.db_helper import (
+    close_all_connections,
+    initialize_connection_pool,
+    initialize_database,
+)
 from utils.logging_config import create_new_logger
 
 # Initialize main logger for the bot
@@ -25,10 +31,10 @@ PREFIX = os.getenv("PREFIX")
 # Check if the bot token and prefix are set as environment variables
 if not DISCORD_TOKEN:
     logger.error("DISCORD_TOKEN environment variable not set")
-    exit(1)
+    sys.exit(1)
 elif not PREFIX:
     logger.error("PREFIX environment variable not set")
-    exit(1)
+    sys.exit(1)
 else:
     # Configure Discord bot intents and initialize the bot
     intents = discord.Intents.default()
@@ -41,13 +47,23 @@ async def main():
     """
     The main function that starts the Discord bot and API server.
     """
+    # Initialize database connection pool and create tables if needed
+    try:
+        initialize_connection_pool()
+        initialize_database()
+        logger.info("Database initialization complete")
+    except (OSError, ValueError, psycopg2.Error) as e:
+        logger.error("Failed to initialize database: %s", e)
+        return
+
     # Load all Cog files
     try:
         await load_all_cogs()
-    except Exception as e:
+    except (discord.DiscordException, OSError) as e:
         logger.error(
             "There was an error loading Cog files, the bot has been stopped: %s", e
         )
+        close_all_connections()
         return
 
     # Set bot reference for API server
@@ -57,8 +73,12 @@ async def main():
     bot_task = asyncio.create_task(bot.start(BOT_TOKEN))
     api_task = asyncio.create_task(run_api_server(host="0.0.0.0", port=5000))
 
-    # Wait for both to run
-    await asyncio.gather(bot_task, api_task)
+    try:
+        # Wait for both to run
+        await asyncio.gather(bot_task, api_task)
+    finally:
+        # Close all database connections on shutdown
+        close_all_connections()
 
 
 @bot.event
@@ -99,7 +119,11 @@ async def load_all_cogs():
     for cog_file in Path("./cogs").rglob("*.py"):
         try:
             await bot.load_extension(f"cogs.{cog_file.stem}")
-        except Exception as e:
+        except commands.ExtensionNotFound:
+            logger.debug(
+                "%s - cog file not found (may be in deprecated/)", cog_file.stem
+            )
+        except commands.ExtensionError as e:
             logger.error("%s - %s not loaded", e, cog_file.stem)
 
     logger.info("Loaded *%s* cogs", len(bot.cogs))
@@ -129,7 +153,7 @@ async def manage_cog(action: str, cog_name: str) -> tuple[bool, str]:
     except commands.ExtensionNotFound as e:
         logger.error("%s - %s does not exist", e, cog_name)
         return False, f"{cog_name}.py does not exist\n{e}"
-    except Exception as e:
+    except commands.ExtensionFailed as e:
         logger.error("%s", e)
         return False, f"{cog_name}.py could not be {action}ed\n{e}"
 
@@ -176,7 +200,7 @@ async def cog(ctx, action: str, cog_name: str = ""):
 @bot.command(name="sync")
 @commands.guild_only()
 @commands.has_permissions(administrator=True)
-async def sync_command(ctx, spec: Optional[str] = None):
+async def sync_command(ctx, spec: str | None = None):
     """
     Syncs slash commands with Discord.
 

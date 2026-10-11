@@ -5,7 +5,11 @@ services:
     env_file:
       - .env
     volumes:
-      # Mount the logs and database folders to the host machine
+      # Mount the logs folder to the host machine
       - ${HOST_LOG_PATH}:/logs
-      - ${HOST_DB_PATH}:/database
+      # Mount the Minecraft server logs directory (read-only for monitoring)
+      # Host path: /mnt/cache/appdata/minecraft-server-vanilla/logs (on Unraid)
+      # Container path: /minecraft/logs
+      # Adjust the host path based on your Unraid Minecraft container mount
+      - /mnt/cache/appdata/minecraft-server-vanilla/logs:/minecraft/logs:ro
     restart: unless-stopped

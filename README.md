@@ -19,22 +19,20 @@ Required Environment variables (the bot will not run without these):
 
 All other environment variables are optional depending on which extension/Cog you want to use.
 
-## Running locally without Docker
-Install requirements and run the bot
-```
-pip install -r requirements.txt
-python main.py
-```
-
-You can view logs for the bot in ```ObamaBot/logs/bot.log```
-
-### Running locally with uv (recommended)
-This project is also managed with [uv](https://docs.astral.sh/uv/). Dependencies live in `pyproject.toml`/`uv.lock`.
+## Running locally
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management. Dependencies live in `pyproject.toml`/`uv.lock`.
 ```
 uv sync
 uv run python main.py
 ```
-`uv add <package>` / `uv remove <package>` keep `pyproject.toml` and `uv.lock` up to date; `requirements.txt` is kept for Docker builds.
+
+You can view logs for the bot in `ObamaBot/logs/bot.log`
+
+To add/remove packages:
+```
+uv add <package>
+uv remove <package>
+```
 
 ## Running with Docker
 I recommend setting up the logging file map in ```docker-compose.yml```. This will bind ```/logs``` in the container to the location you choose so you can access the container logs from your host machine.

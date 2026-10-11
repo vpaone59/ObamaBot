@@ -23,3 +23,20 @@ ON conversations(discord_id, created_at DESC);
 -- Index for cleanup queries (finding old conversations)
 CREATE INDEX IF NOT EXISTS idx_conversations_created_at 
 ON conversations(created_at);
+
+-- Minecraft Players table: Track player join/leave stats
+CREATE TABLE IF NOT EXISTS minecraft_players (
+    username TEXT PRIMARY KEY,
+    ip_address TEXT,
+    first_login TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    login_count INTEGER DEFAULT 1,
+    login_streak INTEGER DEFAULT 0,
+    last_logout TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for faster login streak queries
+CREATE INDEX IF NOT EXISTS idx_minecraft_players_login_streak 
+ON minecraft_players(login_streak DESC);

@@ -139,17 +139,17 @@ async def run_api_server(host: str = "0.0.0.0", port: int = 5000):
     Gracefully handles port conflicts by retrying or using alternate port.
     """
     import socket
-    
+
     # Check if port is available
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    
+
     try:
         result = sock.connect_ex((host, port))
         if result == 0:
             logger.warning(
                 "Port %s already in use. Skipping API server startup (likely another instance is running)",
-                port
+                port,
             )
             sock.close()
             return
@@ -157,7 +157,7 @@ async def run_api_server(host: str = "0.0.0.0", port: int = 5000):
     except Exception as e:
         logger.warning("Error checking port availability: %s", e)
         sock.close()
-    
+
     try:
         config = Config(app=app, host=host, port=port, log_level="info", loop="asyncio")
         server = Server(config)
@@ -167,7 +167,7 @@ async def run_api_server(host: str = "0.0.0.0", port: int = 5000):
         if e.errno == 10048:  # Address already in use
             logger.warning(
                 "Port %s is in use. API server skipped. If this is a restart, kill previous bot instance.",
-                port
+                port,
             )
         else:
             logger.error("Error starting API server: %s", e)

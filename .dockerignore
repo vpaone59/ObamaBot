@@ -1,2 +1,13 @@
 /logs
 *.log
+
+# secrets, local environments and tooling
+.env
+.git
+.github
+.claude
+.venv
+__pycache__
+**/__pycache__
+.pytest_cache
+.ruff_cache

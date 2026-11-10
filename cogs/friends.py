@@ -26,7 +26,7 @@ FRANK_CHANNEL_ID = os.getenv("FRANK_CHANNEL_ID")
 KLIPY_KEY = os.getenv("KLIPY_KEY")
 KLIPY_API_URL = "https://api.klipy.io/gifs/search"
 GIPHY_KEY = os.getenv("GIPHY_KEY")
-GIPHY_SEARCH_URL = "http://api.giphy.com/v1/gifs/search"
+GIPHY_SEARCH_URL = "https://api.giphy.com/v1/gifs/search"
 
 GIF_SEARCH_QUERY = "danny devito"
 FRANK_TRIGGER_PHRASES = {"frank", "!frank"}
@@ -263,7 +263,7 @@ class Friends(commands.Cog):
                 }
             )
             url = f"{KLIPY_API_URL}?{params}"
-            logger.debug("Klipy: Requesting %s", url)
+            logger.debug("Klipy: Searching for %s", GIF_SEARCH_QUERY)
 
             with request.urlopen(url, timeout=10) as response:
                 if response.status != 200:
@@ -305,7 +305,7 @@ class Friends(commands.Cog):
                 }
             )
             url = f"{GIPHY_SEARCH_URL}?{params}"
-            logger.debug("Giphy: Requesting %s", url)
+            logger.debug("Giphy: Searching for %s", GIF_SEARCH_QUERY)
 
             with request.urlopen(url, timeout=10) as response:
                 if response.status != 200:

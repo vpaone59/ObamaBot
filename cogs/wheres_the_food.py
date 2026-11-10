@@ -30,14 +30,20 @@ class WheresTheFood(commands.Cog):
         logger.info("%s ready", self.__cog_name__)
 
     @commands.command()
-    async def food_search(self, ctx, *keywords):
+    async def food_search(self, ctx: commands.Context, *keywords: str) -> None:
         """
         Food search command that hits the Google places API and returns
         the nearest restaurant result to the user who called the command.
         """
         kw = " ".join(keywords)
 
-        result = find_restaurant(kw, ctx)
+        try:
+            result = find_restaurant(kw, ctx)
+        except requests.RequestException as e:
+            # The exception text contains the request URL and API key, only log the type
+            logger.error("Google Places request failed: %s", type(e).__name__)
+            await ctx.send("Couldn't reach Google right now, try again later.")
+            return
 
         await ctx.send(f"```{result}```")
 
@@ -49,7 +55,7 @@ async def setup(bot):
     await bot.add_cog(WheresTheFood(bot))
 
 
-def find_restaurant(keyword, ctx):
+def find_restaurant(keyword: str, ctx: commands.Context) -> str:
     """
     Create a Google Maps API request targeting restaurants matching param keyword.
     By default, Google will use the IP the command was run from to look for a result.
@@ -65,11 +71,10 @@ def find_restaurant(keyword, ctx):
     )
 
     logger.info(
-        "Function: %s\n User: %s\n Search Keyword: %s\n URL: %s",
+        "Function: %s\n User: %s\n Search Keyword: %s",
         __name__,
         ctx.message.author.name,
         keyword,
-        search_url,
     )
     data = requests.get(search_url, timeout=15).json()
     restaurant = data["results"][0]
@@ -86,7 +91,7 @@ def find_restaurant(keyword, ctx):
     return message_response
 
 
-def moredetails(placeid):
+def moredetails(placeid: str) -> dict:
     """
     Using the place_id generated from googlefoods() we can make
     another API call to get information that textsearch can't get
@@ -99,7 +104,6 @@ def moredetails(placeid):
         + "&key="
         + GOOGLE_KEY
     )
-    print(search_url)
     data = requests.get(search_url, timeout=15).json()
 
     return data

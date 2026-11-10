@@ -126,7 +126,7 @@ class PromptLoader(commands.Cog):
         except (RuntimeError, httpx.RequestError):
             logger.debug("Failed to close PromptManager client on unload")
 
-    async def _show_prompt_app(self, interaction: discord.Interaction):
+    async def _show_prompt_app(self, interaction: discord.Interaction) -> None:
         """App command handler to display current prompt."""
         logger.info(
             "/show_prompt invoked by %s in guild %s",
@@ -154,6 +154,10 @@ class PromptLoader(commands.Cog):
                 logger.info("fetch_prompt result: %s", fetched)
             except (httpx.RequestError, httpx.HTTPStatusError, ValueError):
                 logger.warning("Error while fetching prompt on-demand")
+
+        if not mgr.prompt:
+            await interaction.response.send_message("No active bot prompt loaded.")
+            return
 
         # truncate if too long
         prompt_text = mgr.prompt

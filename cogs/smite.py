@@ -87,14 +87,15 @@ class SmiteShuffler(commands.Cog):
         await ctx.send(f"{random_god_name}")
 
     @app_commands.command(name="add_god", description="Add a God to the God list")
-    @commands.has_permissions(administrator=True)
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.has_permissions(administrator=True)
     async def add_god(
         self,
         interaction: discord.Interaction,
         god_name: str,
         god_pantheon: str,
         god_type: str,
-    ):
+    ) -> None:
         """
         Add a God to the God list
         """
@@ -109,8 +110,9 @@ class SmiteShuffler(commands.Cog):
     @app_commands.command(
         name="remove_god", description="Remove a God from the God list"
     )
-    @commands.has_permissions(administrator=True)
-    async def remove_god(self, interaction: discord.Interaction, god_name: str):
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.has_permissions(administrator=True)
+    async def remove_god(self, interaction: discord.Interaction, god_name: str) -> None:
         """
         Remove a God from the God list
         """

@@ -20,3 +20,4 @@
 *.db
 
 .vscode
+.claude/settings.local.json

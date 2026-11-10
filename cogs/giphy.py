@@ -18,7 +18,7 @@ from utils.logging_config import create_new_logger
 logger = create_new_logger(__name__)
 # Grab Giphy key & assign url to variable
 GIPHY_KEY = os.getenv("GIPHY_KEY")
-URL = "http://api.giphy.com/v1/gifs/search"
+URL = "https://api.giphy.com/v1/gifs/search"
 
 
 class GifGenerator(commands.Cog):

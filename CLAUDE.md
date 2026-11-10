@@ -2,7 +2,30 @@
 
 This file contains shared instructions referenced by copilot-instructions.md to avoid duplication. All AI agents should follow these guidelines.
 
+Architecture and workflows: @.github/copilot-instructions.md
+
+Project skills live in `.claude/skills/`.
+
+## Engineering Standards
+
+Hold this project to the same bar as a well run Django project, written in strong, idiomatic Python.
+
+- Take the clear solution. Avoid complex workarounds when a straightforward fix exists
+- Explicit is better than implicit. Prefer readable code over clever code
+- Keep commands thin. Business logic and database access belong in helpers in `utils/`
+- Don't repeat yourself. Reuse an existing helper before writing a new one
+- Secure by default: check permissions on every admin command, and never log or commit secrets
+- Configuration comes from environment variables. Document new ones in `.env-example`
+- Schema changes go in `database/init_create.sql` and must be safe to run on an existing database
+- Fix the cause of a bug, not the symptom
+
+## Authorship
+
+Never add `Co-Authored-By` trailers, "Generated with" lines, or any other AI attribution to commits, pull requests, or GitHub issues. All work should read as if the repo owner wrote it.
+
 ## Commit Message Style: Conventional Commits
+
+Keep commits simple. A one line subject is usually enough, only add a body when the reason for the change isn't obvious.
 
 All commits must follow [Conventional Commits](https://www.conventionalcommits.org/) format:
 
@@ -125,6 +148,9 @@ Before committing:
 - [ ] Run `uv run ruff check cogs/ --fix` — no remaining issues
 - [ ] Run `uv run ruff format cogs/` — code is formatted consistently
 - [ ] Commit message follows Conventional Commits format
+- [ ] No co-authors or AI attribution anywhere in the commit, PR, or issue
+- [ ] Admin commands have a permission check (`app_commands.checks` for slash commands)
+- [ ] No API keys or tokens in log messages
 - [ ] No bare `except Exception:` clauses
 - [ ] No `logger.error(..., exc_info=True)` — use `logger.exception()` instead
 - [ ] Type hints added to new/modified methods

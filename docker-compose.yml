@@ -5,7 +5,34 @@ services:
     env_file:
       - .env
     volumes:
-      # Mount the logs and database folders to the host machine
-      - ${HOST_LOG_PATH}:/logs
-      - ${HOST_DB_PATH}:/database
+      # Mount the logs and dynamic data folders to the host machine
+      - ${HOST_LOG_PATH:-./logs}:/logs
+      - ./dynamic:/dynamic
+    depends_on:
+      # Skipped when the local-db profile is off and DATABASE_HOST is external
+      db:
+        condition: service_healthy
+        required: false
     restart: unless-stopped
+
+  # Local PostgreSQL, turned on with COMPOSE_PROFILES="local-db" in .env
+  db:
+    image: postgres:17-alpine
+    container_name: postgres-obamabot
+    profiles:
+      - local-db
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-obamabot}
+      POSTGRES_USER: ${DATABASE_USER:-obamabot}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

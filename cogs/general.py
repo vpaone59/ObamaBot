@@ -47,7 +47,8 @@ class General(commands.Cog):
 
     @commands.command(name="hiall")
     @commands.cooldown(1, 2, commands.BucketType.user)
-    async def hello_everyone(self, ctx):
+    @commands.has_permissions(administrator=True)
+    async def hello_everyone(self, ctx: commands.Context) -> None:
         """
         Reply mention to all users
         """

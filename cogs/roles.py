@@ -53,7 +53,8 @@ class Roles(commands.Cog, name="Roles"):
 
     @commands.command(aliases=["cr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def createrole(self, ctx, role):
+    @commands.has_permissions(administrator=True)
+    async def createrole(self, ctx: commands.Context, role: str) -> None:
         """
         create a roll in the current guild
         param - role The name of the role you want to create
@@ -67,7 +68,8 @@ class Roles(commands.Cog, name="Roles"):
 
     @commands.command(aliases=["dr"])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def deleterole(self, ctx, role):
+    @commands.has_permissions(administrator=True)
+    async def deleterole(self, ctx: commands.Context, role: str) -> None:
         """
         create a roll in the current guild
         param - role The name of the role you want to delete

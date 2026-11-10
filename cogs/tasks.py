@@ -35,7 +35,10 @@ class Tasks(commands.Cog):
         logger.info("%s ready", self.__cog_name__)
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
-    async def start_task(self, ctx, task_name: str, channel_id: int = None):
+    @commands.has_permissions(administrator=True)
+    async def start_task(
+        self, ctx: commands.Context, task_name: str, channel_id: int = None
+    ) -> None:
         """
         Start a task in a specific channel or the channel the command was run in by default.
         """
@@ -81,7 +84,8 @@ class Tasks(commands.Cog):
         )
 
     @commands.command(aliases=["stop task", "end task", "stop", "end"])
-    async def stop_task(self, ctx, task_name: str):
+    @commands.has_permissions(administrator=True)
+    async def stop_task(self, ctx: commands.Context, task_name: str) -> None:
         """
         Stop a task with the given name.
         """

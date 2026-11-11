@@ -13,7 +13,7 @@ from .logging_config import create_new_logger
 logger = create_new_logger(__name__)
 
 # Configuration
-MAX_CONVERSATION_HISTORY = 15  # Keep last 15 messages per user
+MAX_CONVERSATION_HISTORY = 10  # Keep last 10 messages per user
 CONVERSATION_WINDOW_HOURS = 24  # Only include messages from last 24 hours
 
 
@@ -180,30 +180,27 @@ class ConversationManager:
             return []
 
     @staticmethod
-    def format_history_for_context(history: list, user_name: str) -> str:
+    def format_history_as_messages(history: list) -> list[dict]:
         """
-        Format conversation history into a context string for the AI.
+        Format conversation history as chat messages for the Ollama chat API.
+
+        Speaker names are not added to the content; the role identifies who spoke.
 
         Args:
             history: List of message dicts from get_conversation_history
-            user_name: Name of the current user
 
         Returns:
-            Formatted context string
+            List of dicts with keys: role, content
         """
-        if not history:
-            return ""
-
-        context_lines = []
+        messages = []
         for msg in history:
-            role = "ObamaBot" if msg["role"] == "assistant" else user_name
             content = msg["content"]
             if len(content) > 500:
                 content = content[:500] + "..."
 
-            context_lines.append(f"{role}: {content}")
+            messages.append({"role": msg["role"], "content": content})
 
-        return "\n".join(context_lines)
+        return messages
 
     @staticmethod
     def clear_old_conversations(hours: int = 72) -> int:

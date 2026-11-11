@@ -7,6 +7,7 @@ Includes conversation memory and user customization support.
 
 import asyncio
 import os
+import re
 import time
 from pathlib import Path
 
@@ -23,6 +24,8 @@ logger = create_new_logger(__name__)
 # Configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+OLLAMA_TEMPERATURE = 0.7
+OLLAMA_NUM_CTX = 2048
 PAUL_DISCORD_ID = os.getenv("PAUL_DISCORD_ID")
 
 # Load system prompt from file or fallback
@@ -45,6 +48,12 @@ def load_system_prompt() -> str:
     else:
         logger.debug("System prompt file not found, using fallback")
         return FALLBACK_SYSTEM_PROMPT
+
+
+def strip_speaker_prefix(text: str, user_name: str) -> str:
+    """Remove a leading "ObamaBot:" or "<user_name>:" the model may echo."""
+    pattern = rf"^\s*(ObamaBot|{re.escape(user_name)})\s*:\s*"
+    return re.sub(pattern, "", text.strip(), flags=re.IGNORECASE).strip()
 
 
 def generate_special_user_rules() -> str:
@@ -314,12 +323,13 @@ class AIChat(commands.Cog):
                 "{SPECIAL_USER_RULES}", self.special_user_rules
             ).replace("{USER_NAME}", user_name)
 
-            # Add conversation history (may be empty string if no history)
-            history_context = ConversationManager.format_history_for_context(
-                conversation_history, user_name
-            )
-            if history_context:
-                system_prompt = f"{system_prompt}\n{history_context}\n"
+            # Send history as role-tagged messages so the model replies in a
+            # conversation instead of continuing a "name: text" transcript
+            messages = [
+                {"role": "system", "content": system_prompt},
+                *ConversationManager.format_history_as_messages(conversation_history),
+                {"role": "user", "content": prompt},
+            ]
 
             logger.info(
                 "Sending to Ollama | User: %s | History messages: %d",
@@ -327,15 +337,16 @@ class AIChat(commands.Cog):
                 len(conversation_history),
             )
 
-            # Call Ollama API with context
-            response = self.client.generate(
+            response = self.client.chat(
                 model=OLLAMA_MODEL,
-                prompt=prompt,
-                system=system_prompt,
+                messages=messages,
                 stream=False,
+                options={"temperature": OLLAMA_TEMPERATURE, "num_ctx": OLLAMA_NUM_CTX},
             )
 
-            response_text = response.get("response", "").strip()
+            response_text = strip_speaker_prefix(
+                response.message.content or "", user_name
+            )
             elapsed_time = time.time() - start_time
 
             if response_text:

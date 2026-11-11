@@ -5,15 +5,12 @@ This Cog is custom made for specific servers and will not work in normal servers
 Includes guild-specific inside-joke features like the frank/Danny DeVito trigger.
 """
 
-import asyncio
-import json
 import os
-import random
-from urllib import parse, request
 
 import discord
 from discord.ext import commands
 
+from utils.gif_search import search_gif
 from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
@@ -21,12 +18,6 @@ logger = create_new_logger(__name__)
 # Guild-specific env vars
 WORK_GUILD_ID = os.getenv("WORK_GUILD_ID")
 FRANK_CHANNEL_ID = os.getenv("FRANK_CHANNEL_ID")
-
-# Gif API keys (Klipy primary, Giphy fallback)
-KLIPY_KEY = os.getenv("KLIPY_KEY")
-KLIPY_API_URL = "https://api.klipy.io/gifs/search"
-GIPHY_KEY = os.getenv("GIPHY_KEY")
-GIPHY_SEARCH_URL = "https://api.giphy.com/v1/gifs/search"
 
 GIF_SEARCH_QUERY = "danny devito"
 FRANK_TRIGGER_PHRASES = {"frank", "!frank"}
@@ -196,7 +187,7 @@ class Friends(commands.Cog):
             return
 
         logger.info("Frank trigger matched! Fetching GIF...")
-        gif_url = await self._get_devito_gif()
+        gif_url = await search_gif(GIF_SEARCH_QUERY)
         logger.info("GIF URL fetched: %s", gif_url)
 
         if gif_url:
@@ -213,122 +204,6 @@ class Friends(commands.Cog):
                 logger.info("Frank error message sent")
             except Exception as e:
                 logger.exception("Failed to send frank error message: %s", e)
-
-    async def _get_devito_gif(self) -> str | None:
-        """
-        Search for a Danny DeVito GIF, trying Klipy first, then Giphy as fallback.
-        """
-        logger.info(
-            "Starting GIF fetch | KLIPY_KEY set: %s | GIPHY_KEY set: %s",
-            bool(KLIPY_KEY),
-            bool(GIPHY_KEY),
-        )
-
-        # Try Klipy first if available
-        if KLIPY_KEY:
-            logger.info("Attempting Klipy API...")
-            url = await asyncio.get_event_loop().run_in_executor(
-                None, self._fetch_gif_from_klipy
-            )
-            logger.info("Klipy result: %s", url)
-            if url:
-                return url
-
-        # Fall back to Giphy
-        if GIPHY_KEY:
-            logger.info("Attempting Giphy API (fallback)...")
-            url = await asyncio.get_event_loop().run_in_executor(
-                None, self._fetch_gif_from_giphy
-            )
-            logger.info("Giphy result: %s", url)
-            if url:
-                return url
-
-        logger.error("No GIF APIs configured (KLIPY_KEY and GIPHY_KEY both missing)")
-        return None
-
-    @staticmethod
-    def _fetch_gif_from_klipy() -> str | None:
-        """
-        Search Klipy for a Danny DeVito GIF and return the URL, or None on failure.
-        Blocking call, run via run_in_executor.
-        """
-        try:
-            logger.debug("Klipy: Building request...")
-            params = parse.urlencode(
-                {
-                    "query": GIF_SEARCH_QUERY,
-                    "api_key": KLIPY_KEY,
-                    "limit": "25",
-                }
-            )
-            url = f"{KLIPY_API_URL}?{params}"
-            logger.debug("Klipy: Searching for %s", GIF_SEARCH_QUERY)
-
-            with request.urlopen(url, timeout=10) as response:
-                if response.status != 200:
-                    logger.error("Klipy API returned status code: %s", response.status)
-                    return None
-
-                data = json.loads(response.read())
-                logger.debug("Klipy: Response keys: %s", list(data.keys()))
-                results = data.get("gifs") or data.get("data")
-                if not results:
-                    logger.info(
-                        "No GIFs found on Klipy for query: %s", GIF_SEARCH_QUERY
-                    )
-                    return None
-
-                selection = random.choice(results)
-                url = selection.get("url") or selection.get("embed_url")
-                logger.info("Klipy: Found URL: %s", url)
-                return url
-
-        except Exception:
-            logger.exception("Error fetching GIF from Klipy")
-            return None
-
-    @staticmethod
-    def _fetch_gif_from_giphy() -> str | None:
-        """
-        Search Giphy for a Danny DeVito GIF and return the URL, or None on failure.
-        Blocking call, run via run_in_executor.
-        """
-        try:
-            logger.debug("Giphy: Building request...")
-            params = parse.urlencode(
-                {
-                    "q": GIF_SEARCH_QUERY,
-                    "api_key": GIPHY_KEY,
-                    "limit": "25",
-                    "rating": "pg-13",
-                }
-            )
-            url = f"{GIPHY_SEARCH_URL}?{params}"
-            logger.debug("Giphy: Searching for %s", GIF_SEARCH_QUERY)
-
-            with request.urlopen(url, timeout=10) as response:
-                if response.status != 200:
-                    logger.error("Giphy API returned status code: %s", response.status)
-                    return None
-
-                data = json.loads(response.read())
-                logger.debug("Giphy: Response keys: %s", list(data.keys()))
-                results = data.get("data")
-                if not results:
-                    logger.info(
-                        "No GIFs found on Giphy for query: %s", GIF_SEARCH_QUERY
-                    )
-                    return None
-
-                selection = random.choice(results)
-                url = selection.get("embed_url") or selection.get("url")
-                logger.info("Giphy: Found URL: %s", url)
-                return url
-
-        except Exception:
-            logger.exception("Error fetching GIF from Giphy")
-            return None
 
 
 async def setup(bot):

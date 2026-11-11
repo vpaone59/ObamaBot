@@ -92,10 +92,11 @@ Gold Earned: {player_match_history["gold_earned"]}```"""
             await ctx.channel.send(f"Player '{player_name}' not found.")
 
     @commands.command(aliases=["heroes"])
-    async def hero_stats(self, ctx, *player_name):
+    async def hero_stats(self, ctx: commands.Context, *player_name: str) -> None:
         """
         Displays hero statistics for a player.
         """
+        player_name = " ".join(player_name)
         player_id = await get_player_id(player_name)
 
         if player_id:

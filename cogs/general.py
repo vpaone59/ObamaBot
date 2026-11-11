@@ -77,13 +77,13 @@ class General(commands.Cog):
 
     @commands.command(aliases=["gm"])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def goodmorning(self, ctx):
+    async def goodmorning(self, ctx: commands.Context) -> None:
         """
         Reply with media
         """
         await ctx.send(
             "Goodmorning my fellow Americans!",
-            file=discord.File("gifs/obama/obama-smile.jpg"),
+            file=discord.File("media/obama-smile.jpg"),
         )
 
     @commands.command(name="current_guilds", aliases=["guilds", "servers"])

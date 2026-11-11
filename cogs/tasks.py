@@ -139,7 +139,7 @@ class Tasks(commands.Cog):
             )
 
     @tasks.loop(hours=1)
-    async def ratemytakeaway_task(self):
+    async def ratemytakeaway_task(self) -> None:
         """
         Task to fetch the latest video from Rate My Takeaway's channel
         """
@@ -160,6 +160,9 @@ class Tasks(commands.Cog):
             latest_video = query_latest_youtube_video_from_channel_id(
                 RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID
             )
+
+            if latest_video is None:
+                return
 
             # Check if the latest video is different from the previous one
             if latest_video["video_url"] != self.previous_video_url:

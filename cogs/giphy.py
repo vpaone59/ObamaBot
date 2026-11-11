@@ -8,6 +8,7 @@ import json
 import os
 import random
 from urllib import parse, request
+from urllib.error import URLError
 
 import discord
 from discord import app_commands
@@ -38,7 +39,9 @@ class GifGenerator(commands.Cog):
 
     @app_commands.command(name="gq", description="Search for GIFs using Giphy API")
     @app_commands.describe(query="The search query for the GIFs")
-    async def get_random_gif(self, interaction: discord.Interaction, query: str):
+    async def get_random_gif(
+        self, interaction: discord.Interaction, query: str
+    ) -> None:
         """
         Search for GIFs using the Giphy API and return a random GIF from the results.
 
@@ -79,14 +82,14 @@ class GifGenerator(commands.Cog):
             with request.urlopen("".join((URL, "?", params)), timeout=10) as response:
                 if response.status != 200:
                     logger.error("Giphy API returned status code: %s", response.status)
-                    raise Exception(f"Giphy API error (status {response.status})")
+                    raise ValueError(f"Giphy API error (status {response.status})")
 
                 data = json.loads(response.read())
 
                 # Validate API response
                 if "data" not in data:
                     logger.error("Invalid API response structure: %s", data)
-                    raise Exception("Invalid response from Giphy API")
+                    raise ValueError("Invalid response from Giphy API")
 
                 # Check if no GIFs were found
                 if not data["data"]:
@@ -99,12 +102,13 @@ class GifGenerator(commands.Cog):
                 # Choose a random GIF from the results
                 selection = random.choice(data["data"])
 
-                # Get the best available URL (prefer embed_url, fallback to url)
-                gif_url = selection.get("embed_url") or selection.get("url")
+                # The embed needs the image itself, embed_url and url are web pages
+                gif_url = selection.get("images", {}).get("original", {}).get("url")
+                page_url = selection.get("url") or gif_url
 
                 if not gif_url:
                     logger.error("No valid URL found in GIF data: %s", selection)
-                    raise Exception("No valid URL found for the selected GIF")
+                    raise ValueError("No valid URL found for the selected GIF")
 
                 title = selection.get("title", "GIF")[:100]  # Limit title length
 
@@ -112,14 +116,14 @@ class GifGenerator(commands.Cog):
 
                 embed = discord.Embed(
                     title=f"{query}",
-                    description=f"[{title}]({gif_url})",
+                    description=f"[{title}]({page_url})",
                     color=0xFF6F91,  # Giphy pink
                 )
                 embed.set_image(url=gif_url)
 
                 await interaction.response.send_message(embed=embed)
 
-        except Exception:
+        except (URLError, TimeoutError, ValueError) as e:
             logger.exception(
                 "Error in GIF search - User: %s, Query: %s",
                 interaction.user,
@@ -127,12 +131,8 @@ class GifGenerator(commands.Cog):
             )
 
             # Provide user-friendly error messages
-            if "timeout" in str(e).lower():
+            if "timed out" in str(e).lower():
                 error_msg = "The request timed out. Please try again."
-            elif "no gifs found" in str(e).lower():
-                error_msg = (
-                    f"No GIFs found for **{query}**. Try a different search term!"
-                )
             else:
                 error_msg = (
                     "Sorry, I couldn't fetch a GIF right now. Please try again later."

@@ -12,6 +12,7 @@ from utils.logging_config import create_new_logger
 logger = create_new_logger(__name__)
 
 GOOGLE_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+TEXT_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
 
 class WheresTheFood(commands.Cog):
@@ -36,6 +37,10 @@ class WheresTheFood(commands.Cog):
         the nearest restaurant result to the user who called the command.
         """
         kw = " ".join(keywords)
+
+        if not kw:
+            await ctx.send("Please tell me what food to search for.")
+            return
 
         try:
             result = find_restaurant(kw, ctx)
@@ -63,30 +68,38 @@ def find_restaurant(keyword: str, ctx: commands.Context) -> str:
     param: keyword - The search query.
     param: ctx - The context in which the message was sent.
     """
-    search_url = (
-        "https://maps.googleapis.com/maps/api/place/textsearch/json?query="
-        + keyword
-        + "&type=restaurant&key="
-        + GOOGLE_KEY
-    )
-
     logger.info(
         "Function: %s\n User: %s\n Search Keyword: %s",
         __name__,
         ctx.message.author.name,
         keyword,
     )
-    data = requests.get(search_url, timeout=15).json()
-    restaurant = data["results"][0]
+    data = requests.get(
+        TEXT_SEARCH_URL,
+        params={"query": keyword, "type": "restaurant", "key": GOOGLE_KEY},
+        timeout=15,
+    ).json()
 
-    # Get restaurant open status in a String
-    restaurant_status = ""
-    if {restaurant["opening_hours"]["open_now"]} == True:
-        restaurant_status = "open"
+    results = data.get("results")
+    if not results:
+        return f"No results found for {keyword}."
+
+    restaurant = results[0]
+
+    # Google leaves out opening_hours for places without listed hours
+    open_now = restaurant.get("opening_hours", {}).get("open_now")
+    if open_now is None:
+        restaurant_status = "has no listed hours"
     else:
-        restaurant_status = "closed"
+        restaurant_status = "is currently open" if open_now else "is currently closed"
 
-    message_response = f"We found a result near you for {restaurant['name']}. It's located at {restaurant['formatted_address']} and is currently {restaurant_status}.\n This location has an Average Rating (out of 5⭐️) of {restaurant['rating']}⭐️, with {restaurant['user_ratings_total']} total customer ratings."
+    # Google leaves out the ratings for places that don't have any yet
+    if "rating" in restaurant:
+        rating_info = f"This location has an Average Rating (out of 5⭐️) of {restaurant['rating']}⭐️, with {restaurant.get('user_ratings_total', 0)} total customer ratings."
+    else:
+        rating_info = "This location doesn't have any ratings yet."
+
+    message_response = f"We found a result near you for {restaurant['name']}. It's located at {restaurant['formatted_address']} and {restaurant_status}.\n {rating_info}"
 
     return message_response
 

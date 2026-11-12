@@ -4,17 +4,40 @@ Tasks Cog for ObamaBot by Vincent Paone https://github.com/vpaone59
 Setup tasks to run periodically in your server.
 """
 
-from datetime import datetime, timedelta
+import os
+import random
+from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
+import discord
 from discord.ext import commands, tasks
 
 from cogs.youtube import (
     RATEMYTAKEAWAY_YOUTUBE_CHANNEL_ID,
     query_latest_youtube_video_from_channel_id,
 )
+from utils.gif_search import search_gif
 from utils.logging_config import create_new_logger
 
 logger = create_new_logger(__name__)
+
+EASTERN = ZoneInfo("America/New_York")
+
+# Caturday posts every Saturday at 9 AM Eastern in this channel
+CATURDAY_CHANNEL_ID = os.getenv("CATURDAY_CHANNEL_ID")
+CATURDAY_POST_TIME = time(hour=9, tzinfo=EASTERN)
+SATURDAY = 5  # datetime.weekday() value for Saturday
+CATURDAY_GIF_QUERY = "caturday"
+CATURDAY_PROCLAMATIONS = [
+    "Happy Cat-urday my fellow Americans!",
+    "I am pleased to announce that today is Cat-urday!",
+    "My fellow Americans, by the power vested in me, I hereby declare today Cat-urday.",
+    "Let me be clear, today is Cat-urday.",
+    "Yes we can. And yes, it's Cat-urday.",
+    "The state of our union is strong, and today it is Cat-urday.",
+    "After careful deliberation with my cabinet, I can confirm today is Cat-urday.",
+    "Folks, the cats have spoken. Happy Cat-urday!",
+]
 
 
 class Tasks(commands.Cog):
@@ -33,6 +56,21 @@ class Tasks(commands.Cog):
         Runs when the cog is loaded
         """
         logger.info("%s ready", self.__cog_name__)
+
+    async def cog_load(self) -> None:
+        """
+        Start the tasks that run on their own when the cog is loaded
+        """
+        if CATURDAY_CHANNEL_ID:
+            self.caturday_task.start()
+        else:
+            logger.info("CATURDAY_CHANNEL_ID not set, caturday task not started")
+
+    async def cog_unload(self) -> None:
+        """
+        Stop the automatic tasks when the cog is unloaded
+        """
+        self.caturday_task.cancel()
 
     @commands.command(aliases=["start task", "run task", "start", "run"])
     @commands.has_permissions(administrator=True)
@@ -180,6 +218,58 @@ class Tasks(commands.Cog):
                     "Previous video url is the same as the latest video url - %s",
                     latest_video["video_url"],
                 )
+
+    @tasks.loop(time=CATURDAY_POST_TIME)
+    async def caturday_task(self) -> None:
+        """
+        Task to post a caturday GIF and proclamation every Saturday.
+        The loop runs every day at the post time and skips the days that aren't Saturday.
+        """
+        if datetime.now(EASTERN).weekday() != SATURDAY:
+            return
+
+        task_info = self.running_tasks.get("caturday_task")
+        if task_info is None:
+            logger.error(
+                "No channel associated with caturday_task, but task is running."
+            )
+            return
+
+        proclamation = random.choice(CATURDAY_PROCLAMATIONS)
+        gif_url = await search_gif(CATURDAY_GIF_QUERY)
+        message = f"{proclamation}\n{gif_url}" if gif_url else proclamation
+
+        try:
+            await task_info["channel"].send(message)
+            logger.info("Caturday posted in channel %s", task_info["channel"])
+        except discord.DiscordException:
+            logger.exception(
+                "Failed to post caturday in channel %s", task_info["channel"]
+            )
+
+    @caturday_task.before_loop
+    async def before_caturday_task(self) -> None:
+        """
+        Wait for the bot to connect, then find the caturday channel.
+        Skipped when the task was started with the start command, which sets the channel.
+        """
+        await self.bot.wait_until_ready()
+
+        if "caturday_task" in self.running_tasks:
+            return
+
+        channel = self.bot.get_channel(int(CATURDAY_CHANNEL_ID))
+        if channel is None:
+            logger.error(
+                "Could not find caturday channel with ID %s", CATURDAY_CHANNEL_ID
+            )
+            return
+
+        self.running_tasks["caturday_task"] = {
+            "task": self.caturday_task,
+            "channel": channel,
+        }
+        logger.info("Caturday task scheduled in channel %s", channel)
 
 
 async def setup(bot):

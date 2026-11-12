@@ -13,6 +13,7 @@ dependencies = [
     "psycopg2-binary==2.9.13",
     "pytz==2025.2",
     "requests==2.33.1",
+    "tzdata==2026.6",
     "uvicorn==0.44.0",
 ]
 

@@ -21,5 +21,16 @@ CREATE INDEX IF NOT EXISTS idx_conversations_discord_id_created_at
 ON conversations(discord_id, created_at DESC);
 
 -- Index for cleanup queries (finding old conversations)
-CREATE INDEX IF NOT EXISTS idx_conversations_created_at 
+CREATE INDEX IF NOT EXISTS idx_conversations_created_at
 ON conversations(created_at);
+
+-- Guild commands table: Commands and features turned on or off per server
+-- Anything without a row uses its default
+CREATE TABLE IF NOT EXISTS guild_commands (
+    guild_id BIGINT NOT NULL,
+    command_name TEXT NOT NULL,
+    enabled BOOLEAN NOT NULL,
+    updated_by BIGINT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (guild_id, command_name)
+);

@@ -6,10 +6,12 @@ Includes guild-specific inside-joke features like the frank/Danny DeVito trigger
 """
 
 import os
+import re
 
 import discord
 from discord.ext import commands
 
+from utils.command_settings import is_enabled
 from utils.gif_search import search_gif
 from utils.logging_config import create_new_logger
 
@@ -21,6 +23,14 @@ FRANK_CHANNEL_ID = os.getenv("FRANK_CHANNEL_ID")
 
 GIF_SEARCH_QUERY = "danny devito"
 FRANK_TRIGGER_PHRASES = {"frank", "!frank"}
+
+# British trigger warning, turned on per server with: !command enable british
+BRITISH_PATTERN = re.compile(
+    r"\b(?:british|brits?|britain|britannia|united kingdom|uk|u\.k|england"
+    r"|english(?:man|men|woman|women))\b",
+    re.IGNORECASE,
+)
+BRITISH_REACTIONS = ["⚠️", "🇬🇧"]
 
 
 class Friends(commands.Cog):
@@ -70,6 +80,8 @@ class Friends(commands.Cog):
 
         if self.friend_guilds_locked:
             return
+
+        await self._check_british_trigger(message)
 
         # Message reactions for a user
         if (
@@ -131,6 +143,24 @@ class Friends(commands.Cog):
         else:
             await ctx.send("Friend guilds unlocked.")
             logger.info("Friend guilds unlocked.")
+
+    async def _check_british_trigger(self, message: discord.Message) -> None:
+        """
+        React with a trigger warning when a message mentions anything British.
+        Only runs in servers where the british feature is turned on.
+        """
+        if message.guild is None or not is_enabled(message.guild.id, "british"):
+            return
+
+        if not BRITISH_PATTERN.search(message.content):
+            return
+
+        try:
+            for reaction in BRITISH_REACTIONS:
+                await message.add_reaction(reaction)
+            logger.info("British trigger warning for %s", message.author)
+        except discord.DiscordException:
+            logger.exception("Failed to add British trigger warning reactions")
 
     async def _check_frank_trigger(self, message: discord.Message):
         """

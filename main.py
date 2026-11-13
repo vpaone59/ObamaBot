@@ -13,9 +13,11 @@ from pathlib import Path
 
 import discord
 import psycopg2
+from discord import app_commands
 from discord.ext import commands
 
 from api import ping_backend, run_api_server, set_bot_reference
+from utils.command_settings import is_command_enabled, load_command_statuses
 from utils.db_helper import (
     close_all_connections,
     initialize_connection_pool,
@@ -28,6 +30,29 @@ logger = create_new_logger(__name__)
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 PREFIX = os.getenv("PREFIX")
 
+
+class ObamaBotTree(app_commands.CommandTree):
+    """
+    Slash command tree that blocks commands turned off in a server.
+    """
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """
+        Runs before every slash command
+        """
+        if interaction.guild is None or interaction.command is None:
+            return True
+
+        if is_command_enabled(interaction.guild.id, interaction.command):
+            return True
+
+        if interaction.type is discord.InteractionType.application_command:
+            await interaction.response.send_message(
+                "This command is turned off in this server.", ephemeral=True
+            )
+        return False
+
+
 # Check if the bot token and prefix are set as environment variables
 if not DISCORD_TOKEN:
     logger.error("DISCORD_TOKEN environment variable not set")
@@ -39,7 +64,12 @@ else:
     # Configure Discord bot intents and initialize the bot
     intents = discord.Intents.default()
     intents.message_content = True
-    bot = commands.Bot(command_prefix=PREFIX, intents=intents, case_insensitive=True)
+    bot = commands.Bot(
+        command_prefix=PREFIX,
+        intents=intents,
+        case_insensitive=True,
+        tree_cls=ObamaBotTree,
+    )
     BOT_TOKEN = DISCORD_TOKEN
 
 
@@ -51,6 +81,7 @@ async def main():
     try:
         initialize_connection_pool()
         initialize_database()
+        load_command_statuses()
         logger.info("Database initialization complete")
     except (OSError, ValueError, psycopg2.Error) as e:
         logger.error("Failed to initialize database: %s", e)
@@ -95,6 +126,15 @@ async def on_ready():
         logger.info("Initial backend sync successful")
     else:
         logger.warning("Could not reach backend on startup")
+
+
+@bot.check
+async def command_enabled_in_guild(ctx: commands.Context) -> bool:
+    """
+    Runs before every prefix command. Blocks commands turned off in a server.
+    Help also uses this check, so turned off commands are hidden from it.
+    """
+    return ctx.guild is None or is_command_enabled(ctx.guild.id, ctx.command)
 
 
 @bot.event
